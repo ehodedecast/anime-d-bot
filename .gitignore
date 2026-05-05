@@ -1,0 +1,4 @@
+node_modules
+.env
+animes.json
+notified.json
