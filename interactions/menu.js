@@ -39,7 +39,7 @@ function sendMenu(target) {
 
     new ButtonBuilder()
       .setCustomId('menu_clear')
-      .setLabel('Limpar')
+      .setLabel('Limpar lista')
       .setEmoji('🧹')
       .setStyle(ButtonStyle.Danger)
   );

@@ -6,6 +6,7 @@ const list = require('./list');
 const next = require('./next');
 const info = require('./info');
 const clear = require('./clear');
+const remove = require('./remove');
 const setChannel = require('./setchannel');
 const { loadConfig } = require('../utils/config');
 
@@ -37,7 +38,13 @@ if (
 	 if (message.content === '!setchannel') {
   return setChannel(message);
 }
-	 
+	 // 🔹 COMANDO REMOVE
+	 if (message.content.startsWith('!remove ')) {
+
+  const name = message.content.replace('!remove ', '');
+
+  return remove(message, name);
+}
   // 🔹 COMANDO CLEAR
  const clear = require('./clear');
 

@@ -12,8 +12,8 @@ async function checkAnime(client) {
 
   
   const animeData = loadAnimeData();
-const config = loadConfig();
-const sentEpisodes = loadSentEpisodes();
+  const config = loadConfig();
+  const sentEpisodes = loadSentEpisodes();
   for (const guildId in animeData) {
 
   const animeList = animeData[guildId];
@@ -39,8 +39,12 @@ const sentEpisodes = loadSentEpisodes();
             episode
             airingAt
           }
+		  externalLinks {
+    site
+    url
         }
-      }`;
+      }
+	  }`;
 
       const res = await axios.post('https://graphql.anilist.co', { query });
       const data = res.data?.data?.Media;
@@ -61,18 +65,92 @@ const sentEpisodes = loadSentEpisodes();
 
       const key =
   `${guildId}-${data.title.romaji}-${data.nextAiringEpisode.episode}`;
+  if (!sentEpisodes[key]) {
+  sentEpisodes[key] = {
+    initial: false,
+    "24h": false,
+    released: false
+  };
+}
+const airingAt = data.nextAiringEpisode.airingAt;
+const now = Math.floor(Date.now() / 1000);
 
-if (sentEpisodes[key]) continue;
+const diff = airingAt - now;
 
-sentEpisodes[key] = true;
+const hoursLeft = diff / 3600;
+console.log(hoursLeft);
 
-saveSentEpisodes(sentEpisodes);
 
-      await channel.send({
-        content: `📺 ${data.title.romaji} tem episódio novo chegando!`
-      }).catch(err => {
-        console.log(chalk.red(`💥 [DISCORD] ${err.message}`));
-      });
+
+if (
+  hoursLeft <= 24 &&
+  !sentEpisodes[key]["24h"]
+) {
+
+  sentEpisodes[key]["24h"] = true;
+
+  saveSentEpisodes(sentEpisodes);
+
+  await channel.send({
+    content:
+      `⏰ ${data.title.romaji} • Episódio ${data.nextAiringEpisode.episode} estreia em menos de 24 horas!`
+  });
+
+  continue;
+}
+if (
+  diff <= 0 &&
+  !sentEpisodes[key].released
+) {
+
+  sentEpisodes[key].released = true;
+
+  saveSentEpisodes(sentEpisodes);
+
+  const {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require('discord.js');
+
+const crunchyroll = data.externalLinks?.find(
+  link => link.site === 'Crunchyroll'
+);
+
+const embed = new EmbedBuilder()
+  .setColor(0xff6600)
+  .setTitle('🚨 Episódio Disponível!')
+  .setDescription(
+    `📺 **${data.title.romaji}**\n` +
+    `🎯 Episódio ${data.nextAiringEpisode.episode} já está disponível!`
+  )
+  .setImage(data.coverImage?.large)
+  .setFooter({
+    text: 'AnimeDBot • Boa sessão 🍿'
+  })
+  .setTimestamp();
+
+const row = new ActionRowBuilder()
+  .addComponents(
+    new ButtonBuilder()
+      .setLabel('🍿 Assistir')
+      .setStyle(ButtonStyle.Link)
+      .setURL(
+        crunchyroll?.url ||
+        `https://www.crunchyroll.com/search?q=${encodeURIComponent(data.title.romaji)}`
+      )
+  );
+
+await channel.send({
+  embeds: [embed],
+  components: [row]
+});
+
+  continue;
+}
+
+      
 
     } catch (err) {
       console.log(chalk.red(`💥 [ERROR] ${err.message}`));

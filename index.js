@@ -72,10 +72,10 @@ client.once('clientReady', async () => {
   const channel = await client.channels.fetch(CHANNEL_ID);
 
   channel.send('✅ Bot funcionando!');
-
   setInterval(() => {
   checkAnime(client);
  }, 30000);
+ 
 });
 
 // 🌍 BOT ENTROU EM SERVIDOR

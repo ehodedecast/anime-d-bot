@@ -74,7 +74,8 @@ saveAnimeData(animeData);
           `✅ **Adicionado com sucesso!**\n\n` +
           `🎯 Próximo episódio: **${ep}**\n` +
           `⏰ ${formatted}\n` +
-          `📊 Status: ${status}`,
+          `📊 Status: ${status}` +
+		  `\n\n🔔 Você receberá um lembrete próximo ao lançamento.`,
         image: data.coverImage?.large,
         color: 0x00ccff
       });
