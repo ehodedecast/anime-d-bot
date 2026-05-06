@@ -38,9 +38,12 @@ module.exports = async (interaction, animeList, waitingForAdd) => {
 // 🔹 BOTAO LIMPAR
 if (interaction.customId === 'menu_clear') {
   return clear(
-    { reply: (msg) => interaction.update(msg) },
-    animeList
-  );
+  {
+    reply: (msg) => interaction.reply(msg),
+    guild: interaction.guild
+  },
+  animeList
+);
 }
 
 // 🔹 BOTAO NEXT
