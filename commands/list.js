@@ -1,9 +1,11 @@
-module.exports = (message, animeList) => {
+function list(message, animeList) {
   if (animeList.length === 0) {
-    return message.reply('📭 Nenhum anime.');
+    return message.reply('📭 Nenhum anime na lista.');
   }
 
   return message.reply(
-    '📺 Lista:\n' + animeList.map(a => `• ${a}`).join('\n')
+    '📺 Animes:\n' + animeList.map(a => `• ${a}`).join('\n')
   );
-};
+}
+
+module.exports = list;

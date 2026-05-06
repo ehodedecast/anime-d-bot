@@ -1,30 +1,58 @@
+
 const fs = require('fs');
+const add = require('../commands/add');
+const list = require('../commands/list');
+const next = require('../commands/next');
+const info = require('../commands/info');
+const clear = require('../commands/clear');
+const sendMenu = require('./menu');
+const state = require('../state/state');
+
 
 module.exports = async (interaction, animeList, waitingForAdd) => {
-
+	console.log('BOTÃO CLICADO:', interaction.customId);
+	
+	// 🔹 BOTAO MENU
+	if (interaction.customId === 'menu_home') {
+  return sendMenu(interaction);
+}
+	
+ // 🔹 BOTAO ADD
   if (interaction.customId === 'menu_add') {
-    waitingForAdd[interaction.user.id] = true;
-    return interaction.reply('✏️ Digite o nome do anime:');
-  }
+  state.waitingForAdd[interaction.user.id] = true;
 
-  if (interaction.customId === 'menu_list') {
-    return interaction.reply(
-      animeList.length
-        ? '📺 ' + animeList.join('\n')
-        : '📭 Lista vazia'
-    );
-  }
-
-  if (interaction.customId === 'menu_clear') {
-    animeList.length = 0;
-    fs.writeFileSync('animes.json', '[]');
-    return interaction.reply('🧹 Lista limpa!');
-  }
-  if (interaction.customId === 'menu_next') {
-  return interaction.reply('🔍 Use: !next <nome do anime>');
+  return interaction.update('✏️ Digite o nome do anime:');
 }
 
+// 🔹 BOTAO LISTA
+  if (interaction.customId === 'menu_list') {
+  return list(
+    { reply: (msg) => interaction.update(msg) },
+    animeList
+  );
+}
+
+// 🔹 BOTAO LIMPAR
+if (interaction.customId === 'menu_clear') {
+  return clear(
+    { reply: (msg) => interaction.update(msg) },
+    animeList
+  );
+}
+
+// 🔹 BOTAO NEXT
+  if (interaction.customId === 'menu_next') {
+  state.waitingForNext = state.waitingForNext || {};
+  state.waitingForNext[interaction.user.id] = true;
+
+  return interaction.update('🔍 Digite o nome do anime:');
+}
+
+// 🔹 BOTAO INFO
 if (interaction.customId === 'menu_info') {
-  return interaction.reply('📚 Use: !info <nome do anime>');
+  state.waitingForInfo = state.waitingForInfo || {};
+  state.waitingForInfo[interaction.user.id] = true;
+
+  return interaction.update('📚 Digite o nome do anime:');
 }
 };
