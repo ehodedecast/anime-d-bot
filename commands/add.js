@@ -1,5 +1,8 @@
 const axios = require('axios');
-const fs = require('fs');
+const {
+  loadAnimeData,
+  saveAnimeData
+} = require('../utils/animeStorage');
 const createEmbed = require('../utils/embed');
 
 async function add(message, animeList, inputName) {
@@ -30,8 +33,17 @@ async function add(message, animeList, inputName) {
       return message.reply('⚠️ Já está na lista.');
     }
 
-    animeList.push(name);
-    fs.writeFileSync('animes.json', JSON.stringify(animeList, null, 2));
+    const animeData = loadAnimeData();
+
+if (!animeData[message.guild.id]) {
+  animeData[message.guild.id] = [];
+}
+
+animeData[message.guild.id].push(name);
+
+animeList.push(name);
+console.log(animeData);
+saveAnimeData(animeData);
 
     // 🧠 STATUS
     const statusMap = {

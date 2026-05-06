@@ -1,13 +1,15 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
+const fs = require('fs');
+const notifier = require('node-notifier');
+
 const handleCommands = require('./commands');
 const handleButtons = require('./interactions/buttons');
 const sendMenu = require('./interactions/menu');
 const checkAnime = require('./utils/checkAnime');
-
-const fs = require('fs');
-const notifier = require('node-notifier');
+const { getGuildAnimeList } = require('./utils/animeStorage');
+const { loadConfig } = require('./utils/config');
 
 const TOKEN = process.env.TOKEN;
 const CHANNEL_ID = process.env.CHANNEL_ID;
@@ -20,19 +22,12 @@ const client = new Client({
   ]
 });
 
-// 🔥 LISTA DE ANIMES
-let animeList = [];
+// 📺 LISTA (vazio no momento)
 
-try {
-  animeList = JSON.parse(fs.readFileSync('animes.json'));
-} catch {
-  fs.writeFileSync('animes.json', '[]');
-}
 
-// 🔥 ERROS (UNIFICADO)
+// 🚨 ERROS
 process.on('uncaughtException', async (err) => {
   console.error(err);
-  process.stdout.write('\x07'); // beep
 
   notifier.notify({
     title: 'Erro no Bot',
@@ -41,13 +36,15 @@ process.on('uncaughtException', async (err) => {
 
   try {
     const channel = await client.channels.fetch(CHANNEL_ID);
-    channel.send(`💥 ERRO CRÍTICO:\n\`\`\`${err.message}\`\`\``);
+
+    channel.send(
+      `💥 ERRO CRÍTICO:\n\`\`\`${err.message}\`\`\``
+    );
   } catch {}
 });
 
 process.on('unhandledRejection', async (err) => {
   console.error(err);
-  process.stdout.write('\x07'); // beep
 
   notifier.notify({
     title: 'Erro Async',
@@ -56,11 +53,14 @@ process.on('unhandledRejection', async (err) => {
 
   try {
     const channel = await client.channels.fetch(CHANNEL_ID);
-    channel.send(`⚠️ ERRO ASYNC:\n\`\`\`${err?.message || err}\`\`\``);
+
+    channel.send(
+      `⚠️ ERRO ASYNC:\n\`\`\`${err?.message || err}\`\`\``
+    );
   } catch {}
 });
 
-// 🔥 BOT ONLINE
+// 🤖 BOT ONLINE
 client.once('clientReady', async () => {
   console.log('Bot online!');
 
@@ -70,14 +70,18 @@ client.once('clientReady', async () => {
   });
 
   const channel = await client.channels.fetch(CHANNEL_ID);
+
   channel.send('✅ Bot funcionando!');
 
-  setInterval(() => checkAnime(client, animeList, CHANNEL_ID), 30000);
+  setInterval(() => {
+  checkAnime(client);
+ }, 30000);
 });
 
-// 🔥 BOT ENTRA NO SERVER
+// 🌍 BOT ENTROU EM SERVIDOR
 client.on('guildCreate', async (guild) => {
   try {
+
     const channel = guild.channels.cache.find(c =>
       c.isTextBased() &&
       c.permissionsFor(guild.members.me).has('SendMessages')
@@ -85,32 +89,62 @@ client.on('guildCreate', async (guild) => {
 
     if (!channel) return;
 
-    sendMenu({
-      reply: (msg) => channel.send(msg)
-    });
+    channel.send(
+      '⚠️ Configure um canal para o AnimeDBot usando `!setchannel`.'
+    );
 
   } catch (err) {
-    console.log('Erro ao enviar menu inicial:', err);
+    console.log('Erro guildCreate:', err);
   }
 });
 
-// 🔥 MENSAGENS
+// 💬 MENSAGENS
 client.on('messageCreate', async (message) => {
+
   if (message.author.bot) return;
 
+  const config = loadConfig();
+  const guildConfig = config[message.guild?.id];
+
+  // ⚠️ sem canal configurado
+  if (
+    !guildConfig &&
+    message.content !== '!setchannel'
+  ) {
+    return message.reply(
+      '⚠️ Este servidor ainda não configurou um canal.\n\nUse `!setchannel` no canal desejado.'
+    );
+  }
+
+  // 🚫 canal errado
+  if (
+    guildConfig &&
+    message.channel.id !== guildConfig.channelId &&
+    message.content !== '!setchannel'
+  ) {
+    return;
+  }
+
+  // 📋 MENU
   if (message.content === '!menu') {
     return sendMenu(message);
   }
 
-  handleCommands(message, animeList);
+  // 🎮 COMANDOS
+  const animeList = getGuildAnimeList(message.guild.id);
+console.log(animeList);
+handleCommands(message, animeList);
 });
 
-// 🔥 BOTÕES
+// 🔘 BOTÕES
 client.on('interactionCreate', async (interaction) => {
+
   if (!interaction.isButton()) return;
 
-  handleButtons(interaction, animeList);
+  const animeList = getGuildAnimeList(interaction.guild.id);
+
+handleButtons(interaction, animeList);
 });
 
-// 🔥 LOGIN
+// 🔑 LOGIN
 client.login(TOKEN);

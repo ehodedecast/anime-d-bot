@@ -1,10 +1,18 @@
-function list(message, animeList) {
-  if (animeList.length === 0) {
+const { loadAnimeData } = require('../utils/animeStorage');
+
+function list(message) {
+
+  const data = loadAnimeData();
+
+  const animeList = data[message.guild.id] || [];
+
+  if (!animeList.length) {
     return message.reply('📭 Nenhum anime na lista.');
   }
 
   return message.reply(
-    '📺 Animes:\n' + animeList.map(a => `• ${a}`).join('\n')
+    '📺 Sua lista:\n\n' +
+    animeList.map(a => `• ${a}`).join('\n')
   );
 }
 

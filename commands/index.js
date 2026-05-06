@@ -6,6 +6,9 @@ const list = require('./list');
 const next = require('./next');
 const info = require('./info');
 const clear = require('./clear');
+const setChannel = require('./setchannel');
+const { loadConfig } = require('../utils/config');
+
 
 
 
@@ -14,8 +17,27 @@ const clear = require('./clear');
 
 async function handleCommands(message, animeList) {
 	
+	const config = loadConfig();
+const guildConfig = config[message.guild?.id];
+
+if (!guildConfig && message.content !== '!setchannel') {
+  return message.reply(
+    '⚠️ Este servidor ainda não configurou um canal.\n\nUse `!setchannel` no canal desejado.'
+  );
+}
+if (
+  guildConfig &&
+  message.channel.id !== guildConfig.channelId &&
+  message.content !== '!setchannel'
+) {
+  return;
+}
 	
-	
+	 // 🔹 COMANDO SETCHANNEL
+	 if (message.content === '!setchannel') {
+  return setChannel(message);
+}
+	 
   // 🔹 COMANDO CLEAR
  const clear = require('./clear');
 

@@ -1,13 +1,32 @@
 const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk').default;
+const { loadAnimeData } = require('./animeStorage');
+const { loadConfig } = require('./config');
 
-async function checkAnime(client, animeList, CHANNEL_ID) {
+const { loadSentEpisodes , saveSentEpisodes } = require('./sentStorage');
+
+
+async function checkAnime(client) {
   console.log(chalk.cyan("🔄 [CHECK] Iniciando verificação..."));
 
-  const channel = await client.channels.fetch(CHANNEL_ID);
+  
+  const animeData = loadAnimeData();
+const config = loadConfig();
+const sentEpisodes = loadSentEpisodes();
+  for (const guildId in animeData) {
 
-  for (const animeName of animeList) {
+  const animeList = animeData[guildId];
+
+  const guildConfig = config[guildId];
+
+  if (!guildConfig) continue;
+
+  const channelId = guildConfig.channelId;
+  
+  const channel = await client.channels.fetch(channelId);
+
+  for (const animeName of animeList) { 
     console.log(chalk.green(`📺 [ANIME] ${animeName}`));
 
     try {
@@ -40,13 +59,14 @@ async function checkAnime(client, animeList, CHANNEL_ID) {
 
       console.log(chalk.magenta(`⏰ [EP] Próximo episódio detectado para ${data.title.romaji}`));
 
-      if (!global.sent) global.sent = {};
+      const key =
+  `${guildId}-${data.title.romaji}-${data.nextAiringEpisode.episode}`;
 
-      const key = `${data.title.romaji}-${data.nextAiringEpisode.episode}`;
+if (sentEpisodes[key]) continue;
 
-      if (global.sent[key]) continue;
+sentEpisodes[key] = true;
 
-      global.sent[key] = true;
+saveSentEpisodes(sentEpisodes);
 
       await channel.send({
         content: `📺 ${data.title.romaji} tem episódio novo chegando!`
@@ -57,6 +77,7 @@ async function checkAnime(client, animeList, CHANNEL_ID) {
     } catch (err) {
       console.log(chalk.red(`💥 [ERROR] ${err.message}`));
     }
+  }
   }
 }
 console.log(chalk.gray('⚙️ checkAnime carregado'));

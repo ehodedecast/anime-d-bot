@@ -16,7 +16,7 @@ module.exports = async (interaction, animeList, waitingForAdd) => {
 	if (interaction.customId === 'menu_home') {
   return sendMenu(interaction);
 }
-	
+
  // 🔹 BOTAO ADD
   if (interaction.customId === 'menu_add') {
   state.waitingForAdd[interaction.user.id] = true;
@@ -27,9 +27,12 @@ module.exports = async (interaction, animeList, waitingForAdd) => {
 // 🔹 BOTAO LISTA
   if (interaction.customId === 'menu_list') {
   return list(
-    { reply: (msg) => interaction.update(msg) },
-    animeList
-  );
+  {
+    reply: (msg) => interaction.reply(msg),
+    guild: interaction.guild
+  },
+  animeList
+);
 }
 
 // 🔹 BOTAO LIMPAR

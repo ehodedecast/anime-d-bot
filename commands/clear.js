@@ -1,11 +1,19 @@
-const fs = require('fs');
+const {
+  loadAnimeData,
+  saveAnimeData
+} = require('../utils/animeStorage');
 
-function clear(message, animeList) {
-  animeList.length = 0;
+function clear(message) {
 
-  fs.writeFileSync('animes.json', JSON.stringify(animeList, null, 2));
+  const data = loadAnimeData();
 
-  return message.reply('🧹 Lista limpa com sucesso!');
+  data[message.guild.id] = [];
+
+  saveAnimeData(data);
+
+  return message.reply(
+    '🧹 Lista limpa com sucesso!'
+  );
 }
 
 module.exports = clear;
