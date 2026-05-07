@@ -11,17 +11,37 @@ const setChannel = require('./setchannel');
 const { loadConfig } = require('../utils/config');
 
 
+
+
+
 async function handleCommands(message, animeList) {
+
+  const isCommand = message.content.startsWith('!');
+
+const hasActiveState =
+
+  state.waitingForAdd?.[message.author.id] ||
+  state.waitingForNext?.[message.author.id] ||
+  state.waitingForInfo?.[message.author.id] ||
+  state.waitingForRemove?.[message.author.id];
+
+if (!isCommand && !hasActiveState) {
+  return;
+} 
 	
 	const config = loadConfig();
 const guildConfig = config[message.guild?.id];
 
+
+
+  
 console.log(
   chalk.cyan(`[${message.guild.name}]`) +
   chalk.gray(` (${message.guild.id})`) +
   chalk.green(` ${message.author.username}`) +
   `: ${message.content}`
 );
+
 
 if (!guildConfig && message.content !== '!setchannel') {
   return message.reply(
