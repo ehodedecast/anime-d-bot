@@ -1,5 +1,0 @@
-confirmacao de limpeza da lista
-
-melhor visualizacao da pergunta do botoes
-
-uuid para melhorar a requisicao de animes

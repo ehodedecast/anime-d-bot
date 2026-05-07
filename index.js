@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const notifier = require('node-notifier');
-
+const chalk = require('chalk').default;
 const handleCommands = require('./commands');
 const handleButtons = require('./interactions/buttons');
 const sendMenu = require('./interactions/menu');
@@ -64,14 +64,7 @@ process.on('unhandledRejection', async (err) => {
 client.once('clientReady', async () => {
   console.log('Bot online!');
 
-  notifier.notify({
-    title: 'Bot iniciado',
-    message: 'AnimeBot está online'
-  });
-
-  const channel = await client.channels.fetch(CHANNEL_ID);
-
-  channel.send('✅ Bot funcionando!');
+  
   setInterval(() => {
   checkAnime(client);
  }, 30000);
@@ -127,6 +120,11 @@ client.on('messageCreate', async (message) => {
 
   // 📋 MENU
   if (message.content === '!menu') {
+    console.log(
+  chalk.cyan(`[${message.guild.name}]`) +
+  chalk.green(` ${message.author.username}`) +
+  ' abriu o menu'
+);
     return sendMenu(message);
   }
 

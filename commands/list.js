@@ -11,9 +11,9 @@ function list(message) {
   }
 
   return message.reply(
-    '📺 Sua lista:\n\n' +
-    animeList.map(a => `• ${a}`).join('\n')
-  );
+  `📋 Lista do servidor **${message.guild.name}**:\n\n` +
+  animeList.map(a => `• ${a}`).join('\n')
+);
 }
 
 module.exports = list;

@@ -1,6 +1,6 @@
 const state = require('../state/state');
 const fs = require('fs');
-
+const chalk = require('chalk').default;
 const add = require('./add');
 const list = require('./list');
 const next = require('./next');
@@ -11,15 +11,17 @@ const setChannel = require('./setchannel');
 const { loadConfig } = require('../utils/config');
 
 
-
-
-
-
-
 async function handleCommands(message, animeList) {
 	
 	const config = loadConfig();
 const guildConfig = config[message.guild?.id];
+
+console.log(
+  chalk.cyan(`[${message.guild.name}]`) +
+  chalk.gray(` (${message.guild.id})`) +
+  chalk.green(` ${message.author.username}`) +
+  `: ${message.content}`
+);
 
 if (!guildConfig && message.content !== '!setchannel') {
   return message.reply(
@@ -39,11 +41,12 @@ if (
   return setChannel(message);
 }
 	 // 🔹 COMANDO REMOVE
-	 if (message.content.startsWith('!remove ')) {
+	 if (state.waitingForRemove?.[message.author.id]) {
 
-  const name = message.content.replace('!remove ', '');
+  const input = message.content;
+  delete state.waitingForRemove[message.author.id];
 
-  return remove(message, name);
+  return remove(message, input);
 }
   // 🔹 COMANDO CLEAR
  const clear = require('./clear');
