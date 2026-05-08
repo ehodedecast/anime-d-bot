@@ -1,15 +1,35 @@
 const fs = require('fs');
 
-function loadConfig() {
-  try {
-    return JSON.parse(fs.readFileSync('./data/config.json'));
-  } catch {
-    return {};
+const PATH = './data/config.json';
+
+function ensureFile() {
+
+  if (!fs.existsSync('./data')) {
+    fs.mkdirSync('./data');
+  }
+
+  if (!fs.existsSync(PATH)) {
+    fs.writeFileSync(PATH, '{}');
   }
 }
 
-function saveConfig(config) {
-  fs.writeFileSync('./data/config.json', JSON.stringify(config, null, 2));
+function loadConfig() {
+
+  ensureFile();
+
+  return JSON.parse(
+    fs.readFileSync(PATH, 'utf8')
+  );
+}
+
+function saveConfig(data) {
+
+  ensureFile();
+
+  fs.writeFileSync(
+    PATH,
+    JSON.stringify(data, null, 2)
+  );
 }
 
 module.exports = {

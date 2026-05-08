@@ -4,3 +4,4 @@ melhor visualizacao da pergunta do botoes(feito)
 
 uuid para melhorar a requisicao de animes(feito)
 
+versao em ingles

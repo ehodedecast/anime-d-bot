@@ -1,31 +1,38 @@
 const fs = require('fs');
 
-function loadAnimeData() {
-  try {
-    return JSON.parse(fs.readFileSync('./data/animes.json'));
-  } catch {
-    return {};
+const PATH = './data/animes.json';
+
+function ensureFile() {
+
+  if (!fs.existsSync('./data')) {
+    fs.mkdirSync('./data');
   }
+
+  if (!fs.existsSync(PATH)) {
+    fs.writeFileSync(PATH, '{}');
+  }
+}
+
+function loadAnimeData() {
+
+  ensureFile();
+
+  return JSON.parse(
+    fs.readFileSync(PATH, 'utf8')
+  );
 }
 
 function saveAnimeData(data) {
-  fs.writeFileSync('./data/animes.json', JSON.stringify(data, null, 2));
-}
 
-function getGuildAnimeList(guildId) {
+  ensureFile();
 
-  const data = loadAnimeData();
-
-  if (!data[guildId]) {
-    data[guildId] = [];
-    saveAnimeData(data);
-  }
-
-  return data[guildId];
+  fs.writeFileSync(
+    PATH,
+    JSON.stringify(data, null, 2)
+  );
 }
 
 module.exports = {
   loadAnimeData,
-  saveAnimeData,
-  getGuildAnimeList
+  saveAnimeData
 };
