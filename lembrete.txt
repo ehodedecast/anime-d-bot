@@ -2,4 +2,5 @@ confirmacao de limpeza da lista(feito)
 
 melhor visualizacao da pergunta do botoes(feito)
 
-uuid para melhorar a requisicao de animes
+uuid para melhorar a requisicao de animes(feito)
+

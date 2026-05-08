@@ -4,7 +4,7 @@ function loadSentEpisodes() {
 
   try {
     return JSON.parse(
-      fs.readFileSync('sentEpisodes.json')
+      fs.readFileSync('./data/sentEpisodes.json')
     );
   } catch {
     return {};
@@ -14,7 +14,7 @@ function loadSentEpisodes() {
 function saveSentEpisodes(data) {
 
   fs.writeFileSync(
-    'sentEpisodes.json',
+    './data/sentEpisodes.json',
     JSON.stringify(data, null, 2)
   );
 }

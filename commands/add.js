@@ -11,6 +11,7 @@ async function add(message, animeList, inputName) {
     query {
       Media(search: "${inputName}", type: ANIME) {
       id
+      isAdult
         title { romaji }
         coverImage { large }
         status
@@ -23,6 +24,12 @@ async function add(message, animeList, inputName) {
 
     const res = await axios.post('https://graphql.anilist.co', { query });
     const data = res.data.data.Media;
+    if (data.isAdult) {
+
+  return message.reply(
+    '🔞 AnimeDBot não permite animes +18.'
+  );
+}
 
     if (!data) {
       return message.reply('❌ Anime não encontrado.');
