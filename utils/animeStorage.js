@@ -31,8 +31,19 @@ function saveAnimeData(data) {
     JSON.stringify(data, null, 2)
   );
 }
+function getGuildAnimeList(guildId) {
 
+  const data = loadAnimeData();
+
+  if (!data[guildId]) {
+    data[guildId] = [];
+    saveAnimeData(data);
+  }
+
+  return data[guildId];
+}
 module.exports = {
   loadAnimeData,
-  saveAnimeData
+  saveAnimeData,
+  getGuildAnimeList
 };
