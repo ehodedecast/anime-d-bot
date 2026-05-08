@@ -10,6 +10,7 @@ async function add(message, animeList, inputName) {
     const query = `
     query {
       Media(search: "${inputName}", type: ANIME) {
+      id
         title { romaji }
         coverImage { large }
         status
@@ -29,9 +30,13 @@ async function add(message, animeList, inputName) {
 
     const name = data.title.romaji;
 
-    if (animeList.includes(name)) {
-      return message.reply('⚠️ Já está na lista.');
-    }
+    const alreadyExists = animeList.find(
+  anime => anime.id === data.id
+);
+
+if (alreadyExists) {
+  return message.reply('⚠️ Anime já está na lista.');
+}
 
     const animeData = loadAnimeData();
 
@@ -41,8 +46,15 @@ if (!animeData[message.guild.id]) {
 
 animeData[message.guild.id].push(name);
 
-animeList.push(name);
+animeList.push({
+  id: data.id,
+  title: data.title.romaji
+});
+
+animeData[message.guild.id] = animeList;
+
 console.log(animeData);
+
 saveAnimeData(animeData);
 
     // 🧠 STATUS

@@ -1,4 +1,7 @@
-node_modules
 .env
-animes.json
+node_modules
 notified.json
+animes.json
+config.json
+sentEpisodes.json
+analytics.json

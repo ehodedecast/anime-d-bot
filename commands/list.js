@@ -12,7 +12,7 @@ function list(message) {
 
   return message.reply(
   `📋 Lista do servidor **${message.guild.name}**:\n\n` +
-  animeList.map(a => `• ${a}`).join('\n')
+  animeList.map(a => `• ${a.title}`).join('\n')
 );
 }
 

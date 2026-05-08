@@ -12,7 +12,6 @@ const { getGuildAnimeList } = require('./utils/animeStorage');
 const { loadConfig } = require('./utils/config');
 
 const TOKEN = process.env.TOKEN;
-const CHANNEL_ID = process.env.CHANNEL_ID;
 
 const client = new Client({
   intents: [
@@ -34,13 +33,6 @@ process.on('uncaughtException', async (err) => {
     message: err.message
   });
 
-  try {
-    const channel = await client.channels.fetch(CHANNEL_ID);
-
-    channel.send(
-      `💥 ERRO CRÍTICO:\n\`\`\`${err.message}\`\`\``
-    );
-  } catch {}
 });
 
 process.on('unhandledRejection', async (err) => {
@@ -51,13 +43,6 @@ process.on('unhandledRejection', async (err) => {
     message: err?.message || 'Erro desconhecido'
   });
 
-  try {
-    const channel = await client.channels.fetch(CHANNEL_ID);
-
-    channel.send(
-      `⚠️ ERRO ASYNC:\n\`\`\`${err?.message || err}\`\`\``
-    );
-  } catch {}
 });
 
 // 🤖 BOT ONLINE

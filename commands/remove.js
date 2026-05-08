@@ -10,8 +10,8 @@ function remove(message, animeName) {
   const animeList = data[message.guild.id] || [];
 
   const index = animeList.findIndex(
-    a => a.toLowerCase() === animeName.toLowerCase()
-  );
+  a => a.title.toLowerCase() === animeName.toLowerCase()
+);
 
   if (index === -1) {
     return message.reply(
@@ -28,7 +28,7 @@ function remove(message, animeName) {
   saveAnimeData(data);
 
   return message.reply(
-    `🗑️ ${removed} removido da lista!`
+    `🗑️ ${removed.title} removido da lista!`
   );
 }
 
