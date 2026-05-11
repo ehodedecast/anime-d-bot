@@ -206,7 +206,7 @@ async function checkAnime(client) {
       console.log(query);
 
       const res = await axios.post(
-        'https://graphql.anilist.co',
+        'https://graphql.anilist.co/graphql',
         { query }
       );
 

@@ -7,6 +7,7 @@ const next = require('../commands/next');
 const info = require('../commands/info');
 const clear = require('../commands/clear');
 const sendMenu = require('./menu');
+const { t } = require('../utils/language');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const state = require('../state/state');
 
@@ -18,6 +19,7 @@ function clearUserStates(userId) {
   delete state.waitingForRemove?.[userId];
 }
 module.exports = async (interaction, animeList, waitingForAdd) => {
+  const guildId = interaction.guild.id;
   console.log(
   chalk.cyan(`[${interaction.guild.name}]`) +
   chalk.gray(` (${interaction.guild.id})`) +
@@ -34,7 +36,8 @@ module.exports = async (interaction, animeList, waitingForAdd) => {
   state.waitingForAdd[interaction.user.id] = true;
 
   return interaction.reply({
-  content: '✏️ Digite o nome do anime:',
+  content:
+  t(guildId, 'prompt_type_anime_name'),
   flags: 64
 });
 }
@@ -45,7 +48,7 @@ if (interaction.customId === 'menu_remove') {
   state.waitingForRemove[interaction.user.id] = true;
 
   return interaction.reply({
-  content: '✏️ Digite o nome do anime:',
+  content: t(guildId, 'prompt_type_anime_name'),
   flags: 64
 });
 }
@@ -56,7 +59,7 @@ if (interaction.customId === 'menu_remove') {
   state.waitingForNext[interaction.user.id] = true;
 
   return interaction.reply({
-  content: '✏️ Digite o nome do anime:',
+  content: t(guildId, 'prompt_type_anime_name'),
   flags: 64
 });
 }
@@ -78,7 +81,7 @@ if (interaction.customId === 'menu_info') {
   state.waitingForInfo[interaction.user.id] = true;
 
   return interaction.reply({
-  content: '📚 Digite o nome do anime:',
+  content: t(guildId, 'prompt_type_anime_name'),
   flags: 64
 });
 }
@@ -89,13 +92,13 @@ if (interaction.customId === 'menu_clear') {
 
     new ButtonBuilder()
       .setCustomId('confirm_clear')
-      .setLabel('Confirmar limpeza')
+      .setLabel(t(guildId, 'clear_confirm_button'))
       .setEmoji('✅')
       .setStyle(ButtonStyle.Danger),
 
     new ButtonBuilder()
       .setCustomId('cancel_clear')
-      .setLabel('Cancelar')
+      .setLabel(t(guildId, 'clear_cancel_button'))
       .setEmoji('❌')
       .setStyle(ButtonStyle.Secondary)
 
@@ -103,13 +106,12 @@ if (interaction.customId === 'menu_clear') {
 
   return interaction.reply({
     content:
-      '⚠️ Você está prestes a limpar a lista deste servidor.\n\n' +
-      'AnimeDBot deixará de informar novos episódios dos animes removidos da lista.',
+  t(guildId, 'clear_warning'),
     components: [row],
     flags: 64
   });
 }
-if (interaction.customId === 'confirm_clear') {
+if (interaction.customId === 'clear_confirm_button') {
 
   return clear(
     {
@@ -122,10 +124,10 @@ if (interaction.customId === 'confirm_clear') {
     animeList
   );
 }
-if (interaction.customId === 'cancel_clear') {
+if (interaction.customId === 'clear_cancel_button') {
 
   return interaction.update({
-    content: '❌ Limpeza cancelada.',
+    content: t(guildId, 'clear_cancelled'),
     components: []
   });
 }

@@ -1,0 +1,67 @@
+
+ {
+  "// MENU": "",
+
+  "menu_title": "🤖 ANIMEDBOT",
+  "menu_description": "Adicione animes e receba avisos de novos episódios automaticamente.\n\n**📺 Animes**\n➕ Adicionar anime\n📋 Ver lista\n🧹 Limpar lista\n\n**⏰ Episódios**\n🎯 Próximo episódio\n\n**📚 Informações**\nℹ️ Detalhes do anime",
+
+  "// BUTTONS": "",
+
+  "button_add_anime": "Adicionar anime",
+  "button_next_episode": "Próximo episódio",
+  "button_anime_info": "Informações do anime",
+  "button_anime_list": "Lista de animes",
+  "button_remove_anime": "Remover anime",
+  "button_clear_list": "Limpar lista",
+
+  "// PROMPTS": "",
+
+  "prompt_type_anime_name": "✏️ Digite o nome do anime:",
+
+  "// NEXT": "",
+
+  "next_episode_not_found": "⚠️ Nenhum episódio futuro confirmado.",
+
+  "// INFO": "",
+
+  "anime_info_not_found": "⚠️ Informações do anime não encontradas.",
+
+  "// REMOVE": "",
+
+  "anime_removed": "Anime removido com sucesso.",
+  "anime_not_found": "Anime não encontrado.",
+  "invalid_anime": "Anime inválido.",
+
+  "// LIST": "",
+
+  "list_header": "📋 Lista de Animes",
+  "list_empty": "📭 Nenhum anime na lista.",
+
+  "// CLEAR": "",
+
+  "clear_confirm_button": "Confirmar Limpeza",
+  "clear_cancel_button": "Cancelar",
+  "anime_list_cleared": "✅ Lista de animes limpa com sucesso.",
+  "clear_cancelled": "❌ Limpeza cancelada.",
+  "clear_warning": "⚠️ Você está prestes a limpar a lista deste servidor.\n\nAnimeDBot deixará de informar novos episódios dos animes removidos da lista.",
+
+  "// ADD": "",
+
+  "anime_added": "Anime adicionado com sucesso.",
+  "anime_already_exists": "⚠️ Anime já está na lista.",
+  "add_anime_error": "❌ Erro ao adicionar anime.",
+  "adult_content_warning": "🔞 AnimeDBot não permite animes +18.",
+
+  "// ERRORS": "",
+
+  "api_problem": "⚠️ O AnimeDBot está enfrentando problemas temporários com a API do AniList.\n\nAlguns comandos podem não funcionar no momento.",
+  "search_temporarily_disabled": "⚠️ A busca por animes está temporariamente indisponível.\n\nEstamos aguardando a estabilização da API do AniList.",
+  
+  "// PERMISSIONS": "",
+
+  "no_permission": "Você não tem permissão.",
+
+  "// CHANNEL": "",
+
+  "set_channel_success": "✅ Este canal foi definido como canal oficial do AnimeDBot!"
+}

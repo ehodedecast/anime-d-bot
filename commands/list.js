@@ -1,18 +1,20 @@
 const { loadAnimeData } = require('../utils/animeStorage');
+const { t } = require('../utils/language');
 
 function list(message) {
-
+console.log("ANTES DO LOAD");
   const data = loadAnimeData();
 
   const animeList = data[message.guild.id] || [];
 
   if (!animeList.length) {
-    return message.reply('📭 Nenhum anime na lista.');
+    return message.reply(t(message.guild.id, 'list_empty'));
   }
-
+console.log("ANTES DO REPLY");
   return message.reply(
-  `📋 Lista do servidor **${message.guild.name}**:\n\n` +
-  animeList.map(a => `• ${a.title}`).join('\n')
+  t(message.guild.id, 'list_header') +
+  '\n' +
+  animeList.map((anime, index) => `**${index + 1}.** ${anime}`).join('\n')
 );
 }
 

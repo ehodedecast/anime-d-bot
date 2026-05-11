@@ -4,6 +4,7 @@ const {
   saveAnimeData
 } = require('../utils/animeStorage');
 const createEmbed = require('../utils/embed');
+const { t } = require('../utils/language');
 
 async function add(message, animeList, inputName) {
   try {
@@ -22,18 +23,23 @@ async function add(message, animeList, inputName) {
       }
     }`;
 
-    const res = await axios.post('https://graphql.anilist.co', { query });
+    const res = await axios.post('https://graphql.anilist.co/graphql', { query });
     const data = res.data.data.Media;
     if (data.isAdult) {
 
   return message.reply(
-    '🔞 AnimeDBot não permite animes +18.'
+    t(message.guild.id, 'adult_content_warning')
   );
 }
 
     if (!data) {
-      return message.reply('❌ Anime não encontrado.');
-    }
+  return message.reply(
+    t(
+      message.guild.id,
+      'search_temporarily_disabled'
+    )
+  );
+}
 
     const name = data.title.romaji;
 
@@ -42,7 +48,7 @@ async function add(message, animeList, inputName) {
 );
 
 if (alreadyExists) {
-  return message.reply('⚠️ Anime já está na lista.');
+  return message.reply(t(message.guild.id, 'anime_already_exists'));
 }
 
     const animeData = loadAnimeData();
@@ -117,7 +123,7 @@ saveAnimeData(animeData);
 
   } catch (err) {
     console.log(err);
-    return message.reply('❌ Erro ao adicionar anime.');
+    return message.reply(t(message.guild.id, 'api_problem'));
   }
 }
 module.exports = add;

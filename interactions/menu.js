@@ -1,46 +1,44 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-
+const { t } = require('../utils/language');
 function sendMenu(target) {
+  const guildId = target.guild.id;
   console.log('SENDMENU EXECUTADO');
 
   const embed = new EmbedBuilder()
     .setColor(0x5865F2)
-    .setTitle('🤖 ANIMEDBOT')
+    .setTitle(
+  t(guildId, 'menu_title')
+)
     .setDescription(
-      'Adicione animes e receba avisos de novos episódios automaticamente.\n\n' +
-
-      '**📺 Animes**\n' +
-      '➕ Adicionar anime\n' +
-      '📋 Ver lista\n' +
-      '🧹 Limpar lista\n\n' +
-
-      '**⏰ Episódios**\n' +
-      '🎯 Próximo episódio\n\n' +
-
-      '**📚 Informações**\n' +
-      'ℹ️ Detalhes do anime'
+     t(guildId, 'menu_description')
     )
     .setFooter({
-      text: 'AnimeDBot • André Castro'
+      text: 'AnimeDBot • DBots'
     })
     .setTimestamp();
 
   const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('menu_add')
-      .setLabel('Adicionar anime')
+      .setLabel(
+  t(guildId, 'button_add_anime')
+)
       .setEmoji('➕')
       .setStyle(ButtonStyle.Primary),
 
       new ButtonBuilder()
       .setCustomId('menu_next')
-      .setLabel('Próximo episódio')
+      .setLabel(
+  t(guildId, 'button_next_episode')
+)
       .setEmoji('🎯')
       .setStyle(ButtonStyle.Success),
 
     new ButtonBuilder()
       .setCustomId('menu_info')
-      .setLabel('Informações do anime')
+      .setLabel(
+  t(guildId, 'button_anime_info')
+)
       .setEmoji('ℹ️')
       .setStyle(ButtonStyle.Secondary)
   );
@@ -48,13 +46,17 @@ function sendMenu(target) {
   const row2 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('menu_list')
-      .setLabel('Lista de animes')
+      .setLabel(
+  t(guildId, 'button_anime_list')
+)
       .setEmoji('📋')
       .setStyle(ButtonStyle.Secondary),
 
       new ButtonBuilder()
       .setCustomId('menu_remove')
-      .setLabel('Remover anime')
+      .setLabel(
+  t(guildId, 'button_remove_anime')
+)
       .setEmoji('🗑️')
       .setStyle(ButtonStyle.Danger)
 
@@ -64,7 +66,9 @@ function sendMenu(target) {
   const row3 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('menu_clear')
-      .setLabel('Limpar lista')
+      .setLabel(
+  t(guildId, 'button_clear_list')
+)
       .setEmoji('🧹')
       .setStyle(ButtonStyle.Danger)
     

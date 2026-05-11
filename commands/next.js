@@ -1,5 +1,6 @@
 const axios = require('axios');
 const createEmbed = require('../utils/embed');
+const { t } = require('../utils/language');
 
 function formatTimeLeft(ms) {
   if (ms <= 0) return "Já lançado";
@@ -42,12 +43,17 @@ async function next(message, animeName) {
       }
     }`;
 
-    const res = await axios.post('https://graphql.anilist.co', { query });
+    const res = await axios.post('https://graphql.anilist.co/graphql', { query });
     const data = res.data.data.Media;
 
     if (!data) {
-      return message.reply('❌ Anime não encontrado.');
-    }
+  return message.reply(
+    t(
+      message.guild.id,
+      'search_temporarily_disabled'
+    )
+  );
+}
 
     const name = data.title.romaji;
 
@@ -66,7 +72,7 @@ async function next(message, animeName) {
     if (!data.nextAiringEpisode) {
       const embed = createEmbed({
         title: `📺 ${name}`,
-        description: `⚠️ Nenhum episódio futuro confirmado.`,
+        description: t(message.guild.id, 'next_episode_not_found'),
         image: data.coverImage?.large,
         color: 0xff9900,
 
@@ -123,7 +129,7 @@ if (timeLeft <= 3600000 && timeLeft > 0) {
 
   } catch (err) {
     console.log(err);
-    return message.reply('❌ Erro ao buscar anime.');
+    return message.reply(t(message.guild.id, 'api_problem'));
   }
 }
 

@@ -1,8 +1,33 @@
-const notifier = require('node-notifier');
+async function test() {
 
-notifier.notify({
-  title: 'Teste',
-  message: 'Funcionou?'
-});
+  const query = `
+{
+  Viewer {
+    id
+    name
+  }
+}
+`;
 
-console.log('rodou');
+  const res = await fetch(
+    'https://graphql.anilist.co/graphql',
+    {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+
+      body: JSON.stringify({
+        query
+      })
+    }
+  );
+
+  const json = await res.json();
+
+  console.log(json);
+}
+
+test();

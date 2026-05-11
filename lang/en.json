@@ -1,0 +1,66 @@
+{
+  "// MENU": "",
+
+  "menu_title": "🤖 ANIMEDBOT",
+  "menu_description": "Add anime and receive automatic episode notifications.\n\n**📺 Anime**\n➕ Add anime\n📋 View anime list\n🧹 Clear anime list\n\n**⏰ Episodes**\n🎯 Next episode\n\n**📚 Information**\nℹ️ Anime details",
+
+  "// BUTTONS": "",
+
+  "button_add_anime": "Add anime",
+  "button_next_episode": "Next episode",
+  "button_anime_info": "Anime information",
+  "button_anime_list": "Anime list",
+  "button_remove_anime": "Remove anime",
+  "button_clear_list": "Clear list",
+
+  "// PROMPTS": "",
+
+  "prompt_type_anime_name": "✏️ Type the anime name:",
+
+  "// NEXT": "",
+
+  "next_episode_not_found": "⚠️ No future episodes confirmed.",
+
+  "// INFO": "",
+
+  "anime_info_not_found": "⚠️ Anime information not found.",
+
+  "// REMOVE": "",
+
+  "anime_removed": "Anime removed successfully.",
+  "anime_not_found": "Anime not found.",
+  "invalid_anime": "Invalid anime.",
+
+  "// LIST": "",
+
+  "list_header": "📋 Anime List",
+  "list_empty": "📭 No anime in the list.",
+
+  "// CLEAR": "",
+
+  "clear_confirm_button": "Confirm Clear",
+  "clear_cancel_button": "Cancel",
+  "clear_cancelled": "❌ Clear cancelled.",
+  "anime_list_cleared": "✅ Anime list cleared successfully.",
+  "clear_warning": "⚠️ You are about to clear this server anime list.\n\nAnimeDBot will stop notifying new episodes from removed anime.",
+
+  "// ADD": "",
+
+  "anime_added": "Anime added successfully.",
+  "anime_already_exists": "⚠️ Anime is already on the list.",
+  "adult_content_warning": "🔞 AnimeDBot does not allow +18 anime.",
+  "add_anime_error": "❌ Error adding anime.",
+
+  "// PERMISSIONS": "",
+
+  "no_permission": "You do not have permission.",
+
+  "// ERRORS": "",
+
+  "api_problem": "⚠️ AnimeDBot is currently experiencing temporary issues with the AniList API.\n\nSome commands may not work right now.",
+"search_temporarily_disabled": "⚠️ Anime search is temporarily unavailable.\n\nWe are waiting for the AniList API to stabilize.",
+
+  "// CHANNEL": "",
+
+  "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!"
+}

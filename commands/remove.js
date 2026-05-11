@@ -2,6 +2,7 @@ const {
   loadAnimeData,
   saveAnimeData
 } = require('../utils/animeStorage');
+const { t } = require('../utils/language');
 
 function remove(message, animeName) {
 
@@ -15,9 +16,10 @@ function remove(message, animeName) {
 
   if (index === -1) {
     return message.reply(
-      '❌ Anime não encontrado na lista.'
+      t(message.guild.id, 'anime_not_found', { title: animeName })
     );
   }
+  
 
   const removed = animeList[index];
 
@@ -28,7 +30,7 @@ function remove(message, animeName) {
   saveAnimeData(data);
 
   return message.reply(
-    `🗑️ ${removed.title} removido da lista!`
+    t(message.guild.id, 'anime_removed', { title: removed.title })
   );
 }
 

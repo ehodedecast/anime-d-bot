@@ -3,6 +3,8 @@ const {
   saveAnimeData
 } = require('../utils/animeStorage');
 
+const { t } = require('../utils/language');
+
 function clear(message) {
 
   const data = loadAnimeData();
@@ -12,7 +14,7 @@ function clear(message) {
   saveAnimeData(data);
 
   return message.reply(
-    '🧹 Lista limpa com sucesso!'
+    t(message.guild.id, 'anime_list_cleared')
   );
 }
 

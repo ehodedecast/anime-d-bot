@@ -1,17 +1,25 @@
 const { loadConfig, saveConfig } = require('../utils/config');
+const { t } = require('../utils/language');
 
 function setChannel(message) {
 
   const config = loadConfig();
 
   config[message.guild.id] = {
-    channelId: message.channel.id
-  };
+    ...config[message.guild.id],
+
+    guildName: message.guild.name,
+
+    channelId: message.channel.id,
+
+    language:
+      config[message.guild.id]?.language || 'en'
+};
 
   saveConfig(config);
 
   return message.reply(
-    '✅ Este canal foi definido como canal oficial do AnimeDBot!'
+    t(message.guild.id, 'set_channel_success')
   );
 }
 
