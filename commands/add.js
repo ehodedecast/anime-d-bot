@@ -5,39 +5,107 @@ const {
 } = require('../utils/animeStorage');
 const createEmbed = require('../utils/embed');
 const { t } = require('../utils/language');
+const {
+  loadAnalytics,
+  saveAnalytics
+} = require('../utils/analyticsStorage');
+
 
 async function add(message, animeList, inputName) {
   try {
     const query = `
-    query {
-      Media(search: "${inputName}", type: ANIME) {
+query ($search: String) {
+
+  Page(perPage: 10) {
+
+    media(
+      search: $search,
+      type: ANIME
+    ) {
+
       id
+
       isAdult
-        title { romaji }
-        coverImage { large }
-        status
-        nextAiringEpisode {
-          episode
-          airingAt
-        }
+
+      status
+
+      seasonYear
+
+      title {
+        romaji
       }
-    }`;
 
-    const res = await axios.post('https://graphql.anilist.co/graphql', { query });
-    const data = res.data.data.Media;
-    if (data.isAdult) {
+      coverImage {
+        large
+      }
 
-  return message.reply(
-    t(message.guild.id, 'adult_content_warning')
-  );
-}
+      nextAiringEpisode {
+        episode
+        airingAt
+      }
+    }
+  }
+}`;
 
-    if (!data) {
+    const variables = {
+  search: inputName
+};
+
+const res = await axios.post(
+  'https://graphql.anilist.co/graphql',
+  {
+    query,
+    variables
+  }
+);
+    
+    const results = res.data.data.Page.media;
+
+   if (!results.length) {
+
   return message.reply(
     t(
       message.guild.id,
       'search_temporarily_disabled'
     )
+  );
+}
+
+const priorityStatuses = [
+  'RELEASING',
+  'NOT_YET_RELEASED'
+];
+
+results.sort((a, b) => {
+
+  const aPriority =
+    priorityStatuses.includes(a.status)
+      ? 1
+      : 0;
+
+  const bPriority =
+    priorityStatuses.includes(b.status)
+      ? 1
+      : 0;
+
+  if (aPriority !== bPriority) {
+    return bPriority - aPriority;
+  }
+
+  return (
+    (b.seasonYear || 0) -
+    (a.seasonYear || 0)
+  );
+});
+
+const data = results[0];
+const autoSelected =
+  results.length > 1;
+    
+
+   if (data.isAdult) {
+  return message.reply(
+    t(message.guild.id, 'adult_content_warning')
   );
 }
 
@@ -48,6 +116,43 @@ async function add(message, animeList, inputName) {
 );
 
 if (alreadyExists) {
+  const analytics =
+  loadAnalytics();
+
+if (
+  !analytics.animeMetrics
+) {
+  analytics.animeMetrics = {};
+}
+
+if (
+  !analytics.animeMetrics[data.id]
+) {
+
+  analytics.animeMetrics[data.id] = {
+
+    title:
+      data.title.romaji,
+
+    successfulAdds: 0,
+
+    attemptAdds: 0,
+
+    duplicateAttempts: 0,
+
+    activeGuilds: []
+  };
+}
+
+analytics
+  .animeMetrics[data.id]
+  .attemptAdds++;
+
+analytics
+  .animeMetrics[data.id]
+  .duplicateAttempts++;
+
+saveAnalytics(analytics);
   return message.reply(t(message.guild.id, 'anime_already_exists'));
 }
 
@@ -57,12 +162,79 @@ if (!animeData[message.guild.id]) {
   animeData[message.guild.id] = [];
 }
 
-animeData[message.guild.id].push(name);
+
+const analytics =
+  loadAnalytics();
+
+if (
+  !analytics.animeMetrics
+) {
+  analytics.animeMetrics = {};
+}
+
+if (
+  !analytics.animeMetrics[data.id]
+) {
+
+  analytics.animeMetrics[data.id] = {
+
+    title:
+      data.title.romaji,
+
+    successfulAdds: 0,
+
+    attemptAdds: 0,
+
+    duplicateAttempts: 0,
+
+    activeGuilds: []
+  };
+}
+
+analytics
+  .animeMetrics[data.id]
+  .successfulAdds++;
+
+analytics
+  .animeMetrics[data.id]
+  .attemptAdds++;
+
+if (
+  !analytics
+    .animeMetrics[data.id]
+    .activeGuilds
+    .includes(message.guild.id)
+) {
+
+  analytics
+    .animeMetrics[data.id]
+    .activeGuilds
+    .push(message.guild.id);
+}
+
+saveAnalytics(analytics);
+
+const trackingStatuses = [
+  'RELEASING',
+  'NOT_YET_RELEASED'
+];
+
+const mode =
+  trackingStatuses.includes(data.status)
+
+    ? 'tracking'
+
+    : 'library';
 
 animeList.push({
+
   id: data.id,
-  title: data.title.romaji
+
+  title: data.title.romaji,
+
+  mode
 });
+
 
 animeData[message.guild.id] = animeList;
 
@@ -96,11 +268,36 @@ saveAnimeData(animeData);
       const embed = createEmbed({
         title: `📺 ${name}`,
         description:
-          `✅ **Adicionado com sucesso!**\n\n` +
-          `🎯 Próximo episódio: **${ep}**\n` +
-          `⏰ ${formatted}\n` +
-          `📊 Status: ${status}` +
-		  `\n\n🔔 Você receberá um lembrete próximo ao lançamento.`,
+  t(message.guild.id, 'anime_added') +
+  `\n\n` +
+  t(message.guild.id, 'next_episode') + ` **${ep}**\n` +
+  `⏰ ${formatted}\n` +
+  `📊 Status: ${status}` +
+  (
+  autoSelected
+
+    ? `\n\n${t(
+        message.guild.id,
+        'auto_selected_season'
+      )}`
+
+    : ''
+) +
+  `\n\n` +
+  (
+    mode === 'tracking'
+
+      ? t(
+          message.guild.id,
+          'tracking_mode_message'
+        )
+
+      : t(
+          message.guild.id,
+          'library_mode_message'
+        )
+  ),
+
         image: data.coverImage?.large,
         color: 0x00ccff
       });
@@ -112,8 +309,23 @@ saveAnimeData(animeData);
     const embed = createEmbed({
       title: `📺 ${name}`,
       description:
-        `✅ **Adicionado com sucesso!**\n\n` +
-        `⚠️ Nenhum episódio futuro confirmado.\n` +
+      
+        t(message.guild.id, 'anime_added') +
+        `\n\n` +
+        t(message.guild.id, 'next_episode_not_found') +
+          `\n\n` + 
+        (mode === 'tracking'
+
+  ? t(
+      message.guild.id,
+      'tracking_mode_message'
+    )
+
+  : t(
+      message.guild.id,
+      'library_mode_message'
+    )) +
+          `\n\n` + 
         `📊 Status: ${status}`,
       image: data.coverImage?.large,
       color: 0xff9900

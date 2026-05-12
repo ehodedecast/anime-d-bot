@@ -3,7 +3,7 @@
   "// MENU": "",
 
   "menu_title": "🤖 ANIMEDBOT",
-  "menu_description": "Adicione animes e receba avisos de novos episódios automaticamente.\n\n**📺 Animes**\n➕ Adicionar anime\n📋 Ver lista\n🧹 Limpar lista\n\n**⏰ Episódios**\n🎯 Próximo episódio\n\n**📚 Informações**\nℹ️ Detalhes do anime",
+  "menu_description": "Adicione animes e receba notificações automáticas de episódios.\n\n**📺 Anime**\n➕ Adicionar anime\n📋 Ver lista de animes\n🧹 Limpar lista de animes\n\n**⏰ Episódios**\n🎯 Próximo episódio\n\n**📚 Informações**\nℹ️ Detalhes do anime",
 
   "// BUTTONS": "",
 
@@ -21,6 +21,9 @@
   "// NEXT": "",
 
   "next_episode_not_found": "⚠️ Nenhum episódio futuro confirmado.",
+  "episode_less_than_24h": "⏰ estreia em menos de 24 horas!",
+  "episode_less_than_6h": "🚨 estreia em poucas horas!",
+  "episode_less_than_1h": "🔥 estreia em menos de 1 hora!",
 
   "// INFO": "",
 
@@ -39,27 +42,31 @@
 
   "// CLEAR": "",
 
-  "clear_confirm_button": "Confirmar Limpeza",
+  "clear_confirm_button": "Confirmar limpeza",
   "clear_cancel_button": "Cancelar",
-  "anime_list_cleared": "✅ Lista de animes limpa com sucesso.",
   "clear_cancelled": "❌ Limpeza cancelada.",
-  "clear_warning": "⚠️ Você está prestes a limpar a lista deste servidor.\n\nAnimeDBot deixará de informar novos episódios dos animes removidos da lista.",
+  "anime_list_cleared": "✅ Lista de animes limpa com sucesso.",
+  "clear_warning": "⚠️ Você está prestes a limpar a lista de animes deste servidor.\n\nAnimeDBot deixará de notificar novos episódios dos animes removidos.",
 
   "// ADD": "",
 
-  "anime_added": "Anime adicionado com sucesso.",
+  "anime_added": "🎉 Anime adicionado com sucesso.",
   "anime_already_exists": "⚠️ Anime já está na lista.",
-  "add_anime_error": "❌ Erro ao adicionar anime.",
   "adult_content_warning": "🔞 AnimeDBot não permite animes +18.",
+  "add_anime_error": "❌ Erro ao adicionar anime.",
+  "tracking_mode_message": "🔔 Este anime será monitorado para novos episódios.",
+  "library_mode_message": "📚 Como este anime está finalizado, ele foi salvo apenas na biblioteca.",
+  "next_episode": "🎯 Próximo episódio",
+  "auto_selected_season": "🤓 AnimeDBot selecionou automaticamente a temporada mais recente para monitoramento.",
 
-  "// ERRORS": "",
-
-  "api_problem": "⚠️ O AnimeDBot está enfrentando problemas temporários com a API do AniList.\n\nAlguns comandos podem não funcionar no momento.",
-  "search_temporarily_disabled": "⚠️ A busca por animes está temporariamente indisponível.\n\nEstamos aguardando a estabilização da API do AniList.",
-  
   "// PERMISSIONS": "",
 
   "no_permission": "Você não tem permissão.",
+
+  "// ERRORS": "",
+
+  "api_problem": "⚠️ AnimeDBot está enfrentando problemas temporários com a API da AniList.\n\nAlguns comandos podem não funcionar no momento.",
+  "search_temporarily_disabled": "⚠️ A busca de animes está temporariamente indisponível.\n\nEstamos aguardando a estabilização da API da AniList.",
 
   "// CHANNEL": "",
 

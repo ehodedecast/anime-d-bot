@@ -1,0 +1,54 @@
+{
+  "animes": {
+    "21": {
+      "id": 21,
+      "title": "ONE PIECE",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-ELSYx3yMPcKM.jpg",
+      "nextEpisode": {
+        "episode": 1162,
+        "airingAt": 1779027360
+      },
+      "lastUpdated": "2026-05-12T00:23:51.545Z"
+    },
+    "171630": {
+      "id": 171630,
+      "title": "THE ONE PIECE",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171630-CW3kbduXmmUE.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-12T01:00:37.259Z"
+    },
+    "193883": {
+      "id": 193883,
+      "title": "Chibi Godzilla no Gyakushuu 3",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx193883-Im5tNHwtfAmz.jpg",
+      "nextEpisode": {
+        "episode": 46,
+        "airingAt": 1778623560
+      },
+      "lastUpdated": "2026-05-12T00:23:51.546Z"
+    },
+    "197824": {
+      "id": 197824,
+      "title": "Isekai Nonbiri Nouka 2",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx197824-k9Uyef8g49hB.png",
+      "nextEpisode": {
+        "episode": 7,
+        "airingAt": 1779111000
+      },
+      "lastUpdated": "2026-05-12T00:23:51.545Z"
+    },
+    "209939": {
+      "id": 209939,
+      "title": "Sousou no Frieren 3rd Season",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209939-g2Njkml1rheG.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-12T00:40:51.505Z"
+    }
+  },
+  "stats": {
+    "totalCached": 5,
+    "cacheHits": 0,
+    "cacheMisses": 0
+  },
+  "lastGlobalUpdate": "2026-05-12T01:00:37.259Z"
+}

@@ -20,6 +20,9 @@
   "// NEXT": "",
 
   "next_episode_not_found": "⚠️ No future episodes confirmed.",
+  "episode_less_than_24h": "⏰ Premieres in less than 24 hours!",
+  "episode_less_than_6h": "🚨 Premieres in a few hours!",
+  "episode_less_than_1h": "🔥 Premieres in less than 1 hour!",
 
   "// INFO": "",
 
@@ -46,10 +49,15 @@
 
   "// ADD": "",
 
-  "anime_added": "Anime added successfully.",
+  "anime_added": " 🎉 Anime added successfully.",
   "anime_already_exists": "⚠️ Anime is already on the list.",
   "adult_content_warning": "🔞 AnimeDBot does not allow +18 anime.",
   "add_anime_error": "❌ Error adding anime.",
+  "tracking_mode_message": "🔔 This anime will be tracked for new episodes.",
+  "library_mode_message": "📚 As this anime is finished, it has been saved only in the library.",
+  "next_episode": "🎯 Next episode",
+  "auto_selected_season": "🤓 AnimeDBot automatically selected the most recent season for tracking.",
+  
 
   "// PERMISSIONS": "",
 

@@ -1,5 +1,7 @@
 const axios = require('axios');
 const chalk = require('chalk').default;
+const { t } =
+  require('./language');
 
 const { loadAnimeData } = require('./animeStorage');
 const { loadConfig } = require('./config');
@@ -12,6 +14,11 @@ const {
 const {
   saveAnalytics
 } = require('./analyticsStorage');
+
+const {
+  loadCache,
+  saveCache
+} = require('./cacheManager');
 
 const {
   EmbedBuilder,
@@ -36,6 +43,14 @@ async function checkAnime(client) {
   console.log(
     chalk.cyan('🔄 [CHECK] Iniciando verificação...')
   );
+
+  const cache = loadCache();
+  if (!cache.animes) {
+  cache.animes = {};
+}
+  const analytics =
+  require('./analyticsStorage')
+    .loadAnalytics();
 
   const animeData = loadAnimeData();
 
@@ -69,6 +84,10 @@ async function checkAnime(client) {
 
     for (const anime of animeData[guildId]) {
 
+    if (anime.mode !== 'tracking') {
+    continue;
+    }
+    
       uniqueAnimes.add(
         JSON.stringify(anime)
       );
@@ -118,10 +137,103 @@ async function checkAnime(client) {
     )
   );
 
-  const topAnimes =
-    Object.values(animeCount)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+  const sortedAnimes =
+  Object.values(animeCount)
+    .sort((a, b) =>
+      b.count - a.count
+    );
+
+const topAnimes =
+  sortedAnimes.slice(0, 5);
+
+let weeklyTop =
+  analytics.weeklyTop || [];
+
+const now = Date.now();
+
+const weekMs =
+  7 * 24 * 60 * 60 * 1000;
+const monthMs =
+  30 * 24 * 60 * 60 * 1000;
+const yearMs =
+  365 * 24 * 60 * 60 * 1000;
+
+const weeklyUpdatedAt =
+  analytics.weeklyUpdatedAt
+    ? new Date(
+        analytics.weeklyUpdatedAt
+      ).getTime()
+    : 0;
+const monthlyUpdatedAt =
+  analytics.monthlyUpdatedAt
+
+    ? new Date(
+        analytics.monthlyUpdatedAt
+      ).getTime()
+
+    : 0;
+const yearlyUpdatedAt =
+  analytics.yearlyUpdatedAt
+
+    ? new Date(
+        analytics.yearlyUpdatedAt
+      ).getTime()
+
+    : 0;
+
+if (
+  now - weeklyUpdatedAt >
+  weekMs
+) {
+
+  console.log(
+    chalk.yellow(
+      '📅 Resetando Weekly Top'
+    )
+  );
+
+  weeklyTop =
+    sortedAnimes.slice(0, 100);
+}
+
+let monthlyTop =
+  analytics.monthlyTop || [];
+
+if (
+  now - monthlyUpdatedAt >
+  monthMs
+) {
+
+  console.log(
+    chalk.yellow(
+      '📅 Resetando Monthly Top'
+    )
+  );
+
+  monthlyTop =
+    sortedAnimes.slice(0, 100);
+}
+
+let yearlyTop =
+  analytics.yearlyTop || [];
+
+if (
+  now - yearlyUpdatedAt >
+  yearMs
+) {
+
+  console.log(
+    chalk.yellow(
+      '📅 Resetando Yearly Top'
+    )
+  );
+
+  yearlyTop =
+    sortedAnimes.slice(0, 100);
+}
+
+const allTimeTop =
+  sortedAnimes.slice(0, 100);
 
   console.log(
     chalk.magenta(
@@ -168,55 +280,181 @@ async function checkAnime(client) {
 
     guildStats,
 
-    topAnimes
+    topAnimes,
+weeklyUpdatedAt:
+
+  now - weeklyUpdatedAt >
+  weekMs
+
+    ? new Date().toISOString()
+
+    : analytics.weeklyUpdatedAt,
+
+monthlyUpdatedAt:
+
+  now - monthlyUpdatedAt >
+  monthMs
+
+    ? new Date().toISOString()
+
+    : analytics.monthlyUpdatedAt,
+
+yearlyUpdatedAt:
+
+  now - yearlyUpdatedAt >
+  yearMs
+
+    ? new Date().toISOString()
+
+    : analytics.yearlyUpdatedAt,
+    
+    weeklyTop,
+
+    monthlyTop,
+
+    yearlyTop,
+
+    allTimeTop,
+
+    animeMetrics:
+  analytics.animeMetrics || {}
   });
 
-  // 🔥 PROCESSA CHUNKS
-  for (const chunk of chunks) {
 
-    try {
+ // 🔥 PROCESSA CHUNKS
 
-      let query = 'query {';
+for (const chunk of chunks) {
 
-      chunk.forEach((anime, index) => {
+  try {
 
-        query += `
+    const filteredChunk = [];
 
-          anime${index}: Media(id: ${anime.id}, type: ANIME) {
+    chunk.forEach((anime) => {
 
-            title { romaji }
+      const cachedAnime =
+        cache.animes[anime.id];
 
-            coverImage { large }
+      if (
+        cachedAnime &&
+        cachedAnime.nextEpisode &&
+        cachedAnime.nextEpisode.airingAt >
+          Math.floor(Date.now() / 1000)
+      ) {
 
-            nextAiringEpisode {
-              episode
-              airingAt
-            }
+        console.log(
+          chalk.gray(
+            `💾 CACHE HIT: ${anime.title}`
+          )
+        );
 
-            externalLinks {
-              site
-              url
-            }
-          }
-        `;
-      });
+        return;
+      }
+      const oneDay =
+  24 * 60 * 60 * 1000;
 
-      query += '\n}';
+const lastUpdated =
+  cachedAnime?.lastUpdated
 
-      console.log(query);
+    ? new Date(
+        cachedAnime.lastUpdated
+      ).getTime()
 
-      const res = await axios.post(
-        'https://graphql.anilist.co/graphql',
-        { query }
+    : 0;
+
+if (
+  cachedAnime &&
+  !cachedAnime.nextEpisode &&
+  Date.now() - lastUpdated <
+    oneDay
+) {
+
+  console.log(
+    chalk.gray(
+      `💾 DAILY CACHE HOLD: ${anime.title}`
+    )
+  );
+
+  return;
+}
+
+      filteredChunk.push(anime);
+    });
+
+    if (!filteredChunk.length) {
+
+      console.log(
+        chalk.gray(
+          '💾 Chunk totalmente servido pelo cache'
+        )
       );
 
-      const results =
-        Object.values(res.data.data);
+      continue;
+    }
+
+    let query = 'query {';
+
+    filteredChunk.forEach((anime, index) => {
+
+      query += `
+
+        anime${index}: Media(id: ${anime.id}, type: ANIME) {
+
+          id
+
+          title { romaji }
+
+          coverImage { large }
+
+          nextAiringEpisode {
+            episode
+            airingAt
+          }
+
+          externalLinks {
+            site
+            url
+          }
+        }
+      `;
+    });
+
+    query += '\n}';
+
+    console.log(query);
+
+    const res = await axios.post(
+      'https://graphql.anilist.co/graphql',
+      { query }
+    );
+
+    const results =
+      Object.values(res.data.data);
 
       // 🔥 PROCESSA RESULTADOS
+
       for (const data of results) {
 
         if (!data) continue;
+        cache.animes[data.id] = {
+
+  id: data.id,
+
+  title:
+    data.title?.romaji ||
+
+    'Unknown',
+
+  coverImage:
+    data.coverImage?.large ||
+
+    null,
+
+  nextEpisode:
+    data.nextAiringEpisode || null,
+
+  lastUpdated:
+    new Date().toISOString()
+};
 
         if (!data.nextAiringEpisode) {
           continue;
@@ -278,6 +516,9 @@ async function checkAnime(client) {
           }
 
           // 🔥 AVISO 24H
+          console.log(hoursLeft);
+          console.log(sentEpisodes[key]);
+          console.log(typeof sentEpisodes[key]['24h']);
           if (
             hoursLeft <= 24 &&
             hoursLeft > 0 &&
@@ -288,11 +529,41 @@ async function checkAnime(client) {
 
             saveSentEpisodes(sentEpisodes);
 
+            let warningMessage;
+
+if (hoursLeft <= 1) {
+
+  warningMessage =
+    t(
+      guildId,
+      'episode_less_than_1h'
+    );
+
+} else if (hoursLeft <= 6) {
+
+  warningMessage =
+    t(
+      guildId,
+      'episode_less_than_6h'
+    );
+
+} else {
+
+  warningMessage =
+    t(
+      guildId,
+      'episode_less_than_24h'
+    );
+}
+console.log('ENVIANDO ALERTA');
             await channel.send({
+              
+              
               content:
+              
                 `⏰ ${data.title.romaji} • ` +
                 `Episódio ${data.nextAiringEpisode.episode} ` +
-                `estreia em menos de 24 horas!`
+                warningMessage
             });
 
             console.log(
@@ -368,7 +639,14 @@ async function checkAnime(client) {
         )
       );
     }
-  }
+    cache.lastGlobalUpdate =
+  new Date().toISOString();
+
+cache.stats.totalCached =
+  Object.keys(cache.animes).length;
+
+saveCache(cache);
+  } 
 }
 
 console.log(
