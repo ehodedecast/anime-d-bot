@@ -8,6 +8,7 @@ const info = require('./info');
 const clear = require('./clear');
 const remove = require('./remove');
 const setChannel = require('./setchannel');
+const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
 
 
@@ -45,7 +46,8 @@ console.log(
 
 if (!guildConfig && message.content !== '!setchannel') {
   return message.reply(
-    '⚠️ Este servidor ainda não configurou um canal.\n\nUse `!setchannel` no canal desejado.'
+    t(message.guild.id, 'no_channel_set') + '\n\n' +
+    t(message.guild.id, 'setchannel_instructions')
   );
 }
 if (
@@ -55,7 +57,15 @@ if (
 ) {
   return;
 }
-	
+	// 🔹 COMANDO FORCECHeCK
+
+if (message.content === '!forcecheck') {
+
+  return forcecheck(
+    message,
+    message.client
+  );
+}
 	 // 🔹 COMANDO SETCHANNEL
 	 if (message.content === '!setchannel') {
   return setChannel(message);

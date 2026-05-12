@@ -20,13 +20,22 @@
   "// NEXT": "",
 
   "next_episode_not_found": "⚠️ No future episodes confirmed.",
+  "next_episode_confirmed": "🎯 Next episode confirmed!",
+  "next_episode_soon": "⚠️ Next episode coming soon!",
   "episode_less_than_24h": "⏰ Premieres in less than 24 hours!",
   "episode_less_than_6h": "🚨 Premieres in a few hours!",
   "episode_less_than_1h": "🔥 Premieres in less than 1 hour!",
+  "sequel_found": "⚠️ A sequel has been found!",
 
   "// INFO": "",
 
   "anime_info_not_found": "⚠️ Anime information not found.",
+  "average_score": "⭐ Average Score",
+  "episodes": "🎬 Episodes",
+  "status": "📊 Status",
+  "studio": "🎥 Studio",
+  "studio_unknown": "Unknown",
+  "no_description_available": "No description available.",
 
   "// REMOVE": "",
 
@@ -57,7 +66,16 @@
   "library_mode_message": "📚 As this anime is finished, it has been saved only in the library.",
   "next_episode": "🎯 Next episode",
   "auto_selected_season": "🤓 AnimeDBot automatically selected the most recent season for tracking.",
+  "airing_time": "Airing time",
+  "time_left": "Time left",
   
+  "// status": "",
+
+  "finished": "Finished",
+  "releasing": "Releasing",
+  "not_yet_released": "Not yet released",
+  "cancelled": "Cancelled",
+  "hiatus": "Hiatus",
 
   "// PERMISSIONS": "",
 
@@ -70,5 +88,7 @@
 
   "// CHANNEL": "",
 
-  "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!"
+  "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!",
+  "no_channel_set": "⚠️ This server has not set an official channel for AnimeDBot.",
+  "setchannel_instructions": "Use `!setchannel` in the desired channel to set it as the official AnimeDBot channel."
 }

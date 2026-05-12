@@ -32,6 +32,7 @@ async function next(message, animeName) {
     const query = `
     query {
       Media(search: "${animeName}", type: ANIME) {
+      isAdult
         title { romaji }
         coverImage { large }
         episodes
@@ -45,6 +46,15 @@ async function next(message, animeName) {
 
     const res = await axios.post('https://graphql.anilist.co/graphql', { query });
     const data = res.data.data.Media;
+    if (data.isAdult) {
+
+  return message.reply(
+    t(
+      message.guild.id,
+      'adult_content_warning'
+    )
+  );
+}
 
     if (!data) {
   return message.reply(
@@ -59,11 +69,11 @@ async function next(message, animeName) {
 
     // 🧠 STATUS
     const statusMap = {
-      FINISHED: "Finalizado",
-      RELEASING: "Em exibição",
-      NOT_YET_RELEASED: "Ainda não lançado",
-      CANCELLED: "Cancelado",
-      HIATUS: "Em hiato"
+      FINISHED: t(message.guild.id, 'finished'), // "Finalizado"
+      RELEASING: t(message.guild.id, 'releasing'), // "Em exibição"
+      NOT_YET_RELEASED: t(message.guild.id, 'not_yet_released'), // "Ainda não lançado"
+      CANCELLED: t(message.guild.id, 'cancelled'), // "Cancelado"
+      HIATUS: t(message.guild.id, 'hiatus') // "Em hiato"
     };
 
     const status = statusMap[data.status] || data.status;
@@ -77,8 +87,8 @@ async function next(message, animeName) {
         color: 0xff9900,
 
         fields: [
-          { name: '📊 Status', value: status, inline: true },
-          { name: '🎬 Total episódios', value: `${data.episodes || "?"}`, inline: true }
+          { name: t(message.guild.id, 'status'), value: status, inline: true },
+          { name: t(message.guild.id, 'episodes'), value: `${data.episodes || "?"}`, inline: true }
         ]
       });
 
@@ -98,10 +108,10 @@ if (timeLeft <= 3600000) color = 0xff0000; // < 1h
 else if (timeLeft <= 10800000) color = 0xff9900; // < 3h
 
 // 🧠 texto inteligente
-let statusText = "🎯 Próximo episódio confirmado!";
+let statusText = t(message.guild.id, 'next_episode_confirmed'); // "🎯 Próximo episódio confirmado!"
 
 if (timeLeft <= 3600000 && timeLeft > 0) {
-  statusText = "🚨 Sai em breve!";
+  statusText = t(message.guild.id, 'next_episode_soon'); // "⚠️ Próximo episódio saindo em breve!"
 }
 
     const formattedDate = new Date(airingTime).toLocaleString('pt-BR', {
@@ -118,10 +128,10 @@ if (timeLeft <= 3600000 && timeLeft > 0) {
   color: color,
 
       fields: [
-        { name: '🎬 Episódio', value: `Ep ${ep}`, inline: true },
-        { name: '⏰ Lançamento', value: formattedDate, inline: true },
-        {name: '⏳ Tempo', value: formatTimeLeft(timeLeft), inline: true },
-        { name: '📊 Status', value: status, inline: true }
+        { name: t(message.guild.id, 'episodes'), value: `Ep ${ep}`, inline: true },
+        { name: t(message.guild.id, 'airing_time'), value: formattedDate, inline: true },
+        { name: t(message.guild.id, 'time_left'), value: formatTimeLeft(timeLeft), inline: true },
+        { name: t(message.guild.id, 'status'), value: status, inline: true }
       ]
     });
 
@@ -129,7 +139,7 @@ if (timeLeft <= 3600000 && timeLeft > 0) {
 
   } catch (err) {
     console.log(err);
-    return message.reply(t(message.guild.id, 'api_problem'));
+    return message.reply(t(message.guild.id, 'error_occurred'));
   }
 }
 

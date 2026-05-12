@@ -17,6 +17,7 @@ async function info(message, animeName) {
   type: ANIME,
   sort: SEARCH_MATCH
 ) {
+        isAdult
 
           id
 
@@ -73,6 +74,16 @@ async function info(message, animeName) {
 
     const data =
       json.data?.Page?.media?.[0];
+      
+      if (data.isAdult) {
+
+  return message.reply(
+    t(
+      message.guild.id,
+      'adult_content_warning'
+    )
+  );
+}
 
     if (!data) {
   return message.reply(
@@ -98,16 +109,16 @@ async function info(message, animeName) {
     // status traduzido
     const statusMap = {
 
-      FINISHED: "Finalizado",
+      FINISHED: t(message.guild.id, "finished"),
 
-      RELEASING: "Em exibição",
+      RELEASING: t(message.guild.id, "releasing"),
 
       NOT_YET_RELEASED:
-        "Ainda não lançado",
+        t(message.guild.id, "not_yet_released"),
 
-      CANCELLED: "Cancelado",
+      CANCELLED: t(message.guild.id, "cancelled"),
 
-      HIATUS: "Em hiato"
+      HIATUS: t(message.guild.id, "hiatus")
     };
 
     const status =
@@ -116,7 +127,7 @@ async function info(message, animeName) {
 
     const studio =
       data.studios?.nodes?.[0]?.name ||
-      "Desconhecido";
+      t(message.guild.id, "studio_unknown");
 
     const embed = new EmbedBuilder()
 
@@ -128,33 +139,33 @@ async function info(message, animeName) {
 
       .setDescription(
         description ||
-        "Sem descrição disponível."
+        t(message.guild.id, "no_description_available")
       )
 
       .addFields(
 
         {
-          name: '⭐ Nota',
+          name: t(message.guild.id, "average_score"),
           value:
             `${data.averageScore || "N/A"}`,
           inline: true
         },
 
         {
-          name: '🎬 Episódios',
+          name: t(message.guild.id, "episodes"),
           value:
             `${data.episodes || "?"}`,
           inline: true
         },
 
         {
-          name: '📊 Status',
+          name: t(message.guild.id, "status"),
           value: status,
           inline: true
         },
 
         {
-          name: '🎥 Estúdio',
+          name: t(message.guild.id, "studio"),
           value: studio,
           inline: true
         }
@@ -185,7 +196,7 @@ async function info(message, animeName) {
     return message.reply(
       t(
         message.guild.id,
-        'api_problem'
+        'error_occurred'
       )
     );
   }

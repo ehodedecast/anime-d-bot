@@ -43,6 +43,27 @@ query ($search: String) {
         episode
         airingAt
       }
+
+      relations {
+
+        edges {
+
+          relationType
+
+          node {
+
+            id
+
+            title {
+              romaji
+            }
+
+            status
+
+            format
+          }
+        }
+      }
     }
   }
 }`;
@@ -71,30 +92,65 @@ const res = await axios.post(
   );
 }
 
-const priorityStatuses = [
-  'RELEASING',
-  'NOT_YET_RELEASED'
-];
+const normalizedInput =
+  inputName.toLowerCase().trim();
 
 results.sort((a, b) => {
 
-  const aPriority =
-    priorityStatuses.includes(a.status)
-      ? 1
-      : 0;
+  function calculateScore(anime) {
 
-  const bPriority =
-    priorityStatuses.includes(b.status)
-      ? 1
-      : 0;
+    let score = 0;
 
-  if (aPriority !== bPriority) {
-    return bPriority - aPriority;
+    const title =
+      anime.title.romaji
+        .toLowerCase();
+
+    // MATCH EXATO
+    if (title === normalizedInput) {
+      score += 100;
+    }
+
+    // CONTÉM O TEXTO
+    if (
+      title.includes(
+        normalizedInput
+      )
+    ) {
+      score += 50;
+    }
+
+    // REMOVE PRIORIDADE DE SPINOFFS
+    if (
+      title.includes('movie') ||
+      title.includes('special') ||
+      title.includes('ova') ||
+      title.includes('part')
+    ) {
+      score -= 25;
+    }
+
+    // STATUS
+    if (anime.status === 'RELEASING') {
+      score += 40;
+    }
+
+    if (
+      anime.status ===
+      'NOT_YET_RELEASED'
+    ) {
+      score += 30;
+    }
+
+    // RECÊNCIA
+    score +=
+      anime.seasonYear || 0;
+
+    return score;
   }
 
   return (
-    (b.seasonYear || 0) -
-    (a.seasonYear || 0)
+    calculateScore(b) -
+    calculateScore(a)
   );
 });
 
@@ -244,14 +300,26 @@ saveAnimeData(animeData);
 
     // 🧠 STATUS
     const statusMap = {
-      FINISHED: "Finalizado",
-      RELEASING: "Em exibição",
-      NOT_YET_RELEASED: "Ainda não lançado",
-      CANCELLED: "Cancelado",
-      HIATUS: "Em hiato"
+      FINISHED: t(message.guild.id, 'finished'),
+      RELEASING: t(message.guild.id, 'releasing'),
+      NOT_YET_RELEASED: t(message.guild.id, 'not_yet_released'),
+      CANCELLED: t(message.guild.id, 'cancelled'),
+      HIATUS: t(message.guild.id, 'hiatus')
     };
 
     const status = statusMap[data.status] || data.status;
+    const sequel =
+  data.relations?.edges?.find(edge =>
+
+    edge.relationType === 'SEQUEL' &&
+
+    (
+      edge.node.status === 'RELEASING' ||
+
+      edge.node.status ===
+      'NOT_YET_RELEASED'
+    )
+  );
 
     // 🎯 COM EPISÓDIO
     if (data.nextAiringEpisode) {
@@ -326,7 +394,19 @@ saveAnimeData(animeData);
       'library_mode_message'
     )) +
           `\n\n` + 
-        `📊 Status: ${status}`,
+        t(message.guild.id, 'status') +
+`: ${status}` +
+
+(sequel
+
+  ? `\n\n⚠️ ` +
+    t(
+      message.guild.id,
+      'sequel_found'
+    ) +
+    `\n🎬 ${sequel.node.title.romaji}`
+
+  : ''),
       image: data.coverImage?.large,
       color: 0xff9900
     });
@@ -335,7 +415,7 @@ saveAnimeData(animeData);
 
   } catch (err) {
     console.log(err);
-    return message.reply(t(message.guild.id, 'api_problem'));
+    return message.reply(t(message.guild.id, 'error_occurred'));
   }
 }
 module.exports = add;

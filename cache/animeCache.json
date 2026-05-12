@@ -37,6 +37,13 @@
       },
       "lastUpdated": "2026-05-12T00:23:51.545Z"
     },
+    "206425": {
+      "id": 206425,
+      "title": "Sousou no Frieren: ●● no Mahou Part 3",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b206425-WOwXsfDbHZwb.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-12T11:36:20.055Z"
+    },
     "209939": {
       "id": 209939,
       "title": "Sousou no Frieren 3rd Season",
@@ -46,9 +53,9 @@
     }
   },
   "stats": {
-    "totalCached": 5,
+    "totalCached": 6,
     "cacheHits": 0,
     "cacheMisses": 0
   },
-  "lastGlobalUpdate": "2026-05-12T01:00:37.259Z"
+  "lastGlobalUpdate": "2026-05-12T11:36:20.055Z"
 }

@@ -111,7 +111,7 @@ if (interaction.customId === 'menu_clear') {
     flags: 64
   });
 }
-if (interaction.customId === 'clear_confirm_button') {
+if (interaction.customId === 'confirm_clear') {
 
   return clear(
     {
@@ -124,7 +124,7 @@ if (interaction.customId === 'clear_confirm_button') {
     animeList
   );
 }
-if (interaction.customId === 'clear_cancel_button') {
+if (interaction.customId === 'cancel_clear') {
 
   return interaction.update({
     content: t(guildId, 'clear_cancelled'),
