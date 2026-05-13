@@ -10,6 +10,8 @@ const remove = require('./remove');
 const setChannel = require('./setchannel');
 const language = require('./language');
 const help = require('./help');
+const botstats = require('./botstats');
+const servercounter = require('./servercounter');
 const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
@@ -18,7 +20,7 @@ const { loadConfig } = require('../utils/config');
 
 
 
-async function handleCommands(message, animeList) {
+async function handleCommands(message, animeList, client) {
 
   const isCommand = message.content.startsWith('!');
 
@@ -79,6 +81,30 @@ if (
 
   return language(
     message
+  );
+}
+// 🔹 COMANDO SERVERCOUNTER
+
+if (
+  message.content ===
+  '!servercounter'
+) {
+
+  return servercounter(
+    message,
+    message.client
+  );
+}
+// 🔹 COMANDO BOTSTATS
+
+if (
+  message.content ===
+  '!botstats'
+) {
+
+  return botstats(
+    message,
+    client
   );
 }
 // 🔹 COMANDO HELP

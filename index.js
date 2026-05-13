@@ -116,7 +116,7 @@ client.on('messageCreate', async (message) => {
   // 🎮 COMANDOS
   const animeList = getGuildAnimeList(message.guild.id);
 console.log(animeList);
-handleCommands(message, animeList);
+handleCommands(message, animeList, client);
 });
 
 // 🔘 BOTÕES
