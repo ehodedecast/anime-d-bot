@@ -6,5 +6,6 @@ config.json
 sentEpisodes.json
 analytics.json
 data/
-/dev/temp
-/dev/tests
+cache/
+dev/
+

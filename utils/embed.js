@@ -1,4 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
+const branding =
+  require('../constants/branding.json');
 
 function createEmbed({ title, description, image, color = 0x5865F2, fields = [] }) {
   const embed = new EmbedBuilder()
@@ -7,7 +9,7 @@ function createEmbed({ title, description, image, color = 0x5865F2, fields = [] 
     .setDescription(description)
     .setImage(image || null)
     .setFooter({
-      text: 'AnimeDBot • André Castro'
+      text: branding.footer
     })
     .setTimestamp();
 

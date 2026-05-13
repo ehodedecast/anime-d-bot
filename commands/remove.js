@@ -30,8 +30,14 @@ function remove(message, animeName) {
   saveAnimeData(data);
 
   return message.reply(
-    t(message.guild.id, 'anime_removed', { title: removed.title })
-  );
+
+  t(
+    message.guild.id,
+    'anime_removed'
+  ) +
+
+  ` ${removed.title}`
+);
 }
 
 module.exports = remove;

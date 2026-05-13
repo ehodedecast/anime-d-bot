@@ -3,6 +3,7 @@ const fs = require("fs");
 const en = require("../lang/en.json");
 const pt = require("../lang/pt.json");
 
+
 const languages = {
     en,
     pt

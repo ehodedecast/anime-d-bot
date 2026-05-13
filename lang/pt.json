@@ -13,6 +13,7 @@
   "button_anime_list": "Lista de animes",
   "button_remove_anime": "Remover anime",
   "button_clear_list": "Limpar lista",
+  "button_help": "Ajuda",
 
   "// PROMPTS": "",
 
@@ -90,5 +91,17 @@
 
   "set_channel_success": "✅ Este canal foi definido como canal oficial do AnimeDBot!",
   "no_channel_set": "⚠️ Este servidor não configurou um canal oficial para o AnimeDBot.",
-  "setchannel_instructions": "Use `!setchannel` no canal desejado para defini-lo como o canal oficial do AnimeDBot."
+  "setchannel_instructions": "Use `!setchannel` no canal desejado para defini-lo como o canal oficial do AnimeDBot.",
+
+  "// LANGUAGE": "",
+
+  "language.title": "🌍 Seleção de Idioma",
+  "language.description": "Selecione o idioma do AnimeDBot.",
+  "language.portuguese": "Português",
+  "language.english": "English",
+
+  "// HELP": "",
+  "help_title": "📖 Ajuda do AnimeDBot",
+  "help_description": "Lista de comandos disponíveis do AnimeDBot."
+
 }

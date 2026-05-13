@@ -8,6 +8,9 @@ const info = require('./info');
 const clear = require('./clear');
 const remove = require('./remove');
 const setChannel = require('./setchannel');
+const language = require('./language');
+const help = require('./help');
+const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
 
@@ -66,6 +69,30 @@ if (message.content === '!forcecheck') {
     message.client
   );
 }
+
+// 🔹 COMANDO LANGUAGE
+
+if (
+  message.content ===
+  '!language'
+) {
+
+  return language(
+    message
+  );
+}
+// 🔹 COMANDO HELP
+
+if (
+  message.content ===
+  '!help'
+) {
+
+  return help(
+    message
+  );
+}
+
 	 // 🔹 COMANDO SETCHANNEL
 	 if (message.content === '!setchannel') {
   return setChannel(message);

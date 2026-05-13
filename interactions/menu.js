@@ -70,7 +70,15 @@ function sendMenu(target) {
   t(guildId, 'button_clear_list')
 )
       .setEmoji('🧹')
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Danger),
+
+      new ButtonBuilder()
+      .setCustomId('menu_help')
+      .setLabel(
+  t(guildId, 'button_help')
+)
+      .setEmoji('❓')
+      .setStyle(ButtonStyle.Primary)
     
   );
 
