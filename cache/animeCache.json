@@ -10,12 +10,19 @@
       },
       "lastUpdated": "2026-05-12T00:23:51.545Z"
     },
+    "165523": {
+      "id": 165523,
+      "title": "BORUTO: NARUTO NEXT GENERATIONS Part 2",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b165523-zpuZUkdTTRD3.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-14T10:07:25.834Z"
+    },
     "171630": {
       "id": 171630,
       "title": "THE ONE PIECE",
       "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171630-CW3kbduXmmUE.jpg",
       "nextEpisode": null,
-      "lastUpdated": "2026-05-13T01:01:05.495Z"
+      "lastUpdated": "2026-05-14T09:49:28.450Z"
     },
     "193883": {
       "id": 193883,
@@ -37,6 +44,13 @@
       },
       "lastUpdated": "2026-05-12T00:23:51.545Z"
     },
+    "199404": {
+      "id": 199404,
+      "title": "Blue Lock (Zoku-hen)",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b199404-Rb7hbFEOHRCq.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-14T10:03:55.802Z"
+    },
     "206425": {
       "id": 206425,
       "title": "Sousou no Frieren: ●● no Mahou Part 3",
@@ -49,13 +63,13 @@
       "title": "Sousou no Frieren 3rd Season",
       "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209939-g2Njkml1rheG.jpg",
       "nextEpisode": null,
-      "lastUpdated": "2026-05-12T00:40:51.505Z"
+      "lastUpdated": "2026-05-14T10:07:25.834Z"
     }
   },
   "stats": {
-    "totalCached": 6,
+    "totalCached": 8,
     "cacheHits": 0,
     "cacheMisses": 0
   },
-  "lastGlobalUpdate": "2026-05-13T01:01:05.496Z"
+  "lastGlobalUpdate": "2026-05-14T10:07:25.834Z"
 }

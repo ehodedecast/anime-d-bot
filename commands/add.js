@@ -9,9 +9,16 @@ const {
   loadAnalytics,
   saveAnalytics
 } = require('../utils/analyticsStorage');
+const state = require('../state/state');
 
 
-async function add(message, animeList, inputName) {
+async function add(
+  message,
+  animeList,
+  inputName,
+  skipSelection = false,
+  selectedAnime = null
+) {
   try {
     const query = `
 query ($search: String) {
@@ -28,6 +35,8 @@ query ($search: String) {
       isAdult
 
       status
+
+      format
 
       seasonYear
 
@@ -55,12 +64,15 @@ query ($search: String) {
             id
 
             title {
+
               romaji
+
             }
+
+            format
 
             status
 
-            format
           }
         }
       }
@@ -80,7 +92,19 @@ const res = await axios.post(
   }
 );
     
-    const results = res.data.data.Page.media;
+    const results =
+  res.data.data.Page.media;
+  if (
+  skipSelection &&
+  selectedAnime
+) {
+
+  results.length = 0;
+
+  results.push(
+    selectedAnime
+  );
+}
 
    if (!results.length) {
 
@@ -107,7 +131,7 @@ results.sort((a, b) => {
 
     // MATCH EXATO
     if (title === normalizedInput) {
-      score += 100;
+      score += 40;
     }
 
     // CONTÉM O TEXTO
@@ -120,30 +144,58 @@ results.sort((a, b) => {
     }
 
     // REMOVE PRIORIDADE DE SPINOFFS
-    if (
-      title.includes('movie') ||
-      title.includes('special') ||
-      title.includes('ova') ||
-      title.includes('part')
-    ) {
-      score -= 25;
-    }
+    // FORMATO PRINCIPAL
+
+if (
+  anime.format === 'TV'
+) {
+  score += 40;
+}
+
+// PUNIÇÃO PESADA
+
+if (
+  anime.format === 'MOVIE'
+) {
+  score -= 80;
+}
+
+if (
+  anime.format === 'OVA'
+) {
+  score -= 60;
+}
+
+if (
+  anime.format === 'SPECIAL'
+) {
+  score -= 60;
+}
 
     // STATUS
     if (anime.status === 'RELEASING') {
-      score += 40;
+      score += 120;
     }
 
     if (
       anime.status ===
       'NOT_YET_RELEASED'
     ) {
-      score += 30;
+      score += 100;
     }
 
     // RECÊNCIA
-    score +=
-      anime.seasonYear || 0;
+    if (
+  anime.seasonYear
+) {
+
+  score +=
+
+    (
+      anime.seasonYear -
+      2000
+    );
+}
 
     return score;
   }
@@ -155,9 +207,81 @@ results.sort((a, b) => {
 });
 
 const data = results[0];
+
 const autoSelected =
   results.length > 1;
-    
+  const statusMap = {
+
+  FINISHED:
+    '📚 Finished',
+
+  RELEASING:
+    '🔔 Releasing',
+
+  NOT_YET_RELEASED:
+    '🕒 Upcoming',
+
+  HIATUS:
+    '⏸️ Hiatus',
+
+  CANCELLED:
+    '❌ Cancelled'
+};
+if (
+  !skipSelection
+) {
+const topResults =
+  results.slice(0, 5);
+
+
+
+const description =
+  topResults.map(
+    (anime, index) => {
+
+      const status =
+        statusMap[
+          anime.status
+        ] || anime.status;
+
+      return (
+
+`${index + 1}️⃣ **${anime.title.romaji}**
+${status}
+📺 ${anime.format || 'Unknown'}
+📅 ${anime.seasonYear || 'Unknown'}`
+      );
+    }
+  ).join('\n\n');
+
+state.waitingForAddSelection[
+  message.author.id
+] = {
+
+  results: topResults
+};
+
+return message.reply({
+
+  embeds: [
+
+    createEmbed({
+
+      title:
+
+`🎯 "${inputName}" generated ${topResults.length} results`,
+
+      description:
+
+`${description}
+
+${t(message.guild.id, 'selection_prompt')}`,
+
+      color: 0x5865F2
+    })
+  ]
+});
+}
 
    if (data.isAdult) {
   return message.reply(
@@ -165,7 +289,7 @@ const autoSelected =
   );
 }
 
-    const name = data.title.romaji;
+   
 
     const alreadyExists = animeList.find(
   anime => anime.id === data.id
@@ -299,27 +423,9 @@ console.log(animeData);
 saveAnimeData(animeData);
 
     // 🧠 STATUS
-    const statusMap = {
-      FINISHED: t(message.guild.id, 'finished'),
-      RELEASING: t(message.guild.id, 'releasing'),
-      NOT_YET_RELEASED: t(message.guild.id, 'not_yet_released'),
-      CANCELLED: t(message.guild.id, 'cancelled'),
-      HIATUS: t(message.guild.id, 'hiatus')
-    };
 
     const status = statusMap[data.status] || data.status;
-    const sequel =
-  data.relations?.edges?.find(edge =>
-
-    edge.relationType === 'SEQUEL' &&
-
-    (
-      edge.node.status === 'RELEASING' ||
-
-      edge.node.status ===
-      'NOT_YET_RELEASED'
-    )
-  );
+   
 
     // 🎯 COM EPISÓDIO
     if (data.nextAiringEpisode) {
@@ -334,7 +440,7 @@ saveAnimeData(animeData);
       });
 
       const embed = createEmbed({
-        title: `📺 ${name}`,
+        title: `📺 ${data.title.romaji}`,
         description:
   t(message.guild.id, 'anime_added') +
   `\n\n` +
@@ -375,7 +481,7 @@ saveAnimeData(animeData);
 
     // ❌ SEM EPISÓDIO
     const embed = createEmbed({
-      title: `📺 ${name}`,
+      title: `📺 ${data.title.romaji}`,
       description:
       
         t(message.guild.id, 'anime_added') +
@@ -395,18 +501,9 @@ saveAnimeData(animeData);
     )) +
           `\n\n` + 
         t(message.guild.id, 'status') +
-`: ${status}` +
+`: ${status}`,
 
-(sequel
 
-  ? `\n\n⚠️ ` +
-    t(
-      message.guild.id,
-      'sequel_found'
-    ) +
-    `\n🎬 ${sequel.node.title.romaji}`
-
-  : ''),
       image: data.coverImage?.large,
       color: 0xff9900
     });

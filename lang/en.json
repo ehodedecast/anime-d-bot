@@ -69,7 +69,11 @@
   "auto_selected_season": "🤓 AnimeDBot automatically selected the most recent season for tracking.",
   "airing_time": "Airing time",
   "time_left": "Time left",
+  "selection_prompt": "✏️ Reply with the number of the anime you want to add.",
+  "selection_invalid": "❌ Invalid selection.",
+  "selection_confirmed": "✅ Selected:",
   
+
   "// status": "",
 
   "finished": "Finished",
@@ -103,5 +107,6 @@
   "// HELP": "",
   "help_title": "📖 AnimeDBot Help",
   "help_description": "List of available AnimeDBot commands."
+  
 
 }

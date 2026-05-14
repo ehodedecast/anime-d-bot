@@ -70,8 +70,12 @@
   "auto_selected_season": "🤓 AnimeDBot selecionou automaticamente a temporada mais recente para monitoramento.",
   "airing_time": "Horário de exibição",
   "time_left": "Tempo restante",
+  "selection_prompt": "✏️ Responda com o número do anime que você deseja adicionar.",
+  "selection_invalid": "❌ Seleção inválida.",
+  "selection_confirmed": "✅ Selecionado:",
 
   "// status": "",
+
   "finished": "Finalizado",
   "releasing": "Em lançamento",
   "not_yet_released": "Ainda não lançado",
