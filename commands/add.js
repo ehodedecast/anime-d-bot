@@ -10,6 +10,13 @@ const {
   saveAnalytics
 } = require('../utils/analyticsStorage');
 const state = require('../state/state');
+const {
+
+  sortAnimeResults
+
+} = require(
+  '../services/animeScoring'
+);
 
 
 async function add(
