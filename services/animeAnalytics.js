@@ -37,7 +37,7 @@ function ensureAnimeMetric(
       ] = {
 
         title:
-          anime.title.romaji,
+          anime.title,
 
         successfulAdds: 0,
 

@@ -31,16 +31,34 @@ function saveAnimeData(data) {
     JSON.stringify(data, null, 2)
   );
 }
-function getGuildAnimeList(guildId) {
+function getGuildAnimeList(
+  guildId
+) {
 
-  const data = loadAnimeData();
+  const data =
+    loadAnimeData();
 
-  if (!data[guildId]) {
-    data[guildId] = [];
-    saveAnimeData(data);
+  if (
+    !data[guildId]
+  ) {
+
+    data[guildId] = {
+
+      guildName:
+        'Unknown Guild',
+
+      anime: []
+    };
+
+    saveAnimeData(
+      data
+    );
   }
 
-  return data[guildId];
+  return (
+    data[guildId]
+      .anime
+  );
 }
 module.exports = {
   loadAnimeData,

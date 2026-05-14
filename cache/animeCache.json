@@ -24,6 +24,16 @@
       "nextEpisode": null,
       "lastUpdated": "2026-05-14T09:49:28.450Z"
     },
+    "173172": {
+      "id": 173172,
+      "title": "Dorohedoro Season 2",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx173172-404XnuOS0DhR.jpg",
+      "nextEpisode": {
+        "episode": 10,
+        "airingAt": 1779285600
+      },
+      "lastUpdated": "2026-05-14T13:43:14.883Z"
+    },
     "193883": {
       "id": 193883,
       "title": "Chibi Godzilla no Gyakushuu 3",
@@ -51,6 +61,13 @@
       "nextEpisode": null,
       "lastUpdated": "2026-05-14T10:03:55.802Z"
     },
+    "204436": {
+      "id": 204436,
+      "title": "Gachiakuta 2nd Season",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx204436-gGUp9DNszIY5.png",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-14T13:35:21.993Z"
+    },
     "206425": {
       "id": 206425,
       "title": "Sousou no Frieren: ●● no Mahou Part 3",
@@ -67,9 +84,9 @@
     }
   },
   "stats": {
-    "totalCached": 8,
+    "totalCached": 10,
     "cacheHits": 0,
     "cacheMisses": 0
   },
-  "lastGlobalUpdate": "2026-05-14T10:07:25.834Z"
+  "lastGlobalUpdate": "2026-05-14T13:43:14.884Z"
 }

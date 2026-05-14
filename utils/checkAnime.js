@@ -20,6 +20,8 @@ const {
   saveCache
 } = require('./cacheManager');
 
+
+
 const {
   EmbedBuilder,
   ActionRowBuilder,
@@ -74,35 +76,49 @@ async function checkAnime(client) {
 
   const animeCount = {};
 
-  for (const guildId in animeData) {
+ for (const guildId in animeData) {
 
-    console.log(
-      chalk.blue(
-        `🏠 [${guildId}] ${animeData[guildId].length} animes`
-      )
+  const guildAnime =
+
+    animeData[guildId]
+      ?.anime || [];
+
+  for (
+    const anime of
+    guildAnime
+  ) {
+    if (
+      anime.mode !==
+      'tracking'
+    ) {
+
+      continue;
+    }
+
+    uniqueAnimes.add(
+      JSON.stringify(anime)
     );
 
-    for (const anime of animeData[guildId]) {
+    if (
+      !animeCount[anime.id]
+    ) {
 
-    if (anime.mode !== 'tracking') {
-    continue;
+      animeCount[
+        anime.id
+      ] = {
+
+        title:
+          anime.title,
+
+        count: 0
+      };
     }
-    
-      uniqueAnimes.add(
-        JSON.stringify(anime)
-      );
 
-      if (!animeCount[anime.id]) {
-
-        animeCount[anime.id] = {
-          title: anime.title,
-          count: 0
-        };
-      }
-
-      animeCount[anime.id].count++;
-    }
+    animeCount[
+      anime.id
+    ].count++;
   }
+}
 
   const animeArray =
     [...uniqueAnimes].map(
@@ -253,13 +269,22 @@ const allTimeTop =
   // 🔥 STATS POR SERVIDOR
   const guildStats = {};
 
-  for (const guildId in animeData) {
+  for (
+  const guildId in
+  animeData
+) {
 
-    guildStats[guildId] = {
-      animeCount:
-        animeData[guildId].length
-    };
-  }
+  const guildAnime =
+
+    animeData[guildId]
+      ?.anime || [];
+
+  guildStats[guildId] = {
+
+    animeCount:
+      guildAnime.length
+  };
+}
 
   // 🔥 SALVA ANALYTICS
   saveAnalytics({
@@ -482,7 +507,9 @@ if (
         for (const guildId in animeData) {
 
           const animeList =
-            animeData[guildId];
+
+  animeData[guildId]
+    ?.anime || [];
 
           if (
             !animeList.find(
@@ -656,4 +683,3 @@ console.log(
 );
 
 module.exports = checkAnime;
-

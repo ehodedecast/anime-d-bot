@@ -278,7 +278,6 @@ client.on(
 
         selectedAnime
           .title
-          .romaji
       );
 
       // 🧹 CLEAR STATE
@@ -295,18 +294,16 @@ client.on(
 
       return add(
 
-        message,
+  message,
 
-        animeList,
+  animeList,
 
-        selectedAnime
-          .title
-          .romaji,
+  selectedAnime.title,
 
-        true,
+  true,
 
-        selectedAnime
-      );
+  selectedAnime
+);
     }
 
     // 📋 MENU

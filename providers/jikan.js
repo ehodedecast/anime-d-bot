@@ -48,11 +48,8 @@ async function searchAnime(
       seasonYear:
         anime.year,
 
-      title: {
-
-        romaji:
-          anime.title
-      },
+      title:
+  anime.title,
 
       coverImage: {
 

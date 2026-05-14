@@ -15,6 +15,11 @@ const servercounter = require('./servercounter');
 const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
+const syncAll = require('../dev/syncall');
+const migrateAnimeData = require('../dev/migrateAnimeData');
+const devReply = require('../utils/devReply');
+const testQuery = require('../dev/testquery');
+const repairGuildNames = require('../dev/repairGuildNames');
 
 
 
@@ -62,6 +67,20 @@ if (
 ) {
   return;
 }
+// 🔧 REPAIR GUILD NAMES
+
+if (
+  message.content ===
+  '!repairguilds'
+) {
+
+  return repairGuildNames(
+
+    message,
+
+    client
+  );
+}
 	// 🔹 COMANDO FORCECHeCK
 
 if (message.content === '!forcecheck') {
@@ -71,7 +90,33 @@ if (message.content === '!forcecheck') {
     message.client
   );
 }
+// 🔧 MIGRATE ANIME DATA
 
+if (
+  message.content ===
+  '!migrateanime'
+) {
+
+  await migrateAnimeData();
+
+  return devReply(
+
+  message,
+
+  '✅ Anime data migrated.'
+);
+}
+// 🔹 COMANDO SYNCALL
+
+if (
+  message.content ===
+  '!syncall'
+) {
+
+  return syncAll(
+    message
+  );
+}
 // 🔹 COMANDO LANGUAGE
 
 if (
@@ -122,6 +167,28 @@ if (
 	 // 🔹 COMANDO SETCHANNEL
 	 if (message.content === '!setchannel') {
   return setChannel(message);
+}
+// 🔧 TEST QUERY
+
+if (
+  message.content.startsWith(
+    '!testquery '
+  )
+) {
+
+  const query =
+
+    message.content.replace(
+      '!testquery ',
+      ''
+    );
+
+  return testQuery(
+
+    message,
+
+    query
+  );
 }
 	 // 🔹 COMANDO REMOVE
 	 if (state.waitingForRemove?.[message.author.id]) {

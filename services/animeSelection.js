@@ -50,7 +50,7 @@ function createSelectionDescription(
 
       return (
 
-`${index + 1}️⃣ **${anime.title.romaji}**
+`${index + 1}️⃣ **${anime.title}**
 ${status}
 📺 ${anime.format || 'Unknown'}
 📅 ${anime.seasonYear || 'Unknown'}`

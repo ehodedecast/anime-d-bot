@@ -118,7 +118,7 @@ function createAnimeAddedEmbed({
     return createEmbed({
 
       title:
-        `📺 ${anime.title.romaji}`,
+        `📺 ${anime.title}`,
 
       description:
 
@@ -176,7 +176,7 @@ t(guildId, 'next_episode') +
   return createEmbed({
 
     title:
-      `📺 ${anime.title.romaji}`,
+      `📺 ${anime.title}`,
 
     description:
 

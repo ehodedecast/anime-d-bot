@@ -32,11 +32,17 @@ function ensureGuildAnimeData(
     loadAnimeData();
 
   if (
-    !animeData[guildId]
-  ) {
+  !animeData[guildId]
+) {
 
-    animeData[guildId] = [];
-  }
+  animeData[guildId] = {
+
+    guildName:
+      guildName,
+
+    anime: []
+  };
+}
 
   return animeData;
 }
@@ -57,13 +63,13 @@ function saveAnimeToGuild(
       guildId
     );
 
-  animeData[guildId].push({
+  animeData[guildId].anime.push({
 
     id:
       anime.id,
 
     title:
-      anime.title.romaji,
+      anime.title,
 
     mode
   });

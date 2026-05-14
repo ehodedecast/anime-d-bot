@@ -90,10 +90,42 @@ query ($search: String) {
     );
 
   return response
-    .data
-    .data
-    .Page
-    .media;
+  .data
+  .data
+  .Page
+  .media
+  .map(anime => ({
+
+    id:
+      anime.id,
+
+    title:
+      anime.title
+        ?.romaji ||
+
+      'Unknown',
+
+    isAdult:
+      anime.isAdult,
+
+    status:
+      anime.status,
+
+    format:
+      anime.format,
+
+    seasonYear:
+      anime.seasonYear,
+
+    coverImage:
+      anime.coverImage,
+
+    nextAiringEpisode:
+      anime.nextAiringEpisode,
+
+    relations:
+      anime.relations
+  }));
 }
 
 module.exports = {

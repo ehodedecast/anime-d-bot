@@ -10,7 +10,7 @@ function calculateScore(
 
   const title =
 
-    anime.title.romaji
+    anime.title
       .toLowerCase();
 
   // 🎯 EXACT MATCH
