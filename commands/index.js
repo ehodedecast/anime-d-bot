@@ -15,10 +15,10 @@ const servercounter = require('./servercounter');
 const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
-const syncAll = require('../dev/syncall');
+const syncAll = require('../dev/syncAll');
 const migrateAnimeData = require('../dev/migrateAnimeData');
 const devReply = require('../utils/devReply');
-const testQuery = require('../dev/testquery');
+const testQuery = require('../dev/testQuery');
 const repairGuildNames = require('../dev/repairGuildNames');
 
 
