@@ -31,6 +31,8 @@ function ensureGuildAnimeData(
   const animeData =
     loadAnimeData();
 
+  // 🆕 GUILD NÃO EXISTE
+
   if (
     !animeData[guildId]
   ) {
@@ -41,6 +43,24 @@ function ensureGuildAnimeData(
         'Unknown Guild',
 
       anime: []
+    };
+  }
+
+  // 🔄 FORMATO ANTIGO
+
+  if (
+    Array.isArray(
+      animeData[guildId]
+    )
+  ) {
+
+    animeData[guildId] = {
+
+      guildName:
+        'Unknown Guild',
+
+      anime:
+        animeData[guildId]
     };
   }
 
