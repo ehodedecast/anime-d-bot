@@ -16,12 +16,12 @@ function animeAlreadyExists(
 
 ) {
 
-  return animeList.find(
+  return (animeList || []).find(
 
-    anime =>
+  anime =>
 
-      anime.id === animeId
-  );
+    anime.id === animeId
+);
 }
 
 function ensureGuildAnimeData(
