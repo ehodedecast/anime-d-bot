@@ -18,10 +18,10 @@ function animeAlreadyExists(
 
   return (animeList || []).find(
 
-  anime =>
+    anime =>
 
-    anime.id === animeId
-);
+      anime.id === animeId
+  );
 }
 
 function ensureGuildAnimeData(
@@ -32,17 +32,17 @@ function ensureGuildAnimeData(
     loadAnimeData();
 
   if (
-  !animeData[guildId]
-) {
+    !animeData[guildId]
+  ) {
 
-  animeData[guildId] = {
+    animeData[guildId] = {
 
-    guildName:
-      guildName,
+      guildName:
+        'Unknown Guild',
 
-    anime: []
-  };
-}
+      anime: []
+    };
+  }
 
   return animeData;
 }
@@ -63,16 +63,18 @@ function saveAnimeToGuild(
       guildId
     );
 
-  animeData[guildId].anime.push({
+  animeData[guildId]
+    .anime
+    .push({
 
-    id:
-      anime.id,
+      id:
+        anime.id,
 
-    title:
-      anime.title,
+      title:
+        anime.title,
 
-    mode
-  });
+      mode
+    });
 
   saveAnimeData(
     animeData
