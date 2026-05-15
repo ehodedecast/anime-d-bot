@@ -71,10 +71,11 @@ function saveAnimeToGuild(
 
   guildId,
 
+  guildName,
+
   anime,
 
   mode
-
 ) {
 
   const animeData =
@@ -82,6 +83,9 @@ function saveAnimeToGuild(
     ensureGuildAnimeData(
       guildId
     );
+    
+    animeData[guildId]
+  .guildName = guildName;
 
   animeData[guildId]
     .anime

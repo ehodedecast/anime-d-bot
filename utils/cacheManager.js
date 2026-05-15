@@ -1,13 +1,13 @@
 const fs = require('fs');
 
 const PATH =
-  './cache/animeCache.json';
+  './data/animeCache.json';
 
 function ensureFile() {
 
-  if (!fs.existsSync('./cache')) {
+  if (!fs.existsSync('./data')) {
 
-    fs.mkdirSync('./cache');
+    fs.mkdirSync('./data');
   }
 
   if (!fs.existsSync(PATH)) {
