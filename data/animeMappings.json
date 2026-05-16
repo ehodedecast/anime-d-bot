@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "internalId": "adb_1",
+    "title": "ONE PIECE",
+    "providers": {
+      "anilist": 21
+    },
+    "lastProviderSync": 1778927497883
+  }
+]

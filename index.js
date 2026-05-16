@@ -196,12 +196,9 @@ client.on(
     ) {
 
       return message.reply(
-
-        t(
-          message.guild.id,
-          'no_channel_set'
-        )
-      );
+    t(message.guild.id, 'no_channel_set') + '\n\n' +
+    t(message.guild.id, 'setchannel_instructions')
+  );
     }
 
     // 🚫 WRONG CHANNEL

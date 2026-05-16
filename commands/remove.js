@@ -8,7 +8,12 @@ function remove(message, animeName) {
 
   const data = loadAnimeData();
 
-  const animeList = data[message.guild.id] || [];
+  const animeList =
+  data[message.guild.id]
+    ?.anime || [];
+
+    console.log(animeList);
+console.log(animeName);
 
   const index = animeList.findIndex(
   a => a.title.toLowerCase() === animeName.toLowerCase()
@@ -25,7 +30,8 @@ function remove(message, animeName) {
 
   animeList.splice(index, 1);
 
-  data[message.guild.id] = animeList;
+  data[message.guild.id]
+  .anime = animeList;
 
   saveAnimeData(data);
 

@@ -1,1 +1,45 @@
-{}
+{
+  "lastCheck": "2026-05-16T10:59:53.362Z",
+  "totalGuilds": 2,
+  "totalGlobal": null,
+  "uniqueGlobal": 1,
+  "totalRequests": 1,
+  "savedRequests": null,
+  "guildStats": {
+    "1502263697337221230": {
+      "animeCount": 1
+    },
+    "1354465818066550904": {
+      "animeCount": 0
+    }
+  },
+  "topAnimes": [
+    {
+      "title": "ONE PIECE",
+      "count": 1
+    }
+  ],
+  "weeklyUpdatedAt": "2026-05-16T10:27:23.524Z",
+  "monthlyUpdatedAt": "2026-05-16T10:27:23.524Z",
+  "yearlyUpdatedAt": "2026-05-16T10:27:23.524Z",
+  "weeklyTop": [],
+  "monthlyTop": [],
+  "yearlyTop": [],
+  "allTimeTop": [
+    {
+      "title": "ONE PIECE",
+      "count": 1
+    }
+  ],
+  "animeMetrics": {
+    "21": {
+      "title": "ONE PIECE",
+      "successfulAdds": 1,
+      "attemptAdds": 1,
+      "duplicateAttempts": 0,
+      "activeGuilds": [
+        "1502263697337221230"
+      ]
+    }
+  }
+}

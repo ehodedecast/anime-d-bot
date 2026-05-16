@@ -5,7 +5,9 @@ function list(message) {
 console.log("ANTES DO LOAD");
   const data = loadAnimeData();
 
-  const animeList = data[message.guild.id] || [];
+  const animeList =
+  data[message.guild.id]
+    ?.anime || [];
   console.log(animeList);
 
   if (!animeList.length) {
