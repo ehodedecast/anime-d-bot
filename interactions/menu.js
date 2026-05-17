@@ -6,11 +6,8 @@ function sendMenu(target) {
 
   const embed = new EmbedBuilder()
     .setColor(0x5865F2)
-    .setTitle(
-  t(guildId, 'menu_title')
-)
-    .setDescription(
-     t(guildId, 'menu_description')
+    .setImage(
+      'https://raw.githubusercontent.com/ehodedecast/anime-d-bot/refs/heads/main/assets/banner.png'
     )
     .setFooter({
       text: 'AnimeDBot • DBots'
