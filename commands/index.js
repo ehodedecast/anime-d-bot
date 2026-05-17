@@ -15,7 +15,7 @@ const servercounter = require('./servercounter');
 const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
-const syncAll = require('../dev/syncall');
+const syncAll = require('../dev/syncAll');
 const migrateAnimeData = require('../dev/migrateAnimeData');
 const devReply = require('../utils/devReply');
 const testQuery = require('../dev/testQuery');
@@ -190,13 +190,37 @@ if (
     query
   );
 }
-	 // 🔹 COMANDO REMOVE
-	 if (state.waitingForRemove?.[message.author.id]) {
+   // 🔹 COMANDO REMOVE
+   if (
+  message.content.startsWith(
+    '!remove '
+  )
+) {
+
+  const name =
+
+    message.content.replace(
+      '!remove ',
+      ''
+    );
+
+  return remove(
+    message,
+    name
+  );
+}
+if (state.waitingForRemove?.[message.author.id]) {
 
   const input = message.content;
-  delete state.waitingForRemove[message.author.id];
 
-  return remove(message, input);
+  delete state.waitingForRemove[
+    message.author.id
+  ];
+
+  return remove(
+    message,
+    input
+  );
 }
   // 🔹 COMANDO CLEAR
  const clear = require('./clear');

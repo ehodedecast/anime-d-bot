@@ -1,5 +1,13 @@
 const {
-  EmbedBuilder
+
+  EmbedBuilder,
+
+  ActionRowBuilder,
+
+  ButtonBuilder,
+
+  ButtonStyle
+
 } = require('discord.js');
 
 const {
@@ -19,62 +27,101 @@ async function help(
       .setColor(0x5865F2)
 
       .setTitle(
-        t(
-          guildId,
-          'help_title'
-        )
+        '🤖 AnimeDBot Help Center'
       )
 
       .setDescription(
 
-        t(
-          guildId,
-          'help_description'
-        )
+        'Track anime, check upcoming episodes, manage your anime list and more.\n\n' +
+
+'Most anime features can also be accessed through the main interaction menu, making AnimeDBot easier to use without memorizing commands.\n\n' +
+
+'Below are all available commands and systems currently available in AnimeDBot.'
       )
 
       .addFields(
 
         {
           name:
-            '📺 Anime',
+            '📺 Anime Commands',
 
           value:
 
-            '`!add`\n' +
-            '`!list`\n' +
-            '`!next`\n' +
-            '`!info`\n' +
-            '`!remove`\n' +
-            '`!clearlist`'
+            '`!add <anime>` → Add anime to tracking\n' +
+            '`!list` → Show tracked anime\n' +
+            '`!next <anime>` → Next episode info\n' +
+            '`!info <anime>` → Detailed anime info\n' +
+            '`!remove <anime>` → Remove anime\n' +
+            '`!clearlist` → Clear server anime list'
         },
 
         {
           name:
-            '🌍 Language',
+            '🌍 Language Commands',
 
           value:
-            '`!language`'
+            '`!language` → Change bot language'
         },
 
         {
           name:
-            '⚙️ Admin',
+            '⚙️ Admin Commands',
 
           value:
-            '`!setchannel`'
+            '`!setchannel` → Configure bot channel'
+        },
+
+        {
+          name:
+            '💡 Features',
+
+          value:
+
+            '• Multi-provider anime search\n' +
+            '• AniList + Jikan support\n' +
+            '• Anime tracking\n' +
+            '• Episode notifications\n' +
+            '• Smart search system\n' +
+            '• Anime selection menus'
         }
       )
 
       .setFooter({
 
         text:
-          'AnimeDBot - Dbots'
-      });
+          'AnimeDBot • DBOTs'
+      })
+
+      .setTimestamp();
+
+  const row =
+
+    new ActionRowBuilder()
+
+      .addComponents(
+
+        new ButtonBuilder()
+
+          .setLabel(
+            'Support Server'
+          )
+
+          .setStyle(
+            ButtonStyle.Link
+          )
+
+          .setURL(
+            'https://discord.com/invite/YFvye4hkuV'
+          )
+
+          .setEmoji('💬')
+      );
 
   return message.reply({
 
-    embeds: [embed]
+    embeds: [embed],
+
+    components: [row]
   });
 }
 

@@ -42,7 +42,8 @@ async function syncAll(
 
     const guildAnime =
 
-      animeData[guildId];
+  animeData[guildId]
+    ?.anime || [];
 
     for (
       const anime of guildAnime

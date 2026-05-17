@@ -1,5 +1,5 @@
 {
-  "lastCheck": "2026-05-16T10:59:53.362Z",
+  "lastCheck": "2026-05-17T14:04:38.885Z",
   "totalGuilds": 2,
   "totalGlobal": null,
   "uniqueGlobal": 1,
@@ -34,8 +34,8 @@
   "animeMetrics": {
     "21": {
       "title": "ONE PIECE",
-      "successfulAdds": 1,
-      "attemptAdds": 1,
+      "successfulAdds": 2,
+      "attemptAdds": 2,
       "duplicateAttempts": 0,
       "activeGuilds": [
         "1502263697337221230"
