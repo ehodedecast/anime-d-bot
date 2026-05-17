@@ -2,7 +2,7 @@
  {
   "// MENU": "",
 
-  "menu_title": "🤖 ANIMEDBOT",
+  "menu_title": "🤖 AnimeDBot",
   "menu_description": "Adicione animes e receba notificações automáticas de episódios.\n\n**📺 Anime**\n➕ Adicionar anime\n📋 Ver lista de animes\n🧹 Limpar lista de animes\n\n**⏰ Episódios**\n🎯 Próximo episódio\n\n**📚 Informações**\nℹ️ Detalhes do anime",
 
   "// BUTTONS": "",
@@ -106,6 +106,14 @@
 
   "// HELP": "",
   "help_title": "📖 Ajuda do AnimeDBot",
-  "help_description": "Lista de comandos disponíveis do AnimeDBot."
-
+  "help_description": "Bem-vindo ao Centro de Ajuda do AnimeDBot! Aqui você pode encontrar todos os comandos e recursos disponíveis para aproveitar ao máximo sua experiência de rastreamento de animes.\n\nA maioria dos recursos de anime também pode ser acessada através do menu principal de interação, tornando o AnimeDBot mais fácil de usar sem memorizar comandos.\n\nAbaixo estão todos os comandos e sistemas atualmente disponíveis no AnimeDBot.",
+  "help_anime_commands_title": "📺 Comandos de Anime",
+  "help_anime_commands": "`!add` <anime> → Adicionar anime ao rastreamento\n`!list` → Mostrar animes rastreados\n`!next` <anime> → Informações do próximo episódio\n`!info` <anime> → Informações detalhadas do anime\n`!remove` <anime> → Remover anime\n`!clearlist` → Limpar lista de animes do servidor",
+  "help_language_commands_title": "🌍 Comandos de Idioma",
+  "help_language_commands": "`!language` → Alterar idioma do bot",
+  "help_admin_commands_title": "⚙️ Comandos de Admin",
+  "help_admin_commands": "`!setchannel` → Configurar canal do bot",
+  "help_features_title": "💡 Recursos",
+  "help_features": "• Busca de animes em múltiplos provedores\n• Suporte ao AniList + Jikan\n• Rastreamento de animes\n• Notificações de episódios\n• Sistema de busca inteligente\n• Menus de seleção de animes",
+  "join_support_server": "💬 Servidor de Suporte"
 }

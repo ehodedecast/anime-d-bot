@@ -6,6 +6,15 @@ const path =
 
 const chalk =
   require('chalk').default;
+  require('dotenv').config();
+
+const {
+
+  Client,
+
+  GatewayIntentBits
+
+} = require('discord.js');
 
 console.log(
   chalk.cyan(
@@ -345,6 +354,81 @@ console.log(
     '\n✅ Command tests completed\n'
   )
 );
+// 🔔 FULL NOTIFICATION TEST
+
+console.log(
+  chalk.blue(
+    '\n🔔 Testing notification pipeline...\n'
+  )
+);
+
+const checkAnime =
+  require('../utils/checkAnime');
+
+const client =
+  new Client({
+
+    intents: [
+      GatewayIntentBits.Guilds
+    ]
+  });
+
+await client.login(
+  process.env.TOKEN
+);
+
+console.log(
+  chalk.yellow(
+    '⏰ Testing 24H notification...'
+  )
+);
+
+await checkAnime(
+  client,
+  {
+    force24h: true,
+
+testUserId:
+  process.env.OWNER_ID
+  }
+);
+
+console.log(
+  chalk.green(
+    '✅ 24H notification pipeline passed'
+  )
+);
+
+console.log(
+  chalk.yellow(
+    '🚨 Testing release notification...'
+  )
+);
+
+await checkAnime(
+  client,
+  {
+    forceRelease: true,
+
+testUserId:
+  process.env.OWNER_ID
+  }
+);
+
+console.log(
+  chalk.green(
+    '✅ Release notification pipeline passed'
+  )
+);
+
+await client.destroy();
+
+console.log(
+  chalk.green(
+    '\n✅ Notification tests completed\n'
+  )
+);
+
   } catch (err) {
 
     console.log(

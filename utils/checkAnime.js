@@ -40,7 +40,13 @@ function chunkArray(array, size) {
   return result;
 }
 
-async function checkAnime(client) {
+async function checkAnime(
+
+  client,
+
+  options = {}
+
+) {
 
   console.log(
     chalk.cyan('🔄 [CHECK] Iniciando verificação...')
@@ -60,11 +66,17 @@ async function checkAnime(client) {
     Object.keys(animeData).length;
 
   const totalGlobal =
-    Object.values(animeData)
-      .reduce(
-        (acc, list) => acc + list.length,
-        0
-      );
+  Object.values(animeData)
+    .reduce(
+
+      (acc, guild) =>
+
+        acc + (
+          guild.anime?.length || 0
+        ),
+
+      0
+    );
 
   const config = loadConfig();
 
@@ -141,8 +153,7 @@ async function checkAnime(client) {
   const chunks =
     chunkArray(animeArray, 25);
 
-  const totalRequests =
-    chunks.length;
+  let totalRequests = 0;
 
   const savedRequests =
     totalGlobal - totalRequests;
@@ -360,11 +371,15 @@ for (const chunk of chunks) {
         cache.animes[anime.id];
 
       if (
-        cachedAnime &&
-        cachedAnime.nextEpisode &&
-        cachedAnime.nextEpisode.airingAt >
-          Math.floor(Date.now() / 1000)
-      ) {
+
+  cachedAnime &&
+  cachedAnime.nextEpisode &&
+  cachedAnime.nextEpisode.airingAt >
+    Math.floor(Date.now() / 1000) &&
+
+  !options.force24h &&
+  !options.forceRelease
+) {
 
         console.log(
           chalk.gray(
@@ -446,7 +461,7 @@ if (
     query += '\n}';
 
     console.log(query);
-
+totalRequests++;
     const res = await axios.post(
       'https://graphql.anilist.co/graphql',
       { query }
@@ -502,6 +517,13 @@ if (
 
         const hoursLeft =
           diff / 3600;
+          // 🧪 TEST MODE
+
+const force24h =
+  options.force24h;
+
+const forceRelease =
+  options.forceRelease;
 
         // 🔥 DISTRIBUI PARA SERVIDORES
         for (const guildId in animeData) {
@@ -529,6 +551,20 @@ if (
 
           const channel =
             await client.channels.fetch(channelId);
+            
+            // 🧪 TEST USER
+
+let testUser = null;
+
+if (
+  options.testUserId
+) {
+
+  testUser =
+    await client.users.fetch(
+      options.testUserId
+    );
+}
 
           const key =
             `${guildId}-${data.title.romaji}-${data.nextAiringEpisode.episode}`;
@@ -547,14 +583,29 @@ if (
           console.log(sentEpisodes[key]);
           console.log(typeof sentEpisodes[key]['24h']);
           if (
-            hoursLeft <= 24 &&
-            hoursLeft > 0 &&
-            !sentEpisodes[key]['24h']
-          ) {
 
-            sentEpisodes[key]['24h'] = true;
+  (
+    (
+      hoursLeft <= 24 &&
+      hoursLeft > 0
+    ) ||
 
-            saveSentEpisodes(sentEpisodes);
+    force24h
+  ) &&
+
+  !sentEpisodes[key]['24h']
+) {
+
+            if (
+  !options.testUserId
+) {
+
+  sentEpisodes[key]['24h'] = true;
+
+  saveSentEpisodes(
+    sentEpisodes
+  );
+}
 
             let warningMessage;
 
@@ -583,7 +634,11 @@ if (hoursLeft <= 1) {
     );
 }
 console.log('ENVIANDO ALERTA');
-            await channel.send({
+
+const target =
+  testUser || channel;
+
+await target.send({
               
               
               content:
@@ -602,13 +657,26 @@ console.log('ENVIANDO ALERTA');
 
           // 🔥 EPISÓDIO LANÇADO
           if (
-            diff <= 0 &&
-            !sentEpisodes[key].released
-          ) {
 
-            sentEpisodes[key].released = true;
+  (
+    diff <= 0 ||
 
-            saveSentEpisodes(sentEpisodes);
+    forceRelease
+  ) &&
+
+  !sentEpisodes[key].released
+) {
+
+            if (
+  !options.testUserId
+) {
+
+  sentEpisodes[key].released = true;
+
+  saveSentEpisodes(
+    sentEpisodes
+  );
+}
 
             const crunchyroll =
               data.externalLinks?.find(
@@ -644,7 +712,10 @@ console.log('ENVIANDO ALERTA');
                     )
                 );
 
-            await channel.send({
+            const target =
+  testUser || channel;
+
+await target.send({
               embeds: [embed],
               components: [row]
             });

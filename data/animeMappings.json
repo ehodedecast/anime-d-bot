@@ -6,5 +6,37 @@
       "anilist": 21
     },
     "lastProviderSync": 1779024272253
+  },
+  {
+    "internalId": "adb_2",
+    "title": "Sousou no Frieren 3rd Season",
+    "providers": {
+      "anilist": 209939
+    },
+    "lastProviderSync": 1779034458082
+  },
+  {
+    "internalId": "adb_3",
+    "title": "Ponkotsu Fuuki Iin to Skirt take ga Futekisetsu na JK no Hanashi",
+    "providers": {
+      "anilist": 189987
+    },
+    "lastProviderSync": 0
+  },
+  {
+    "internalId": "adb_4",
+    "title": "Tongari Boushi no Atelier",
+    "providers": {
+      "anilist": 147105
+    },
+    "lastProviderSync": 0
+  },
+  {
+    "internalId": "adb_5",
+    "title": "LIAR GAME",
+    "providers": {
+      "anilist": 197754
+    },
+    "lastProviderSync": 0
   }
 ]

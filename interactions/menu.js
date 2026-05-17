@@ -1,11 +1,18 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { t } = require('../utils/language');
+
 function sendMenu(target) {
   const guildId = target.guild.id;
   console.log('SENDMENU EXECUTADO');
 
   const embed = new EmbedBuilder()
     .setColor(0x5865F2)
+    .setTitle(
+  t(guildId, 'menu_title')
+  )
+  .setURL(
+    'https://discord.com/invite/YFvye4hkuV'
+  )
     .setImage(
       'https://raw.githubusercontent.com/ehodedecast/anime-d-bot/refs/heads/main/assets/banner.png'
     )
@@ -29,7 +36,7 @@ function sendMenu(target) {
   t(guildId, 'button_next_episode')
 )
       .setEmoji('🎯')
-      .setStyle(ButtonStyle.Success),
+      .setStyle(ButtonStyle.Secondary),
 
     new ButtonBuilder()
       .setCustomId('menu_info')
@@ -55,20 +62,18 @@ function sendMenu(target) {
   t(guildId, 'button_remove_anime')
 )
       .setEmoji('🗑️')
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Secondary),
 
-    
-  );
-
-  const row3 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
+      new ButtonBuilder()
       .setCustomId('menu_clear')
       .setLabel(
   t(guildId, 'button_clear_list')
 )
       .setEmoji('🧹')
-      .setStyle(ButtonStyle.Danger),
+      .setStyle(ButtonStyle.Danger)
 
+  );
+  const row3 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
       .setCustomId('menu_help')
       .setLabel(

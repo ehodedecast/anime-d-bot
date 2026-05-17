@@ -1,13 +1,13 @@
 {
-  "lastCheck": "2026-05-17T14:25:03.866Z",
+  "lastCheck": "2026-05-17T17:59:05.882Z",
   "totalGuilds": 2,
-  "totalGlobal": null,
-  "uniqueGlobal": 1,
-  "totalRequests": 1,
-  "savedRequests": null,
+  "totalGlobal": 5,
+  "uniqueGlobal": 5,
+  "totalRequests": 0,
+  "savedRequests": 5,
   "guildStats": {
     "1502263697337221230": {
-      "animeCount": 1
+      "animeCount": 5
     },
     "1354465818066550904": {
       "animeCount": 0
@@ -16,6 +16,22 @@
   "topAnimes": [
     {
       "title": "ONE PIECE",
+      "count": 1
+    },
+    {
+      "title": "Tongari Boushi no Atelier",
+      "count": 1
+    },
+    {
+      "title": "Ponkotsu Fuuki Iin to Skirt take ga Futekisetsu na JK no Hanashi",
+      "count": 1
+    },
+    {
+      "title": "LIAR GAME",
+      "count": 1
+    },
+    {
+      "title": "Sousou no Frieren 3rd Season",
       "count": 1
     }
   ],
@@ -29,6 +45,22 @@
     {
       "title": "ONE PIECE",
       "count": 1
+    },
+    {
+      "title": "Tongari Boushi no Atelier",
+      "count": 1
+    },
+    {
+      "title": "Ponkotsu Fuuki Iin to Skirt take ga Futekisetsu na JK no Hanashi",
+      "count": 1
+    },
+    {
+      "title": "LIAR GAME",
+      "count": 1
+    },
+    {
+      "title": "Sousou no Frieren 3rd Season",
+      "count": 1
     }
   ],
   "animeMetrics": {
@@ -36,6 +68,42 @@
       "title": "ONE PIECE",
       "successfulAdds": 2,
       "attemptAdds": 2,
+      "duplicateAttempts": 0,
+      "activeGuilds": [
+        "1502263697337221230"
+      ]
+    },
+    "147105": {
+      "title": "Tongari Boushi no Atelier",
+      "successfulAdds": 1,
+      "attemptAdds": 1,
+      "duplicateAttempts": 0,
+      "activeGuilds": [
+        "1502263697337221230"
+      ]
+    },
+    "189987": {
+      "title": "Ponkotsu Fuuki Iin to Skirt take ga Futekisetsu na JK no Hanashi",
+      "successfulAdds": 1,
+      "attemptAdds": 1,
+      "duplicateAttempts": 0,
+      "activeGuilds": [
+        "1502263697337221230"
+      ]
+    },
+    "197754": {
+      "title": "LIAR GAME",
+      "successfulAdds": 1,
+      "attemptAdds": 1,
+      "duplicateAttempts": 0,
+      "activeGuilds": [
+        "1502263697337221230"
+      ]
+    },
+    "209939": {
+      "title": "Sousou no Frieren 3rd Season",
+      "successfulAdds": 1,
+      "attemptAdds": 1,
       "duplicateAttempts": 0,
       "activeGuilds": [
         "1502263697337221230"

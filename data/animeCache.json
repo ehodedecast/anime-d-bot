@@ -8,12 +8,49 @@
         "episode": 1163,
         "airingAt": 1779632160
       },
-      "lastUpdated": "2026-05-17T14:24:04.111Z"
+      "lastUpdated": "2026-05-17T17:07:32.895Z"
+    },
+    "147105": {
+      "id": 147105,
+      "title": "Tongari Boushi no Atelier",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx147105-rwOX8qyUy8gV.jpg",
+      "nextEpisode": {
+        "episode": 8,
+        "airingAt": 1779112800
+      },
+      "lastUpdated": "2026-05-17T17:27:03.686Z"
+    },
+    "189987": {
+      "id": 189987,
+      "title": "Ponkotsu Fuuki Iin to Skirt take ga Futekisetsu na JK no Hanashi",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx189987-CkTDPfD7vu2Y.jpg",
+      "nextEpisode": {
+        "episode": 7,
+        "airingAt": 1779114240
+      },
+      "lastUpdated": "2026-05-17T17:26:33.682Z"
+    },
+    "197754": {
+      "id": 197754,
+      "title": "LIAR GAME",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx197754-Q5KqcUhIdypp.png",
+      "nextEpisode": {
+        "episode": 7,
+        "airingAt": 1779116400
+      },
+      "lastUpdated": "2026-05-17T17:27:33.708Z"
+    },
+    "209939": {
+      "id": 209939,
+      "title": "Sousou no Frieren 3rd Season",
+      "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209939-g2Njkml1rheG.jpg",
+      "nextEpisode": null,
+      "lastUpdated": "2026-05-17T16:14:26.237Z"
     }
   },
-  "lastGlobalUpdate": "2026-05-17T14:24:04.112Z",
+  "lastGlobalUpdate": "2026-05-17T17:27:34.052Z",
   "stats": {
-    "totalCached": 1,
+    "totalCached": 5,
     "cacheHits": 0,
     "cacheMisses": 0
   }

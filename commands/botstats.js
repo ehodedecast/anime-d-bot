@@ -7,6 +7,9 @@ async function botstats(
   message,
   client
 ) {
+  console.log(
+  `✅ !botstats executed by ${message.author.username}`
+);
 
   if (
     String(message.author.id) !==

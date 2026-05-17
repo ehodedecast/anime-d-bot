@@ -27,62 +27,48 @@ async function help(
       .setColor(0x5865F2)
 
       .setTitle(
-        '🤖 AnimeDBot Help Center'
+        t(message.guild.id,'help_title')
       )
 
       .setDescription(
 
-        'Track anime, check upcoming episodes, manage your anime list and more.\n\n' +
-
-'Most anime features can also be accessed through the main interaction menu, making AnimeDBot easier to use without memorizing commands.\n\n' +
-
-'Below are all available commands and systems currently available in AnimeDBot.'
+        t(message.guild.id,'help_description')
       )
 
       .addFields(
 
         {
           name:
-            '📺 Anime Commands',
+            t(message.guild.id,'help_anime_commands_title')+'\n',
 
           value:
 
-            '`!add <anime>` → Add anime to tracking\n' +
-            '`!list` → Show tracked anime\n' +
-            '`!next <anime>` → Next episode info\n' +
-            '`!info <anime>` → Detailed anime info\n' +
-            '`!remove <anime>` → Remove anime\n' +
-            '`!clearlist` → Clear server anime list'
+            t(message.guild.id,'help_anime_commands')
         },
 
         {
           name:
-            '🌍 Language Commands',
+            t(message.guild.id,'help_language_commands_title')+'\n',
 
           value:
-            '`!language` → Change bot language'
+            t(message.guild.id,'help_language_commands')
         },
 
         {
           name:
-            '⚙️ Admin Commands',
+            t(message.guild.id,'help_admin_commands_title')+'\n',
 
           value:
-            '`!setchannel` → Configure bot channel'
+            t(message.guild.id,'help_admin_commands')
         },
 
         {
           name:
-            '💡 Features',
+            t(message.guild.id,'help_features_title')+'\n',
 
           value:
 
-            '• Multi-provider anime search\n' +
-            '• AniList + Jikan support\n' +
-            '• Anime tracking\n' +
-            '• Episode notifications\n' +
-            '• Smart search system\n' +
-            '• Anime selection menus'
+           t(message.guild.id,'help_features') 
         }
       )
 
@@ -103,7 +89,7 @@ async function help(
         new ButtonBuilder()
 
           .setLabel(
-            'Support Server'
+            t(message.guild.id,'join_support_server')
           )
 
           .setStyle(
