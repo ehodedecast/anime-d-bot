@@ -11,6 +11,11 @@ const sendMenu = require('./interactions/menu');
 
 const checkAnime = require('./utils/checkAnime');
 
+const validateStorage =
+  require(
+    './utils/storageValidator'
+  );
+
 const {
   getGuildAnimeList
 } = require('./utils/animeStorage');
@@ -369,6 +374,7 @@ client.on(
     );
   }
 );
+validateStorage();
 
 // 🔑 LOGIN
 

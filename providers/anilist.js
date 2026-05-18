@@ -88,7 +88,13 @@ query ($search: String) {
         variables
       }
     );
-
+console.log(
+  response
+    .data
+    .data
+    .Page
+    .media
+);
   return response
   .data
   .data

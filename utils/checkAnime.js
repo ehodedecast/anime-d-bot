@@ -100,6 +100,20 @@ async function checkAnime(
     guildAnime
   ) {
     if (
+  !anime ||
+  !anime.id ||
+  !anime.title
+) {
+
+  console.log(
+    chalk.red(
+      `💥 Invalid anime entry in guild ${guildId}`
+    )
+  );
+
+  continue;
+}
+    if (
       anime.mode !==
       'tracking'
     ) {
@@ -433,7 +447,14 @@ if (
 
     let query = 'query {';
 
+
+
     filteredChunk.forEach((anime, index) => {
+      console.log(
+  chalk.yellow(
+    `📦 Chunk anime: ${anime.title} (${anime.id})`
+  )
+);
 
       query += `
 
@@ -449,11 +470,11 @@ if (
             episode
             airingAt
           }
-
           externalLinks {
             site
             url
           }
+          
         }
       `;
     });
@@ -732,10 +753,29 @@ await target.send({
     } catch (err) {
 
       console.log(
-        chalk.red(
-          `💥 [ERROR] ${err.message}`
-        )
-      );
+  chalk.red(
+    `💥 [ERROR] ${err.message}`
+  )
+);
+
+if (
+  err.response
+) {
+
+  console.log(
+
+    chalk.red(
+      `📡 STATUS: ${err.response.status}`
+    )
+  );
+
+  console.log(
+
+    chalk.red(
+      `📄 DATA: ${JSON.stringify(err.response.data, null, 2)}`
+    )
+  );
+}
     }
     cache.lastGlobalUpdate =
   new Date().toISOString();
