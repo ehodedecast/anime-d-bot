@@ -412,6 +412,43 @@ module.exports = async (
 
       flags: 64
     });
+    
+  }
+  // 🔹 BOTAO LANGUAGE ES
+
+  if (
+    interaction.customId ===
+    'lang_es'
+  ) {
+
+    const config =
+      loadConfig();
+
+    if (
+      !config[
+        interaction.guild.id
+      ]
+    ) {
+
+      config[
+        interaction.guild.id
+      ] = {};
+    }
+
+    config[
+      interaction.guild.id
+    ].language = 'es';
+
+    saveConfig(config);
+
+    return interaction.reply({
+
+      content:
+        '🇪🇸 Idioma cambiado a español.',
+
+      flags: 64
+    });
+    
   }
 
   /* =========================================

@@ -14,7 +14,7 @@
   "button_remove_anime": "Remover anime",
   "button_clear_list": "Limpar lista",
   "button_help": "Ajuda",
-
+  "button_vote": "Votar",
   "// PROMPTS": "",
 
   "prompt_type_anime_name": "✏️ Digite o nome do anime:",
@@ -103,8 +103,10 @@
   "language.description": "Selecione o idioma do AnimeDBot.",
   "language.portuguese": "Português",
   "language.english": "English",
+  "language.spanish": "Español",
 
   "// HELP": "",
+  
   "help_title": "📖 Ajuda do AnimeDBot",
   "help_description": "Bem-vindo ao Centro de Ajuda do AnimeDBot! Aqui você pode encontrar todos os comandos e recursos disponíveis para aproveitar ao máximo sua experiência de rastreamento de animes.\n\nA maioria dos recursos de anime também pode ser acessada através do menu principal de interação, tornando o AnimeDBot mais fácil de usar sem memorizar comandos.\n\nAbaixo estão todos os comandos e sistemas atualmente disponíveis no AnimeDBot.",
   "help_anime_commands_title": "📺 Comandos de Anime",

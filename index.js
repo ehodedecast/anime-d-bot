@@ -171,6 +171,34 @@ client.on(
     ) {
       return;
     }
+    const isLocalDev =
+
+  !process.env.RAILWAY_ENVIRONMENT;
+
+const devChannelId =
+  process.env.DEV_CHANNEL_ID;
+
+// 🧪 LOCAL BOT
+
+if (
+  isLocalDev &&
+  message.channel.id !==
+    devChannelId
+) {
+
+  return;
+}
+
+// 🚫 PRODUCTION BOT
+
+if (
+  !isLocalDev &&
+  message.channel.id ===
+    devChannelId
+) {
+
+  return;
+}
 
     // 📺 GUILD ANIME LIST
 

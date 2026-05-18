@@ -2,13 +2,15 @@ const fs = require("fs");
 
 const en = require("../lang/en.json");
 const pt = require("../lang/pt.json");
+const es = require("../lang/es.json");
 
 
 const languages = {
     en,
-    pt
+    pt,
+    es
 };
-
+    
 const configPath = './data/config.json';
 
 function getGuildLanguage(guildId) {

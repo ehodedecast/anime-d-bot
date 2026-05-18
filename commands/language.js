@@ -43,7 +43,7 @@ async function language(
           .setEmoji('🇧🇷')
 
           .setStyle(
-            ButtonStyle.Primary
+            ButtonStyle.Secondary
           ),
 
         new ButtonBuilder()
@@ -60,7 +60,24 @@ async function language(
 
           .setStyle(
             ButtonStyle.Secondary
+          ),
+          
+          new ButtonBuilder()
+
+          .setCustomId(
+            'lang_es'
           )
+
+          .setLabel(
+            t(message.guild.id, 'language.spanish')
+          )
+
+          .setEmoji('🇪🇸')
+
+          .setStyle(
+            ButtonStyle.Secondary
+          ),
+
       );
 
   return message.reply({

@@ -80,8 +80,14 @@ function sendMenu(target) {
   t(guildId, 'button_help')
 )
       .setEmoji('❓')
-      .setStyle(ButtonStyle.Primary)
-    
+      .setStyle(ButtonStyle.Primary),
+
+      new ButtonBuilder()
+  .setLabel('⭐ Vote')
+  .setStyle(ButtonStyle.Link)
+  .setURL(
+    'https://top.gg/bot/1500880961603244112/vote'
+  )
   );
 
  if (target.isButton?.()) {
