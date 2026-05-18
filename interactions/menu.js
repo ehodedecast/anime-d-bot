@@ -11,7 +11,7 @@ function sendMenu(target) {
   t(guildId, 'menu_title')
   )
   .setURL(
-    'https://discord.com/invite/YFvye4hkuV'
+    'https://top.gg/bot/1500880961603244112'
   )
     .setImage(
       'https://raw.githubusercontent.com/ehodedecast/anime-d-bot/refs/heads/main/assets/banner.png'
