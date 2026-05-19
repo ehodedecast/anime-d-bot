@@ -16,6 +16,11 @@ const validateStorage =
     './utils/storageValidator'
   );
 
+  const guildCreate =
+  require(
+    './events/guildCreate'
+  );
+
 const {
   getGuildAnimeList
 } = require('./utils/animeStorage');
@@ -107,54 +112,13 @@ client.once(
   }
 );
 
+
+
 // 🌍 BOT JOINED SERVER
 
 client.on(
   'guildCreate',
-
-  async (guild) => {
-
-    try {
-
-      const channel =
-        guild.channels.cache.find(
-
-          c =>
-
-            c.isTextBased() &&
-
-            c.permissionsFor(
-              guild.members.me
-            ).has(
-              'SendMessages'
-            )
-        );
-
-      if (!channel) return;
-
-      channel.send(
-
-        t(
-          guild.id,
-          'welcome_message'
-        ) +
-
-        `\n\n` +
-
-        t(
-          guild.id,
-          'setup_instructions'
-        )
-      );
-
-    } catch (err) {
-
-      console.log(
-        'Erro guildCreate:',
-        err
-      );
-    }
-  }
+  guildCreate
 );
 
 // 💬 MESSAGE CREATE
@@ -174,9 +138,18 @@ client.on(
     const isLocalDev =
 
   !process.env.RAILWAY_ENVIRONMENT;
+  console.log(
+
+  isLocalDev
+
+    ? '🧪 LOCAL DEV MODE'
+
+    : '🚀 PRODUCTION MODE'
+);
 
 const devChannelId =
   process.env.DEV_CHANNEL_ID;
+
 
 // 🧪 LOCAL BOT
 
