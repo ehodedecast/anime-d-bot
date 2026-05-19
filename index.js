@@ -1,6 +1,11 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
+const startVoteServer =
+  require(
+    './topgg/server'
+  );
+
 const fs = require('fs');
 const notifier = require('node-notifier');
 const chalk = require('chalk').default;
@@ -104,6 +109,8 @@ client.once(
       'Bot online!'
     );
 
+    startVoteServer(client);
+
     setInterval(() => {
 
       checkAnime(client);
@@ -137,7 +144,9 @@ client.on(
     }
     const isLocalDev =
 
-  !process.env.RAILWAY_ENVIRONMENT;
+  process.env.LOCAL_DEV ===
+  'true';
+
   console.log(
 
   isLocalDev

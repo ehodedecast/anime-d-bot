@@ -21,6 +21,8 @@ const REQUIRED_FILES = {
     animes: {}
   },
 
+  'votes.json': {},
+
   'sentEpisodes.json': {},
 
   'analytics.json': {},
