@@ -142,45 +142,6 @@ client.on(
     ) {
       return;
     }
-    const isLocalDev =
-
-  process.env.LOCAL_DEV ===
-  'true';
-
-  console.log(
-
-  isLocalDev
-
-    ? '🧪 LOCAL DEV MODE'
-
-    : '🚀 PRODUCTION MODE'
-);
-
-const devChannelId =
-  process.env.DEV_CHANNEL_ID;
-
-
-// 🧪 LOCAL BOT
-
-if (
-  isLocalDev &&
-  message.channel.id !==
-    devChannelId
-) {
-
-  return;
-}
-
-// 🚫 PRODUCTION BOT
-
-if (
-  !isLocalDev &&
-  message.channel.id ===
-    devChannelId
-) {
-
-  return;
-}
 
     // 📺 GUILD ANIME LIST
 
