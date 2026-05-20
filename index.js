@@ -1,6 +1,11 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
+const guildDelete =
+  require(
+    './events/guildDelete'
+  );
+
 const startVoteServer =
   require(
     './topgg/server'
@@ -13,6 +18,8 @@ const chalk = require('chalk').default;
 const handleCommands = require('./commands');
 const handleButtons = require('./interactions/buttons');
 const sendMenu = require('./interactions/menu');
+
+
 
 const checkAnime = require('./utils/checkAnime');
 
@@ -126,6 +133,11 @@ client.once(
 client.on(
   'guildCreate',
   guildCreate
+);
+
+client.on(
+  'guildDelete',
+  guildDelete
 );
 
 // 💬 MESSAGE CREATE
@@ -277,8 +289,8 @@ client.on(
 
   selectedAnime
 );
-    }
 
+    }
     // 📋 MENU
 
     if (

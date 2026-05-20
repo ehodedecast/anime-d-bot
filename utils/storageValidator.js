@@ -27,7 +27,9 @@ const REQUIRED_FILES = {
 
   'analytics.json': {},
 
-  'config.json': {}
+  'config.json': {},
+
+  'guildHistory.json': {},
 };
 
 function ensureDirectory() {

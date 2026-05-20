@@ -12,6 +12,17 @@ const {
   'discord.js'
 );
 
+const {
+
+  loadGuildHistory,
+
+  saveGuildHistory
+
+} = require(
+
+  '../utils/guildHistoryStorage'
+);
+
 
 
 const OWNER_ID =
@@ -32,6 +43,70 @@ async function guildCreate(
       await guild.client.users.fetch(
         OWNER_ID
       );
+const history =
+
+  loadGuildHistory();
+
+if (
+  !history[guild.id]
+) {
+
+  history[guild.id] = {
+
+    guildName:
+      guild.name,
+
+    joinCount: 0,
+
+    currentlyInServer: false,
+
+    firstJoinedAt: null,
+
+    lastJoinedAt: null,
+
+    lastLeftAt: null,
+
+    totalTimeMs: 0,
+
+    history: []
+  };
+}
+
+const guildData =
+  history[guild.id];
+
+guildData.guildName =
+  guild.name;
+
+guildData.joinCount++;
+
+guildData.currentlyInServer =
+  true;
+
+const now =
+  new Date().toISOString();
+
+if (
+  !guildData.firstJoinedAt
+) {
+
+  guildData.firstJoinedAt =
+    now;
+}
+
+guildData.lastJoinedAt =
+  now;
+
+guildData.history.push({
+
+  joinedAt: now,
+
+  leftAt: null
+});
+
+saveGuildHistory(
+  history
+);
 
     const embed =
       new EmbedBuilder()

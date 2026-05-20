@@ -20,6 +20,7 @@ const migrateAnimeData = require('../dev/migrateAnimeData');
 const devReply = require('../utils/devReply');
 const testQuery = require('../dev/testQuery');
 const repairGuildNames = require('../dev/repairGuildNames');
+const serverhistory = require('./serverhistory');
 
 
 
@@ -117,6 +118,17 @@ if (
     message
   );
 }
+
+if (
+  message.content ===
+  '!serverhistory'
+) {
+
+  return serverhistory(
+    message
+  );
+}
+
 // 🔹 COMANDO LANGUAGE
 
 if (
