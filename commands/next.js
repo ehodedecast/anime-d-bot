@@ -27,119 +27,325 @@ function formatTimeLeft(ms) {
   return `${minutes}m`;
 }
 
-async function next(message, animeName) {
+async function next(
+  message,
+  animeList
+) {
+
   try {
-    const query = `
-    query {
-      Media(search: "${animeName}", type: ANIME) {
-      isAdult
-        title { romaji }
-        coverImage { large }
-        episodes
-        status
-        nextAiringEpisode {
-          episode
-          airingAt
-        }
-      }
-    }`;
 
-    const res = await axios.post('https://graphql.anilist.co/graphql', { query });
-    const data = res.data.data.Media;
-    if (data.isAdult) {
+    const guildAnime =
 
-  return message.reply(
-    t(
-      message.guild.id,
-      'adult_content_warning'
-    )
-  );
-}
+      animeList?.[
+        message.guild.id
+      ]?.anime || [];
 
-    if (!data) {
-  return message.reply(
-    t(
-      message.guild.id,
-      'search_temporarily_disabled'
-    )
-  );
-}
+    if (
+      guildAnime.length === 0
+    ) {
 
-    const name = data.title.romaji;
-
-    // 🧠 STATUS
-    const statusMap = {
-      FINISHED: t(message.guild.id, 'finished'), // "Finalizado"
-      RELEASING: t(message.guild.id, 'releasing'), // "Em exibição"
-      NOT_YET_RELEASED: t(message.guild.id, 'not_yet_released'), // "Ainda não lançado"
-      CANCELLED: t(message.guild.id, 'cancelled'), // "Cancelado"
-      HIATUS: t(message.guild.id, 'hiatus') // "Em hiato"
-    };
-
-    const status = statusMap[data.status] || data.status;
-
-    // ❌ SEM PRÓXIMO EP
-    if (!data.nextAiringEpisode) {
-      const embed = createEmbed({
-        title: `📺 ${name}`,
-        description: t(message.guild.id, 'next_episode_not_found'),
-        image: data.coverImage?.large,
-        color: 0xff9900,
-
-        fields: [
-          { name: t(message.guild.id, 'status'), value: status, inline: true },
-          { name: t(message.guild.id, 'episodes'), value: `${data.episodes || "?"}`, inline: true }
-        ]
-      });
-
-      return message.reply({ embeds: [embed] });
+      return message.reply(
+        t(
+          message.guild.id,
+          'anime_list_empty'
+        )
+      );
     }
 
-    // ✅ COM PRÓXIMO EP
-    const ep = data.nextAiringEpisode.episode;
-    const airingTime = data.nextAiringEpisode.airingAt * 1000;
-    const now = Date.now();
+    const results = [];
 
-    const timeLeft = airingTime - now;
-	// 🎨 cor dinâmica
-let color = 0x00ccff;
+    for (
+      const anime of guildAnime
+    ) {
 
-if (timeLeft <= 3600000) color = 0xff0000; // < 1h
-else if (timeLeft <= 10800000) color = 0xff9900; // < 3h
+      try {
 
-// 🧠 texto inteligente
-let statusText = t(message.guild.id, 'next_episode_confirmed'); // "🎯 Próximo episódio confirmado!"
+        const query = `
+        query {
+          Media(
+            id: ${anime.id},
+            type: ANIME
+          ) {
 
-if (timeLeft <= 3600000 && timeLeft > 0) {
-  statusText = t(message.guild.id, 'next_episode_soon'); // "⚠️ Próximo episódio saindo em breve!"
+            isAdult
+
+            title {
+              romaji
+            }
+
+            coverImage {
+              medium
+            }
+
+            status
+
+            nextAiringEpisode {
+              episode
+              airingAt
+            }
+          }
+        }`;
+
+        const res =
+          await axios.post(
+            'https://graphql.anilist.co/graphql',
+            { query }
+          );
+
+        const data =
+          res.data.data.Media;
+
+        if (
+          !data ||
+          data.isAdult ||
+          !data.nextAiringEpisode
+        ) {
+
+          continue;
+        }
+
+        const airingTime =
+
+          data
+            .nextAiringEpisode
+            .airingAt * 1000;
+
+        const now =
+          Date.now();
+
+        const timeLeft =
+          airingTime - now;
+
+        results.push({
+
+          title:
+            data.title.romaji,
+
+          image:
+            data.coverImage?.medium,
+
+          episode:
+            data
+              .nextAiringEpisode
+              .episode,
+
+          airingTime,
+
+          timeLeft,
+
+          status:
+            data.status
+        });
+
+      } catch (err) {
+
+        console.log(
+          `NEXT FAILED: ${anime.title}`
+        );
+      }
+    }
+
+    if (
+      results.length === 0
+    ) {
+
+      return message.reply(
+        t(
+          message.guild.id,
+          'next_episode_not_found'
+        )
+      );
+    }
+
+    // 🧠 ORDER BY CLOSEST
+
+    results.sort(
+
+      (a, b) =>
+
+        a.airingTime -
+        b.airingTime
+    );
+
+    // 🧠 BUILD DESCRIPTION
+
+    // 🎯 HEADER EMBED
+
+const embeds = [];
+
+const headerEmbed =
+  createEmbed({
+
+    title:
+      '🎯 Upcoming Episodes',
+
+    description:
+      'Upcoming episodes from your tracked anime list.',
+
+    color:
+      0x00ccff
+  });
+
+embeds.push(
+  headerEmbed
+);
+
+// 📺 ANIME EMBEDS
+
+for (
+  const anime of results
+) {
+
+  const formattedDate =
+
+    new Date(
+      anime.airingTime
+    )
+
+    .toLocaleString(
+      'pt-BR',
+      {
+
+        day: '2-digit',
+
+        month: '2-digit',
+
+        hour: '2-digit',
+
+        minute: '2-digit'
+      }
+    );
+
+  let color =
+  0x8b5cf6;
+
+// 🔴 < 1h
+
+if (
+  anime.timeLeft <=
+  3600000
+) {
+
+  color =
+    0xff0000;
 }
 
-    const formattedDate = new Date(airingTime).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+// 🟠 < 6h
 
-    const embed = createEmbed({
-  title: `📺 ${name}`,
-  description: statusText,
-  image: data.coverImage?.large,
-  color: color,
+else if (
+
+  anime.timeLeft <=
+  21600000
+
+) {
+
+  color =
+    0xff9900;
+}
+
+// 🔵 < 24h
+
+else if (
+
+  anime.timeLeft <=
+  86400000
+
+) {
+
+  color =
+    0x00ccff;
+}
+
+  if (
+    anime.timeLeft <=
+    3600000
+  ) {
+
+    color =
+      0xff0000;
+  }
+
+  else if (
+
+    anime.timeLeft <=
+    10800000
+
+  ) {
+
+    color =
+      0xff9900;
+  }
+
+  const animeEmbed =
+    createEmbed({
+
+      title:
+        anime.title,
+
+      thumbnail:
+        anime.image,
+
+      color,
 
       fields: [
-        { name: t(message.guild.id, 'episodes'), value: `Ep ${ep}`, inline: true },
-        { name: t(message.guild.id, 'airing_time'), value: formattedDate, inline: true },
-        { name: t(message.guild.id, 'time_left'), value: formatTimeLeft(timeLeft), inline: true },
-        { name: t(message.guild.id, 'status'), value: status, inline: true }
+
+        {
+
+          name:
+            '📺 Episode',
+
+          value:
+            `Ep ${anime.episode}`,
+
+          inline: true
+        },
+
+        {
+
+          name:
+            '⏳ Time Left',
+
+          value:
+            formatTimeLeft(
+              anime.timeLeft
+            ),
+
+          inline: true
+        },
+
+        {
+
+          name:
+            '🕒 Airing',
+
+          value:
+            formattedDate,
+
+          inline: true
+        }
       ]
     });
 
-    return message.reply({ embeds: [embed] });
+  embeds.push(
+    animeEmbed
+  );
+}
+
+return message.reply({
+  embeds
+});
 
   } catch (err) {
+
     console.log(err);
-    return message.reply(t(message.guild.id, 'error_occurred'));
+
+    return message.reply(
+
+      t(
+        message.guild.id,
+        'error_occurred'
+      )
+    );
   }
 }
 

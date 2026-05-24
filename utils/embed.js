@@ -2,12 +2,29 @@ const { EmbedBuilder } = require('discord.js');
 const branding =
   require('../constants/branding.json');
 
-function createEmbed({ title, description, image, color = 0x5865F2, fields = [] }) {
+function createEmbed({
+
+  title,
+
+  description,
+
+  image,
+
+  thumbnail,
+
+  color = 0x5865F2,
+
+  fields = []
+
+}) {
   const embed = new EmbedBuilder()
     .setColor(color)
     .setTitle(title)
-    .setDescription(description)
+    .setDescription(
+  description || null
+)
     .setImage(image || null)
+    .setThumbnail(thumbnail || null)
     .setFooter({
       text: branding.footer
     })

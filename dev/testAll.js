@@ -1,20 +1,8 @@
-const fs =
-  require('fs');
-
-const path =
-  require('path');
-
 const chalk =
   require('chalk').default;
-  require('dotenv').config();
 
-const {
-
-  Client,
-
-  GatewayIntentBits
-
-} = require('discord.js');
+require('dotenv')
+  .config();
 
 console.log(
   chalk.cyan(
@@ -22,423 +10,129 @@ console.log(
   )
 );
 
-const requiredFiles = [
+const testSuites = [
 
-  './data/animes.json',
+  // 📂 FILESYSTEM
 
-  './data/animeMappings.json',
+  require(
+    './tests/filesystem/filesystem.test'
+  ),
 
-  './data/animeCache.json',
+  // 🌐 PROVIDERS
 
-  './data/sentEpisodes.json',
+  require(
+    './tests/providers/providers.test'
+  ),
 
-  './data/analytics.json'
+  // 🤖 COMMANDS
+
+  require(
+    './tests/commands/commands.test'
+  ),
+
+  // 🎮 INTERACTIONS
+
+  require(
+    './tests/interactions/interactions.test'
+  ),
+
+  // 🧠 STATE
+
+  require(
+  './tests/state/state.test'
+  ),
+
+  // 🔔 NOTIFICATIONS
+
+  require(
+    './tests/notifications/notifications.test'
+  ),
+// 💾 STORAGE
+
+require(
+  './tests/storage/storage.test'
+),
+  // ⚡ CACHE
+
+  require(
+    './tests/cache/cache.test'
+  ),
+
+  // 📊 ANALYTICS
+
+  require(
+    './tests/analytics/analytics.test'
+  ),
+
+  // 💥 FAILURES
+
+  require(
+    './tests/failures/failures.test'
+  ),
+
+  // 🏰 LIFECYCLE
+
+  require(
+    './tests/lifecycle/lifecycle.test'
+  )
 ];
+
+let passed =
+  0;
+
+let failed =
+  0;
 
 async function runTests() {
 
-  try {
+  console.log(
+    chalk.yellow(
+      '🔍 Running test suites...\n'
+    )
+  );
 
-    console.log(
-      chalk.yellow(
-        '🔍 Running tests...\n'
-      )
-    );
+  for (
+    const suite of
+    testSuites
+  ) {
 
-    // 📂 FILE TESTS
+    try {
 
-    console.log(
-      chalk.blue(
-        '\n📂 Checking files...\n'
-      )
-    );
+      await suite.run();
 
-    for (
-      const file of requiredFiles
-    ) {
+      passed++;
 
-      const exists =
-        fs.existsSync(file);
+    } catch (err) {
 
-      if (!exists) {
-
-        console.log(
-          chalk.red(
-            `❌ Missing: ${file}`
-          )
-        );
-
-        continue;
-      }
+      failed++;
 
       console.log(
-        chalk.green(
-          `✅ Found: ${file}`
+        chalk.red(
+          `\n❌ Suite failed: ${err.message}`
         )
       );
-
-      // 🔍 VALID JSON
-
-      try {
-
-        const raw =
-          fs.readFileSync(
-            file,
-            'utf8'
-          );
-
-        JSON.parse(raw);
-
-        console.log(
-          chalk.green(
-            `✅ Valid JSON: ${file}`
-          )
-        );
-
-      } catch {
-
-        console.log(
-          chalk.red(
-            `❌ Invalid JSON: ${file}`
-          )
-        );
-      }
     }
-
-    console.log(
-      chalk.green(
-        '\n✅ File tests completed\n'
-      )
-    );
-    // 🧠 SCHEMA VALIDATION
-
-console.log(
-  chalk.blue(
-    '\n🧠 Checking schema...\n'
-  )
-);
-
-const animeData = JSON.parse(
-
-  fs.readFileSync(
-    './data/animes.json',
-    'utf8'
-  )
-);
-
-for (
-  const guildId in animeData
-) {
-
-  const guild =
-    animeData[guildId];
-
-  // ❌ LEGACY FORMAT
-
-  if (
-    Array.isArray(guild)
-  ) {
-
-    console.log(
-      chalk.red(
-        `❌ Legacy schema: ${guildId}`
-      )
-    );
-
-    continue;
-  }
-
-  // ❌ INVALID GUILD NAME
-
-  if (
-    typeof guild.guildName !==
-    'string'
-  ) {
-
-    console.log(
-      chalk.red(
-        `❌ Missing guildName: ${guildId}`
-      )
-    );
-
-    continue;
-  }
-
-  // ❌ INVALID ANIME ARRAY
-
-  if (
-    !Array.isArray(
-      guild.anime
-    )
-  ) {
-
-    console.log(
-      chalk.red(
-        `❌ Invalid anime array: ${guildId}`
-      )
-    );
-
-    continue;
   }
 
   console.log(
-    chalk.green(
-      `✅ Valid guild: ${guild.guildName}`
+    chalk.cyan(
+      '\n📊 TEST SUMMARY\n'
     )
   );
-}
-
-console.log(
-  chalk.green(
-    '\n✅ Schema validation completed\n'
-  )
-);
-// 🌐 PROVIDER TESTS
-
-console.log(
-  chalk.blue(
-    '\n🌐 Testing providers...\n'
-  )
-);
-
-const {
-  searchAnime:
-    anilistSearch
-} = require(
-  '../providers/anilist'
-);
-
-const {
-  searchAnime:
-    jikanSearch
-} = require(
-  '../providers/jikan'
-);
-
-// 🔵 ANILIST
-
-try {
-
-  const results =
-    await anilistSearch(
-      'Naruto'
-    );
 
   console.log(
     chalk.green(
-      `✅ AniList online (${results.length} results)`
+      `✅ Passed: ${passed}`
     )
   );
-
-} catch (err) {
 
   console.log(
     chalk.red(
-      `❌ AniList failed: ${err.message}`
-    )
-  );
-}
-
-// 🟡 JIKAN
-
-try {
-
-  const results =
-    await jikanSearch(
-      'Naruto'
-    );
-
-  console.log(
-    chalk.green(
-      `✅ Jikan online (${results.length} results)`
+      `❌ Failed: ${failed}`
     )
   );
 
-} catch (err) {
-
-  console.log(
-    chalk.red(
-      `❌ Jikan failed: ${err.message}`
-    )
-  );
-}
-
-console.log(
-  chalk.green(
-    '\n✅ Provider tests completed\n'
-  )
-);
-// 🤖 COMMAND TESTS
-
-console.log(
-  chalk.blue(
-    '\n🤖 Testing commands...\n'
-  )
-);
-
-const add = require(
-  '../commands/add'
-);
-
-// 🎭 FAKE MESSAGE
-
-const fakeMessage = {
-
-  guild: {
-
-    id:
-      'TEST_GUILD',
-
-    name:
-      'Test Guild'
-  },
-
-  author: {
-    bot: false
-  },
-
-  channel: {
-
-    async send(data) {
-
-      console.log(
-        chalk.gray(
-          '\n📨 Fake Discord Output:'
-        )
-      );
-
-      console.log(data);
-    }
-  },
-
-  async reply(data) {
-
-    console.log(
-      chalk.gray(
-        '\n💬 Fake Reply:'
-      )
-    );
-
-    console.log(data);
-  }
-};
-
-try {
-
-  await add(
-
-    fakeMessage,
-
-    [],
-
-    'Naruto'
-  );
-
-  console.log(
-    chalk.green(
-      '\n✅ Add command passed'
-    )
-  );
-
-} catch (err) {
-
-  console.log(
-    chalk.red(
-      `\n❌ Add command failed: ${err.message}`
-    )
-  );
-}
-
-console.log(
-  chalk.green(
-    '\n✅ Command tests completed\n'
-  )
-);
-// 🔔 FULL NOTIFICATION TEST
-
-console.log(
-  chalk.blue(
-    '\n🔔 Testing notification pipeline...\n'
-  )
-);
-
-const checkAnime =
-  require('../utils/checkAnime');
-
-const client =
-  new Client({
-
-    intents: [
-      GatewayIntentBits.Guilds
-    ]
-  });
-
-await client.login(
-  process.env.TOKEN
-);
-
-console.log(
-  chalk.yellow(
-    '⏰ Testing 24H notification...'
-  )
-);
-
-await checkAnime(
-  client,
-  {
-    force24h: true,
-
-testUserId:
-  process.env.OWNER_ID
-  }
-);
-
-console.log(
-  chalk.green(
-    '✅ 24H notification pipeline passed'
-  )
-);
-
-console.log(
-  chalk.yellow(
-    '🚨 Testing release notification...'
-  )
-);
-
-await checkAnime(
-  client,
-  {
-    forceRelease: true,
-
-testUserId:
-  process.env.OWNER_ID
-  }
-);
-
-console.log(
-  chalk.green(
-    '✅ Release notification pipeline passed'
-  )
-);
-
-await client.destroy();
-
-console.log(
-  chalk.green(
-    '\n✅ Notification tests completed\n'
-  )
-);
-
-  } catch (err) {
-
-    console.log(
-      chalk.red(
-        '\n❌ TEST FAILURE'
-      )
-    );
-
-    console.log(err);
-  }
+  console.log('');
 }
 
 runTests();

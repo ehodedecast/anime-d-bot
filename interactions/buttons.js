@@ -167,36 +167,38 @@ module.exports = async (
   }
 
   // 🔹 BOTAO NEXT
-
   if (
-    interaction.customId ===
-    'menu_next'
-  ) {
+  interaction.customId ===
+  'menu_next'
+) {
 
-    clearUserStates(
-      interaction.user.id
-    );
+  clearUserStates(
+    interaction.user.id
+  );
 
-    state.waitingForNext =
-      state.waitingForNext || {};
+  await interaction.deferReply({
+    flags: 64
+  });
 
-    state.waitingForNext[
-      interaction.user.id
-    ] = true;
+  return next(
 
-    return interaction.reply({
+    {
+      reply: (msg) =>
+        interaction.editReply(msg),
 
-      content:
+      guild:
+        interaction.guild
+    },
 
-        t(
-          guildId,
-          'prompt_type_anime_name'
-        ),
+    JSON.parse(
 
-      flags: 64
-    });
-  }
-
+  fs.readFileSync(
+    './data/animes.json',
+    'utf8'
+  )
+)
+  );
+}
   // 🔹 BOTAO LISTA
 
   if (
