@@ -448,8 +448,28 @@ if (
     let query = 'query {';
 
 
+console.log(
+  filteredChunk
+);
 
     filteredChunk.forEach((anime, index) => {
+      if (
+
+  !Number.isInteger(
+    anime.id
+  )
+
+) {
+
+  console.log(
+
+    chalk.red(
+      `💥 Invalid ID type: ${anime.title}`
+    )
+  );
+
+  return;
+}
       console.log(
   chalk.yellow(
     `📦 Chunk anime: ${anime.title} (${anime.id})`
@@ -483,6 +503,22 @@ if (
 
     console.log(query);
 totalRequests++;
+
+if (
+  !query.includes(
+    'Media('
+  )
+) {
+
+  console.log(
+    chalk.red(
+      '💥 Empty query blocked'
+    )
+  );
+
+  continue;
+}
+
     const res = await axios.post(
       'https://graphql.anilist.co/graphql',
       { query }
@@ -751,6 +787,21 @@ await target.send({
       }
 
     } catch (err) {
+      if (
+
+  err.response?.data?.errors
+
+) {
+
+  console.log(
+
+    chalk.red(
+      '⚠️ POSSIBLE INVALID ANIME ID DETECTED'
+    )
+  );
+
+  console.log(query);
+}
 
       console.log(
   chalk.red(

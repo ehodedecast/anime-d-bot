@@ -85,7 +85,7 @@ if (
 
     console.log(
 
-      `🔄 Syncing providers for: ${title}`
+      `🔄 Syncing providers for: ${title}+ ${anime.id}`
     );
 
     // 📡 SEARCH JIKAN

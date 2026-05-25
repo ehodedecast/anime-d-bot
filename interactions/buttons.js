@@ -64,6 +64,7 @@ function clearUserStates(
   ];
 }
 
+
 module.exports = async (
   interaction,
   animeList,
@@ -102,6 +103,79 @@ module.exports = async (
   console.log(
     interaction.deferred
   );
+  // 🎯 NEXT PAGINATION
+
+if (
+
+  interaction.customId.startsWith(
+    'next_'
+  )
+
+) {
+
+  const animeList =
+
+    JSON.parse(
+
+      fs.readFileSync(
+        './data/animes.json',
+        'utf8'
+      )
+    );
+
+  let page = 0;
+
+  // ➡️ NEXT PAGE
+
+  if (
+
+    interaction.customId.startsWith(
+      'next_next_'
+    )
+
+  ) {
+
+    page = Number(
+
+      interaction.customId
+        .split('_')[2]
+    );
+  }
+
+  // ⬅️ PREVIOUS PAGE
+
+  if (
+
+    interaction.customId.startsWith(
+      'next_prev_'
+    )
+
+  ) {
+
+    page = Number(
+
+      interaction.customId
+        .split('_')[2]
+    );
+  }
+
+  await interaction.deferUpdate();
+
+  return next(
+
+    {
+      reply: (msg) =>
+        interaction.editReply(msg),
+
+      guild:
+        interaction.guild
+    },
+
+    animeList,
+
+    page
+  );
+}
 
   /* =========================================
      🎛️ MENU BUTTONS

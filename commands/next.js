@@ -1,4 +1,13 @@
 const axios = require('axios');
+const {
+
+  ActionRowBuilder,
+
+  ButtonBuilder,
+
+  ButtonStyle
+
+} = require('discord.js');
 const createEmbed = require('../utils/embed');
 const { t } = require('../utils/language');
 
@@ -15,21 +24,12 @@ function formatTimeLeft(ms) {
   return `${minutes}m`;
 }
 
-function formatTimeLeft(ms) {
-  const totalMinutes = Math.floor(ms / 60000);
-
-  const days = Math.floor(totalMinutes / 1440);
-  const hours = Math.floor((totalMinutes % 1440) / 60);
-  const minutes = totalMinutes % 60;
-
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-}
-
 async function next(
   message,
-  animeList
+
+  animeList,
+
+  currentPage = 0
 ) {
 
   try {
@@ -173,6 +173,8 @@ async function next(
 
 const embeds = [];
 
+const ITEMS_PER_PAGE = 5;
+
 const headerEmbed =
   createEmbed({
 
@@ -192,8 +194,18 @@ embeds.push(
 
 // 📺 ANIME EMBEDS
 
+const currentItems =
+
+  results.slice(
+
+    currentPage * ITEMS_PER_PAGE,
+
+    (currentPage + 1) *
+    ITEMS_PER_PAGE
+  );
+
 for (
-  const anime of results
+  const anime of currentItems
 ) {
 
   const formattedDate =
@@ -256,26 +268,6 @@ else if (
     0x00ccff;
 }
 
-  if (
-    anime.timeLeft <=
-    3600000
-  ) {
-
-    color =
-      0xff0000;
-  }
-
-  else if (
-
-    anime.timeLeft <=
-    10800000
-
-  ) {
-
-    color =
-      0xff9900;
-  }
-
   const animeEmbed =
     createEmbed({
 
@@ -331,8 +323,73 @@ else if (
   );
 }
 
+const totalPages =
+
+  Math.ceil(
+    results.length /
+    ITEMS_PER_PAGE
+  );
+
+const row =
+  new ActionRowBuilder()
+
+  .addComponents(
+
+    new ButtonBuilder()
+
+      .setCustomId(
+  `next_prev_${currentPage - 1}`
+)
+
+      .setLabel('⬅️')
+
+      .setStyle(
+        ButtonStyle.Secondary
+      )
+
+      .setDisabled(
+  currentPage <= 0
+),
+
+    new ButtonBuilder()
+
+      .setCustomId(
+  `next_page_${currentPage}`
+)
+
+      .setLabel(
+  `${currentPage + 1}/${totalPages}`
+)
+
+      .setStyle(
+        ButtonStyle.Primary
+      )
+
+      .setDisabled(true),
+
+    new ButtonBuilder()
+
+      .setCustomId(
+        `next_next_${currentPage + 1}`
+      )
+
+      .setLabel('➡️')
+
+      .setStyle(
+        ButtonStyle.Secondary
+      )
+
+      .setDisabled(
+  currentPage >=
+  totalPages - 1
+)
+  );
+
 return message.reply({
-  embeds
+
+  embeds,
+
+  components: [row]
 });
 
   } catch (err) {
