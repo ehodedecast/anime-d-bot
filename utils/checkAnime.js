@@ -1,9 +1,12 @@
 const axios = require('axios');
+
 const chalk = require('chalk').default;
+
 const { t } =
   require('./language');
 
 const { loadAnimeData } = require('./animeStorage');
+
 const { loadConfig } = require('./config');
 
 const {
@@ -20,7 +23,10 @@ const {
   saveCache
 } = require('./cacheManager');
 
+const fs = require('fs');
 
+const repairInvalidAnime =
+  require('./repairInvalidAnime');
 
 const {
   EmbedBuilder,
@@ -475,7 +481,19 @@ console.log(
     `📦 Chunk anime: ${anime.title} (${anime.id})`
   )
 );
+if (
+  anime.invalid
+) {
 
+  console.log(
+
+    chalk.gray(
+      `🛡️ Skipping quarantined anime: ${anime.title}`
+    )
+  );
+
+  return;
+}
       query += `
 
         anime${index}: Media(id: ${anime.id}, type: ANIME) {
@@ -531,7 +549,17 @@ if (
 
       for (const data of results) {
 
-        if (!data) continue;
+        if (!data) {
+
+  console.log(
+
+    chalk.red(
+      '⚠️ Invalid anime detected'
+    )
+  );
+
+  continue;
+}
         cache.animes[data.id] = {
 
   id: data.id,
@@ -802,7 +830,65 @@ await target.send({
 
   console.log(query);
 }
+if (
 
+  err.response?.data?.errors
+
+) {
+
+  console.log(
+
+    chalk.red(
+      '⚠️ Invalid anime quarantine triggered'
+    )
+  );
+
+  filteredChunk.forEach(
+    brokenAnime => {
+
+      for (
+        const guildId in animeData
+      ) {
+
+        const guildAnime =
+
+          animeData[guildId]
+            ?.anime || [];
+
+        guildAnime.forEach(
+          anime => {
+
+            if (
+              anime.id ===
+              brokenAnime.id
+            ) {
+
+              anime.invalid = true;
+
+              anime.invalidReason =
+                'AniList validation failed';
+
+              anime.invalidDetectedAt =
+                new Date()
+                  .toISOString();
+            }
+          }
+        );
+      }
+    }
+  );
+
+  fs.writeFileSync(
+
+    './data/animes.json',
+
+    JSON.stringify(
+      animeData,
+      null,
+      2
+    )
+  );
+}
       console.log(
   chalk.red(
     `💥 [ERROR] ${err.message}`
@@ -835,8 +921,12 @@ cache.stats.totalCached =
   Object.keys(cache.animes).length;
 
 saveCache(cache);
+
+
   } 
+  await repairInvalidAnime();
 }
+
 
 console.log(
   chalk.gray(
