@@ -384,18 +384,20 @@ for (const chunk of chunks) {
   try {
 
     const filteredChunk = [];
+    const cachedResults = [];
 
     chunk.forEach((anime) => {
 
       const cachedAnime =
         cache.animes[anime.id];
 
+      const nowSeconds =
+        Math.floor(Date.now() / 1000);
+
       if (
 
   cachedAnime &&
   cachedAnime.nextEpisode &&
-  cachedAnime.nextEpisode.airingAt >
-    Math.floor(Date.now() / 1000) &&
 
   !options.force24h &&
   !options.forceRelease
@@ -407,7 +409,40 @@ for (const chunk of chunks) {
           )
         );
 
-        return;
+        cachedResults.push({
+
+  id: anime.id,
+
+  title: {
+    romaji:
+      cachedAnime.title
+  },
+
+  coverImage: {
+    large:
+      cachedAnime.coverImage
+  },
+
+  nextAiringEpisode:
+    cachedAnime.nextEpisode,
+
+  externalLinks:
+    cachedAnime.externalLinks || []
+});
+
+        if (
+          cachedAnime.nextEpisode.airingAt >
+          nowSeconds
+        ) {
+
+return;
+        }
+
+        console.log(
+          chalk.yellow(
+            `CACHE EXPIRED: ${anime.title}`
+          )
+        );
       }
       const oneDay =
   24 * 60 * 60 * 1000;
@@ -440,16 +475,17 @@ if (
       filteredChunk.push(anime);
     });
 
-    if (!filteredChunk.length) {
+    let results = [...cachedResults];
 
-      console.log(
-        chalk.gray(
-          '💾 Chunk totalmente servido pelo cache'
-        )
-      );
+if (!filteredChunk.length) {
 
-      continue;
-    }
+  console.log(
+    chalk.gray(
+      '💾 Chunk totalmente servido pelo cache'
+    )
+  );
+
+} else {
 
     let query = 'query {';
 
@@ -542,8 +578,16 @@ if (
       { query }
     );
 
-    const results =
-      Object.values(res.data.data);
+    const apiResults =
+  Object.values(res.data.data);
+
+results = [
+
+  ...results,
+
+  ...apiResults
+];
+}
 
       // 🔥 PROCESSA RESULTADOS
 
@@ -576,6 +620,9 @@ if (
 
   nextEpisode:
     data.nextAiringEpisode || null,
+
+  externalLinks:
+    data.externalLinks || [],
 
   lastUpdated:
     new Date().toISOString()
@@ -681,17 +728,6 @@ if (
   !sentEpisodes[key]['24h']
 ) {
 
-            if (
-  !options.testUserId
-) {
-
-  sentEpisodes[key]['24h'] = true;
-
-  saveSentEpisodes(
-    sentEpisodes
-  );
-}
-
             let warningMessage;
 
 if (hoursLeft <= 1) {
@@ -733,6 +769,17 @@ await target.send({
                 warningMessage
             });
 
+            if (
+  !options.testUserId
+) {
+
+  sentEpisodes[key]['24h'] = true;
+
+  saveSentEpisodes(
+    sentEpisodes
+  );
+}
+
             console.log(
               chalk.yellow(
                 `⏰ 24H enviado para ${guildId}`
@@ -751,17 +798,6 @@ await target.send({
 
   !sentEpisodes[key].released
 ) {
-
-            if (
-  !options.testUserId
-) {
-
-  sentEpisodes[key].released = true;
-
-  saveSentEpisodes(
-    sentEpisodes
-  );
-}
 
             const crunchyroll =
               data.externalLinks?.find(
@@ -804,6 +840,17 @@ await target.send({
               embeds: [embed],
               components: [row]
             });
+
+            if (
+  !options.testUserId
+) {
+
+  sentEpisodes[key].released = true;
+
+  saveSentEpisodes(
+    sentEpisodes
+  );
+}
 
             console.log(
               chalk.magenta(
