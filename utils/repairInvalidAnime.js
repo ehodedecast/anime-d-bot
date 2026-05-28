@@ -46,7 +46,7 @@ async function repairInvalidAnime() {
 
         const res =
           await axios.post(
-            'https://graphql.anilist.co',
+            'https://graphql.anilist.co/graphql',
             { query }
           );
 
@@ -67,7 +67,7 @@ try {
   query {
 
     Media(
-      search: "${anime.title}",
+      search: ${JSON.stringify(anime.title)},
       type: ANIME
     ) {
 
@@ -81,7 +81,7 @@ try {
 
   const searchRes =
     await axios.post(
-      'https://graphql.anilist.co',
+      'https://graphql.anilist.co/graphql',
       { query: searchQuery }
     );
 
@@ -135,6 +135,9 @@ continue;
         delete anime.invalid;
         delete anime.invalidReason;
         delete anime.invalidDetectedAt;
+
+        anime.title =
+          data.title.romaji;
 
         repaired++;
 

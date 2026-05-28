@@ -46,6 +46,50 @@ function chunkArray(array, size) {
   return result;
 }
 
+function quarantineAnime(
+
+  animeData,
+
+  animeId,
+
+  reason
+
+) {
+
+  let quarantined = false;
+
+  for (const guildId in animeData) {
+
+    const guildAnime =
+      animeData[guildId]
+        ?.anime || [];
+
+    guildAnime.forEach(
+      anime => {
+
+        if (
+          anime.id ===
+          animeId
+        ) {
+
+          anime.invalid = true;
+
+          anime.invalidReason =
+            reason;
+
+          anime.invalidDetectedAt =
+            new Date()
+              .toISOString();
+
+          quarantined = true;
+        }
+      }
+    );
+  }
+
+  return quarantined;
+}
+
 async function checkAnime(
 
   client,
@@ -476,6 +520,8 @@ if (
     });
 
     let results = [...cachedResults];
+    let query = null;
+    let querySources = [];
 
 if (!filteredChunk.length) {
 
@@ -487,7 +533,7 @@ if (!filteredChunk.length) {
 
 } else {
 
-    let query = 'query {';
+    query = 'query {';
 
 
 console.log(
@@ -507,6 +553,21 @@ console.log(
 
     chalk.red(
       `💥 Invalid ID type: ${anime.title}`
+    )
+  );
+
+  quarantineAnime(
+    animeData,
+    anime.id,
+    'Invalid AniList ID type'
+  );
+
+  fs.writeFileSync(
+    './data/animes.json',
+    JSON.stringify(
+      animeData,
+      null,
+      2
     )
   );
 
@@ -530,9 +591,16 @@ if (
 
   return;
 }
+      const queryIndex =
+        querySources.length;
+
+      querySources.push(
+        anime
+      );
+
       query += `
 
-        anime${index}: Media(id: ${anime.id}, type: ANIME) {
+        anime${queryIndex}: Media(id: ${anime.id}, type: ANIME) {
 
           id
 
@@ -579,7 +647,20 @@ if (
     );
 
     const apiResults =
-  Object.values(res.data.data);
+  Object.entries(res.data.data)
+    .map(([alias, data]) => {
+
+      const sourceIndex =
+        Number(
+          alias.replace('anime', '')
+        );
+
+      return {
+        data,
+        sourceAnime:
+          querySources[sourceIndex]
+      };
+    });
 
 results = [
 
@@ -591,7 +672,22 @@ results = [
 
       // 🔥 PROCESSA RESULTADOS
 
-      for (const data of results) {
+      for (const result of results) {
+
+        const wrappedResult =
+          result &&
+          Object.prototype.hasOwnProperty.call(
+            result,
+            'data'
+          );
+
+        const data =
+          wrappedResult
+            ? result.data
+            : result;
+
+        const sourceAnime =
+          result?.sourceAnime;
 
         if (!data) {
 
@@ -601,6 +697,24 @@ results = [
       '⚠️ Invalid anime detected'
     )
   );
+
+  if (sourceAnime) {
+
+    quarantineAnime(
+      animeData,
+      sourceAnime.id,
+      'AniList returned empty data'
+    );
+
+    fs.writeFileSync(
+      './data/animes.json',
+      JSON.stringify(
+        animeData,
+        null,
+        2
+      )
+    );
+  }
 
   continue;
 }
@@ -890,38 +1004,19 @@ if (
     )
   );
 
-  filteredChunk.forEach(
+  const brokenSources =
+    querySources.length
+      ? querySources
+      : filteredChunk;
+
+  brokenSources.forEach(
     brokenAnime => {
 
-      for (
-        const guildId in animeData
-      ) {
-
-        const guildAnime =
-
-          animeData[guildId]
-            ?.anime || [];
-
-        guildAnime.forEach(
-          anime => {
-
-            if (
-              anime.id ===
-              brokenAnime.id
-            ) {
-
-              anime.invalid = true;
-
-              anime.invalidReason =
-                'AniList validation failed';
-
-              anime.invalidDetectedAt =
-                new Date()
-                  .toISOString();
-            }
-          }
-        );
-      }
+      quarantineAnime(
+        animeData,
+        brokenAnime.id,
+        'AniList validation failed'
+      );
     }
   );
 
