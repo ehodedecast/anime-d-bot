@@ -71,6 +71,28 @@ module.exports = async (
   waitingForAdd
 ) => {
 
+  if (
+    interaction.customId ===
+    'menu_list'
+  ) {
+
+    await interaction.deferReply({
+      flags: 64
+    });
+
+    return list(
+      {
+        reply: (msg) =>
+          interaction.editReply(msg),
+
+        guild:
+          interaction.guild
+      },
+
+      animeList
+    );
+  }
+
   const guildId =
     interaction.guild.id;
 
@@ -274,30 +296,34 @@ if (
   );
 }
   // 🔹 BOTAO LISTA
+// 🔹 BOTAO LISTA
 
-  if (
-    interaction.customId ===
-    'menu_list'
-  ) {
+if (
+  interaction.customId ===
+  'menu_list'
+) {
 
-    clearUserStates(
-      interaction.user.id
-    );
+  clearUserStates(
+    interaction.user.id
+  );
 
-    return list(
+  await interaction.deferReply({
+    flags: 64
+  });
 
-      {
-        reply: (msg) =>
-          interaction.reply(msg),
+  return list(
 
-        guild:
-          interaction.guild
-      },
+    {
+      reply: (msg) =>
+        interaction.editReply(msg),
 
-      animeList
-    );
-  }
+      guild:
+        interaction.guild
+    },
 
+    animeList
+  );
+}
   // 🔹 BOTAO INFO
 
   if (

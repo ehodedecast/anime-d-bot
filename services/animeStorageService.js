@@ -97,6 +97,9 @@ function saveAnimeToGuild(
       title:
         anime.title,
 
+      coverImage:
+        anime.coverImage || null,
+
       mode
     });
 

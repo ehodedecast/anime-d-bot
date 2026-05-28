@@ -48,6 +48,11 @@ const {
 const state =
   require('./state/state');
 
+const {
+  shouldIgnoreForLocalTest,
+  getEffectiveChannelId
+} = require('./utils/localMode');
+
 const TOKEN =
   process.env.TOKEN;
 
@@ -172,13 +177,32 @@ client.on(
         message.guild?.id
       ];
 
+    const normalizedContent =
+      (message.content || '')
+        .trim()
+        .toLowerCase();
+
+    if (
+      shouldIgnoreForLocalTest(message)
+    ) {
+      return;
+    }
+
+    const effectiveChannelId =
+      getEffectiveChannelId(
+        guildConfig
+      );
+
     // ⚠️ NO CHANNEL CONFIGURED
 
     if (
 
-      !guildConfig &&
+      (
+        !guildConfig ||
+        !effectiveChannelId
+      ) &&
 
-      message.content !==
+      normalizedContent !==
       '!setchannel'
 
     ) {
@@ -193,15 +217,25 @@ client.on(
 
     if (
 
-      guildConfig &&
+      effectiveChannelId &&
 
       message.channel.id !==
-      guildConfig.channelId &&
+      effectiveChannelId &&
 
-      message.content !==
+      normalizedContent !==
       '!setchannel'
 
     ) {
+      if (
+        normalizedContent.startsWith('!')
+      ) {
+
+        return message.reply(
+          `Este servidor esta configurado para usar comandos em <#${effectiveChannelId}>.\n` +
+          'Se quiser usar este canal, envie `!setchannel` aqui.'
+        );
+      }
+
       return;
     }
 
@@ -294,7 +328,7 @@ client.on(
     // 📋 MENU
 
     if (
-      message.content ===
+      normalizedContent ===
       '!menu'
     ) {
 
@@ -339,6 +373,12 @@ client.on(
   'interactionCreate',
 
   async (interaction) => {
+
+    if (
+      shouldIgnoreForLocalTest(interaction)
+    ) {
+      return;
+    }
 
     if (
       !interaction.isButton()

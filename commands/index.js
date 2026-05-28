@@ -15,6 +15,10 @@ const servercounter = require('./servercounter');
 const { t } = require('../utils/language');
 const forcecheck = require('./forcecheck');
 const { loadConfig } = require('../utils/config');
+const {
+  shouldIgnoreForLocalTest,
+  getEffectiveChannelId
+} = require('../utils/localMode');
 const syncAll = require('../dev/syncall');
 const migrateAnimeData = require('../dev/migrateAnimeData');
 const devReply = require('../utils/devReply');
@@ -28,7 +32,17 @@ const serverhistory = require('./serverhistory');
 
 async function handleCommands(message, animeList, client) {
 
-  const isCommand = message.content.startsWith('!');
+  const rawContent =
+    message.content || '';
+
+  const trimmedContent =
+    rawContent.trim();
+
+  const normalizedContent =
+    trimmedContent.toLowerCase();
+
+  const isCommand =
+    normalizedContent.startsWith('!');
 
 const hasActiveState =
 
@@ -44,6 +58,17 @@ if (!isCommand && !hasActiveState) {
 	const config = loadConfig();
 const guildConfig = config[message.guild?.id];
 
+if (
+  shouldIgnoreForLocalTest(message)
+) {
+  return;
+}
+
+const effectiveChannelId =
+  getEffectiveChannelId(
+    guildConfig
+  );
+
 
 
   
@@ -55,23 +80,39 @@ console.log(
 );
 
 
-if (!guildConfig && message.content !== '!setchannel') {
+if (
+  (
+    !guildConfig ||
+    !effectiveChannelId
+  ) &&
+  normalizedContent !== '!setchannel'
+) {
   return message.reply(
     t(message.guild.id, 'no_channel_set') + '\n\n' +
     t(message.guild.id, 'setchannel_instructions')
   );
 }
 if (
-  guildConfig &&
-  message.channel.id !== guildConfig.channelId &&
-  message.content !== '!setchannel'
+  effectiveChannelId &&
+  message.channel.id !== effectiveChannelId &&
+  normalizedContent !== '!setchannel'
 ) {
+  if (
+    normalizedContent.startsWith('!')
+  ) {
+
+    return message.reply(
+      `Este servidor esta configurado para usar comandos em <#${effectiveChannelId}>.\n` +
+      'Se quiser usar este canal, envie `!setchannel` aqui.'
+    );
+  }
+
   return;
 }
 // 🔧 REPAIR GUILD NAMES
 
 if (
-  message.content ===
+  normalizedContent ===
   '!repairguilds'
 ) {
 
@@ -84,7 +125,7 @@ if (
 }
 	// 🔹 COMANDO FORCECHeCK
 
-if (message.content === '!forcecheck') {
+if (normalizedContent === '!forcecheck') {
 
   return forcecheck(
     message,
@@ -94,7 +135,7 @@ if (message.content === '!forcecheck') {
 // 🔧 MIGRATE ANIME DATA
 
 if (
-  message.content ===
+  normalizedContent ===
   '!migrateanime'
 ) {
 
@@ -110,7 +151,7 @@ if (
 // 🔹 COMANDO SYNCALL
 
 if (
-  message.content ===
+  normalizedContent ===
   '!syncall'
 ) {
 
@@ -120,7 +161,7 @@ if (
 }
 
 if (
-  message.content ===
+  normalizedContent ===
   '!serverhistory'
 ) {
 
@@ -132,7 +173,7 @@ if (
 // 🔹 COMANDO LANGUAGE
 
 if (
-  message.content ===
+  normalizedContent ===
   '!language'
 ) {
 
@@ -143,7 +184,7 @@ if (
 // 🔹 COMANDO SERVERCOUNTER
 
 if (
-  message.content ===
+  normalizedContent ===
   '!servercounter'
 ) {
 
@@ -155,7 +196,7 @@ if (
 // 🔹 COMANDO BOTSTATS
 
 if (
-  message.content ===
+  normalizedContent ===
   '!botstats'
 ) {
 
@@ -167,7 +208,7 @@ if (
 // 🔹 COMANDO HELP
 
 if (
-  message.content ===
+  normalizedContent ===
   '!help'
 ) {
 
@@ -177,23 +218,20 @@ if (
 }
 
 	 // 🔹 COMANDO SETCHANNEL
-	 if (message.content === '!setchannel') {
+	 if (normalizedContent === '!setchannel') {
   return setChannel(message);
 }
 // 🔧 TEST QUERY
 
 if (
-  message.content.startsWith(
+  normalizedContent.startsWith(
     '!testquery '
   )
 ) {
 
   const query =
 
-    message.content.replace(
-      '!testquery ',
-      ''
-    );
+    trimmedContent.slice(11).trim();
 
   return testQuery(
 
@@ -204,17 +242,14 @@ if (
 }
    // 🔹 COMANDO REMOVE
    if (
-  message.content.startsWith(
+  normalizedContent.startsWith(
     '!remove '
   )
 ) {
 
   const name =
 
-    message.content.replace(
-      '!remove ',
-      ''
-    );
+    trimmedContent.slice(8).trim();
 
   return remove(
     message,
@@ -223,7 +258,7 @@ if (
 }
 if (state.waitingForRemove?.[message.author.id]) {
 
-  const input = message.content;
+  const input = trimmedContent;
 
   delete state.waitingForRemove[
     message.author.id
@@ -237,44 +272,46 @@ if (state.waitingForRemove?.[message.author.id]) {
   // 🔹 COMANDO CLEAR
  const clear = require('./clear');
 
-if (message.content === '!clearlist') {
+if (normalizedContent === '!clearlist') {
   return clear(message, animeList);
 }
   // 🔹 COMANDO ADD
   if (state.waitingForAdd?.[message.author.id]) {
-  const input = message.content;
+  const input = trimmedContent;
   delete state.waitingForAdd[message.author.id];
 
   return add(message, animeList, input);
 }
-  if (message.content.startsWith('!add ')) {
-    const name = message.content.replace('!add ', '');
+  if (normalizedContent.startsWith('!add ')) {
+    const name = trimmedContent.slice(5).trim();
     return add(message, animeList, name);
   }
 // 🔹 COMANDO INFO
 if (state.waitingForInfo?.[message.author.id]) {
-  const input = message.content;
+  const input = trimmedContent;
   delete state.waitingForInfo[message.author.id];
 
   return info(message, input);
 }
-  if (message.content.startsWith('!info ')) {
-    const name = message.content.replace('!info ', '');
+  if (normalizedContent.startsWith('!info ')) {
+    const name = trimmedContent.slice(6).trim();
     return info(message, name);
   }
 // 🔹 COMANDO LIST
-  if (message.content === '!list') {
+  if (
+    normalizedContent === '!list'
+  ) {
     return list(message, animeList);
   }
   // 🔹 COMANDO NEXT
 if (state.waitingForNext?.[message.author.id]) {
-  const input = message.content;
+  const input = trimmedContent;
   delete state.waitingForNext[message.author.id];
 
   return next(message, input);
 }
-  if (message.content.startsWith('!next ')) {
-    const name = message.content.replace('!next ', '');
+  if (normalizedContent.startsWith('!next ')) {
+    const name = trimmedContent.slice(6).trim();
     return next(message, name);
   }
 }
