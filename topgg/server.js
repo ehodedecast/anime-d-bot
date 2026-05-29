@@ -318,8 +318,12 @@ function startVoteServer(
         new Date().toISOString();
 
       console.log(
-        'Top.gg Vote Server Online'
-      );
+  `Top.gg Vote Server Online on port ${port}`
+);
+console.log(
+  'Environment PORT:',
+  process.env.PORT
+);
     }
   ).on(
     'error',
