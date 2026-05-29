@@ -999,7 +999,15 @@ await target.send({
     )
   );
 
-  console.log(query);
+  console.log(
+    chalk.gray(
+      JSON.stringify(
+        err.response.data.errors,
+        null,
+        2
+      )
+    )
+  );
 }
 if (
 
