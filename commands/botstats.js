@@ -15,6 +15,10 @@ const {
   loadCache
 } = require('../utils/cacheManager');
 
+const {
+  loadVotes
+} = require('../utils/voteStorage');
+
 const runtimeStatus =
   require('../state/runtimeStatus');
 
@@ -187,7 +191,7 @@ function formatTop(items) {
     .join('\n');
 }
 
-async function botstatus(
+async function botstats(
   message,
   client
 ) {
@@ -200,6 +204,22 @@ async function botstatus(
 
   const cache =
     loadCache();
+
+  const votes =
+  loadVotes();
+
+const uniqueVoters =
+  Object.keys(votes).length;
+
+const totalVotes =
+  Object.values(votes)
+    .reduce(
+      (sum, user) =>
+        sum + (
+          user.totalVotes || 0
+        ),
+      0
+    );
 
   const animeStats =
     getAnimeStats(animeData);
@@ -233,6 +253,8 @@ async function botstatus(
     '',
     `Servers: ${client.guilds.cache.size}`,
     `Approx users: ${totalMembers}`,
+    `Total votes: ${totalVotes}`,
+    `Unique voters: ${uniqueVoters}`,
     `Global anime: ${animeStats.total}`,
     `Unique anime: ${animeStats.unique}`,
     `Tracking: ${animeStats.tracking}`,
@@ -267,4 +289,4 @@ async function botstatus(
 }
 
 module.exports =
-  botstatus;
+  botstats;
