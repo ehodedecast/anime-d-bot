@@ -72,6 +72,19 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
+    .setName('resetdata')
+    .setDescription('Temporarily reset AnimeDBot data after strict confirmation.')
+    .addStringOption(option =>
+      option
+        .setName('confirmation')
+        .setDescription('Required exact confirmation string')
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.Administrator
+    ),
+
+  new SlashCommandBuilder()
     .setName('clear')
     .setDescription('Clear this server anime list.')
     .setDefaultMemberPermissions(

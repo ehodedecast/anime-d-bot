@@ -7,30 +7,12 @@ const path =
 const chalk =
   require('chalk').default;
 
+const {
+  REQUIRED_DATA_FILES
+} = require('./dataSchemas');
+
 const DATA_DIR =
   './data';
-
-const REQUIRED_FILES = {
-
-  'animes.json': {},
-
-  'animeMappings.json': {},
-
-  'animeCache.json': {
-
-    animes: {}
-  },
-
-  'votes.json': {},
-
-  'sentEpisodes.json': {},
-
-  'analytics.json': {},
-
-  'config.json': {},
-
-  'guildHistory.json': {},
-};
 
 function ensureDirectory() {
 
@@ -52,6 +34,36 @@ function ensureFile(
   fileName,
   defaultData
 ) {
+
+  function isSchemaCompatible(
+    data
+  ) {
+
+    if (
+      Array.isArray(
+        defaultData
+      )
+    ) {
+
+      return Array.isArray(
+        data
+      );
+    }
+
+    if (
+      defaultData &&
+      typeof defaultData === 'object'
+    ) {
+
+      return (
+        data &&
+        typeof data === 'object' &&
+        !Array.isArray(data)
+      );
+    }
+
+    return true;
+  }
 
   const filePath =
     path.join(
@@ -95,7 +107,32 @@ function ensureFile(
         'utf8'
       );
 
-    JSON.parse(raw);
+    const data =
+      JSON.parse(raw);
+
+    if (
+      !isSchemaCompatible(
+        data
+      )
+    ) {
+
+      console.log(
+        chalk.red(
+          `Invalid storage schema repaired: ${fileName}`
+        )
+      );
+
+      fs.writeFileSync(
+
+        filePath,
+
+        JSON.stringify(
+          defaultData,
+          null,
+          2
+        )
+      );
+    }
 
   } catch {
 
@@ -130,14 +167,14 @@ function validateStorage() {
 
   for (
     const fileName in
-    REQUIRED_FILES
+    REQUIRED_DATA_FILES
   ) {
 
     ensureFile(
 
       fileName,
 
-      REQUIRED_FILES[
+      REQUIRED_DATA_FILES[
         fileName
       ]
     );

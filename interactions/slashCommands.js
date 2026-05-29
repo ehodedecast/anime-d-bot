@@ -8,6 +8,7 @@ const setChannel = require('../commands/setchannel');
 const language = require('../commands/language');
 const help = require('../commands/help');
 const botstats = require('../commands/botstats');
+const resetdata = require('../commands/resetdata');
 const sendMenu = require('./menu');
 const {
   PermissionFlagsBits
@@ -49,8 +50,14 @@ function requireBotOwner(
 ) {
 
   return Boolean(
-    process.env.OWNER_ID &&
-    interaction.user.id === process.env.OWNER_ID
+    (
+      process.env.OWNER_ID ||
+      process.env.BOT_OWNER_ID
+    ) &&
+    interaction.user.id === (
+      process.env.OWNER_ID ||
+      process.env.BOT_OWNER_ID
+    )
   );
 }
 
@@ -101,7 +108,8 @@ async function handleSlashCommand(
       !effectiveChannelId
     ) &&
     command !== 'setchannel' &&
-    command !== 'botstats'
+    command !== 'botstats' &&
+    command !== 'resetdata'
   ) {
 
     return interaction.reply({
@@ -115,7 +123,8 @@ async function handleSlashCommand(
     effectiveChannelId &&
     interaction.channelId !== effectiveChannelId &&
     command !== 'setchannel' &&
-    command !== 'botstats'
+    command !== 'botstats' &&
+    command !== 'resetdata'
   ) {
 
     return interaction.reply({
@@ -221,6 +230,13 @@ async function handleSlashCommand(
     return botstats(
       message,
       client
+    );
+  }
+
+  if (command === 'resetdata') {
+
+    return resetdata(
+      interaction
     );
   }
 
