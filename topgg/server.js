@@ -101,6 +101,10 @@ function startVoteServer(
     '/topgg/vote',
 
     async (req, res) => {
+      console.log(
+  'Top.gg webhook request received:',
+  JSON.stringify(req.body, null, 2)
+);
 
       try {
         if (
