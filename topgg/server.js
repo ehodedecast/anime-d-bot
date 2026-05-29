@@ -16,6 +16,20 @@ const runtimeStatus =
 
 const app =
   express();
+  app.get(
+  '/health',
+
+  (req, res) => {
+
+    console.log(
+      'Health check received'
+    );
+
+    res
+      .status(200)
+      .send('AnimeDBot webhook server is alive');
+  }
+);
   app.use(
   (req, res, next) => {
 
