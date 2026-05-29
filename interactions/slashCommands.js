@@ -8,6 +8,7 @@ const setChannel = require('../commands/setchannel');
 const language = require('../commands/language');
 const help = require('../commands/help');
 const botstats = require('../commands/botstats');
+const sendMenu = require('./menu');
 const {
   PermissionFlagsBits
 } = require('discord.js');
@@ -192,6 +193,13 @@ async function handleSlashCommand(
 
     return help(
       message
+    );
+  }
+
+  if (command === 'menu') {
+
+    return sendMenu(
+      interaction
     );
   }
 
