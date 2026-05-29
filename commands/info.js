@@ -1,21 +1,104 @@
 const { EmbedBuilder } = require('discord.js');
 const { t } = require('../utils/language');
 const {
+  searchAnime
+} = require('../providers/animeProvider');
+const {
+  sortAnimeResults
+} = require('../services/animeScoring');
+const {
+  createSelectionData,
+  registerSelectionState,
+  createSelectionEmbed,
+  createSelectionRows
+} = require('../services/animeSelection');
+const {
+  hasResults
+} = require('../services/animeValidation');
+const {
   createInfoNavigationRow
 } = require('../utils/navigationButtons');
 
-async function info(message, animeName) {
+async function info(
+  message,
+  animeName,
+  selectedAnime = null
+) {
 
   try {
 
     console.log("ANIME NAME:", animeName);
 
+    if (
+      !selectedAnime
+    ) {
+
+      const results =
+        await searchAnime(
+          animeName
+        );
+
+      if (
+        !hasResults(results)
+      ) {
+
+        return message.reply(
+          t(
+            message.guild.id,
+            'search_temporarily_disabled'
+          )
+        );
+      }
+
+      const normalizedInput =
+        animeName
+          .toLowerCase()
+          .trim();
+
+      sortAnimeResults(
+        results,
+        normalizedInput
+      );
+
+      const topResults =
+        createSelectionData(
+          results
+        );
+
+      registerSelectionState(
+        message.author.id,
+        topResults,
+        'info',
+        {
+          inputName:
+            animeName
+        }
+      );
+
+      const embed =
+        createSelectionEmbed(
+          animeName,
+          topResults,
+          t(
+            message.guild.id,
+            'selection_prompt'
+          )
+        );
+
+      return message.reply({
+        embeds: [embed],
+        components:
+          createSelectionRows(
+            topResults
+          )
+      });
+    }
+
     const query = `
-    query ($search: String) {
+    query ($search: String, $id: Int) {
 
-      Page(perPage: 1) {
-
-        media(
+        Media(
+  id: $id,
   search: $search,
   type: ANIME,
   sort: SEARCH_MATCH
@@ -46,12 +129,17 @@ async function info(message, animeName) {
             large
           }
         }
-      }
     }
     `;
 
     const variables = {
-      search: animeName
+      search:
+        selectedAnime
+          ? null
+          : animeName,
+
+      id:
+        selectedAnime?.id || null
     };
 
     const response = await fetch(
@@ -76,7 +164,7 @@ async function info(message, animeName) {
     console.log(json);
 
     const data =
-      json.data?.Page?.media?.[0];
+      json.data?.Media;
       
     if (!data) {
   return message.reply(

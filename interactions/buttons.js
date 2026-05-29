@@ -70,6 +70,14 @@ function clearUserStates(
   delete state.waitingForRemove?.[
     userId
   ];
+
+  delete state.waitingForAddSelection?.[
+    userId
+  ];
+
+  delete state.waitingForAnimeSelection?.[
+    userId
+  ];
 }
 
 function createReplyAdapter(
@@ -82,6 +90,37 @@ function createReplyAdapter(
 
     guild:
       interaction.guild
+  };
+}
+
+function createSelectionReplyAdapter(
+  interaction
+) {
+
+  return {
+    ...createInteractionMessage(
+      interaction
+    ),
+
+    reply: (msg) => {
+
+      if (
+        typeof msg === 'string'
+      ) {
+
+        return interaction.editReply({
+          content: msg,
+          embeds: [],
+          components: []
+        });
+      }
+
+      return interaction.editReply({
+        embeds: [],
+        components: [],
+        ...msg
+      });
+    }
   };
 }
 
@@ -176,8 +215,7 @@ async function handleAnimeModal(
     return add(
       message,
       animeData[interaction.guild.id]?.anime || [],
-      animeName,
-      'first'
+      animeName
     );
   }
 
@@ -235,6 +273,164 @@ module.exports = async (
     ) +
     ` clicou ${interaction.customId}`
   );
+
+  if (
+    interaction.customId.startsWith(
+      'anime_select_'
+    )
+  ) {
+
+    const selectionState =
+      state.waitingForAnimeSelection?.[
+        interaction.user.id
+      ];
+
+    if (
+      !selectionState
+    ) {
+
+      return interaction.reply({
+        content:
+          'Esta selecao expirou. Execute o comando novamente.',
+        ephemeral: true
+      });
+    }
+
+    const selectedIndex =
+      Number(
+        interaction.customId
+          .split('_')[2]
+      );
+
+    const selectedAnime =
+      selectionState.results?.[
+        selectedIndex
+      ];
+
+    if (
+      !selectedAnime
+    ) {
+
+      return interaction.reply({
+        content:
+          'Selecao invalida. Execute o comando novamente.',
+        ephemeral: true
+      });
+    }
+
+    clearUserStates(
+      interaction.user.id
+    );
+
+    await interaction.deferUpdate();
+
+    const message =
+      createSelectionReplyAdapter(
+        interaction
+      );
+
+    const animeData =
+      loadAnimeData();
+
+    if (
+      selectionState.action === 'add'
+    ) {
+
+      return add(
+        message,
+        animeData[interaction.guild.id]?.anime || [],
+        selectedAnime.title,
+        true,
+        selectedAnime
+      );
+    }
+
+    if (
+      selectionState.action === 'info'
+    ) {
+
+      return info(
+        message,
+        selectedAnime.title,
+        selectedAnime
+      );
+    }
+
+    if (
+      selectionState.action === 'remove'
+    ) {
+
+      return remove(
+        message,
+        selectedAnime.title,
+        selectedAnime
+      );
+    }
+  }
+
+  if (
+    interaction.customId.startsWith(
+      'remove_confirm_'
+    )
+  ) {
+
+    const selectionIndex =
+      Number(
+        interaction.customId
+          .split('_')[2]
+      );
+
+    const selectionState =
+      state.waitingForAnimeSelection?.[
+        interaction.user.id
+      ];
+
+    const selectedAnime =
+      selectionState?.results?.[
+        selectionIndex
+      ];
+
+    if (
+      !selectedAnime
+    ) {
+
+      return interaction.reply({
+        content:
+          'Anime nao encontrado na lista atual.',
+        ephemeral: true
+      });
+    }
+
+    clearUserStates(
+      interaction.user.id
+    );
+
+    await interaction.deferUpdate();
+
+    return remove(
+      createSelectionReplyAdapter(
+        interaction
+      ),
+      selectedAnime.title,
+      selectedAnime
+    );
+  }
+
+  if (
+    interaction.customId === 'remove_cancel'
+  ) {
+
+    clearUserStates(
+      interaction.user.id
+    );
+
+    return interaction.update({
+      content:
+        'Remocao cancelada.',
+      embeds: [],
+      components: []
+    });
+  }
 
   if (
     interaction.customId === 'menu_back'

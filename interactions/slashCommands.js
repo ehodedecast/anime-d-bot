@@ -149,8 +149,7 @@ async function handleSlashCommand(
     return add(
       message,
       animeData[interaction.guild.id]?.anime || [],
-      interaction.options.getString('anime'),
-      'first'
+      interaction.options.getString('anime')
     );
   }
 

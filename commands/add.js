@@ -28,7 +28,9 @@ const {
 
   registerSelectionState,
 
-  createSelectionEmbed
+  createSelectionEmbed,
+
+  createSelectionRows
 
 } = require(
   '../services/animeSelection'
@@ -112,24 +114,16 @@ async function add(
     // 📡 SEARCH
 
     let results =
-      await searchAnime(
-        inputName
-      );
+      skipSelection &&
+      selectedAnime
+        ? [
+            selectedAnime
+          ]
+        : await searchAnime(
+            inputName
+          );
 
     // 🎯 MANUAL SELECTION RESULT
-
-    if (
-
-      skipSelection &&
-
-      selectedAnime
-
-    ) {
-
-      results = [
-        selectedAnime
-      ];
-    }
 
     // ❌ NO RESULTS
 
@@ -164,14 +158,6 @@ async function add(
     // 📋 SELECTION MENU
 
     if (
-      skipSelection === 'first'
-    ) {
-
-      results = [
-        results[0]
-      ];
-
-    } else if (
       !skipSelection
     ) {
 
@@ -185,7 +171,13 @@ async function add(
 
         message.author.id,
 
-        topResults
+        topResults,
+
+        'add',
+
+        {
+          inputName
+        }
       );
 
       const embed =
@@ -204,7 +196,12 @@ async function add(
 
       return message.reply({
 
-        embeds: [embed]
+        embeds: [embed],
+
+        components:
+          createSelectionRows(
+            topResults
+          )
       });
     }
 

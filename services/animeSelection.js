@@ -4,6 +4,12 @@ const createEmbed =
 const state =
   require('../state/state');
 
+const {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require('discord.js');
+
 const statusMap = {
 
   FINISHED:
@@ -46,7 +52,9 @@ function createSelectionDescription(
           anime.status
         ] ||
 
-        anime.status;
+        anime.status ||
+
+        'Tracked';
 
       return (
 
@@ -64,7 +72,11 @@ function registerSelectionState(
 
   userId,
 
-  results
+  results,
+
+  action = 'add',
+
+  meta = {}
 
 ) {
 
@@ -74,6 +86,18 @@ function registerSelectionState(
     ] = {
 
       results
+    };
+
+  state
+    .waitingForAnimeSelection[
+      userId
+    ] = {
+
+      action,
+
+      results,
+
+      meta
     };
 }
 
@@ -85,6 +109,39 @@ function clearSelectionState(
     .waitingForAddSelection[
       userId
     ];
+
+  delete state
+    .waitingForAnimeSelection[
+      userId
+    ];
+}
+
+function createSelectionRows(
+  topResults
+) {
+
+  const row =
+    new ActionRowBuilder();
+
+  topResults.forEach(
+    (anime, index) => {
+
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId(
+            `anime_select_${index}`
+          )
+          .setLabel(
+            `${index + 1}`
+          )
+          .setStyle(
+            ButtonStyle.Primary
+          )
+      );
+    }
+  );
+
+  return [row];
 }
 
 function createSelectionEmbed(
@@ -130,5 +187,7 @@ module.exports = {
 
   clearSelectionState,
 
-  createSelectionEmbed
+  createSelectionEmbed,
+
+  createSelectionRows
 };

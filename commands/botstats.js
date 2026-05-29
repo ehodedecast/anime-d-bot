@@ -288,7 +288,10 @@ const totalVotes =
   );
 
   return message.reply(
-    'Status enviado no seu PV.'
+    'Status enviado no seu PV.',
+    {
+      ephemeral: true
+    }
   );
 
 } catch {
