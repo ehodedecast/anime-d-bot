@@ -125,12 +125,11 @@ client.once(
 
     
 
-    // Temporarily disabled while testing Top.gg webhook
-// setInterval(() => {
-//
-//   checkAnime(client);
-//
-// }, 30000);
+ setInterval(() => {
+
+   checkAnime(client);
+
+ }, 30000);
   }
 );
 
