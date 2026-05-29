@@ -10,7 +10,7 @@ const remove = require('./remove');
 const setChannel = require('./setchannel');
 const language = require('./language');
 const help = require('./help');
-const botstatus = require('./botstatus');
+const botstats = require('./botstats');
 
 const { t } = require('../utils/language');
 const { loadConfig } = require('../utils/config');
@@ -111,8 +111,8 @@ async function handleCommands(
     return help(message);
   }
 
-  if (normalizedContent === '!botstatus') {
-    return botstatus(
+  if (normalizedContent === '!botstats') {
+    return botstats(
       message,
       client
     );
