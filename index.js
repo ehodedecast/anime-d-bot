@@ -71,6 +71,8 @@ const client =
     ]
   });
 
+  startVoteServer(client);
+
 // 🚨 ERRORS
 
 process.on(
@@ -121,7 +123,7 @@ client.once(
       'Bot online!'
     );
 
-    startVoteServer(client);
+    
 
     // Temporarily disabled while testing Top.gg webhook
 // setInterval(() => {
