@@ -117,6 +117,6 @@
   "help_admin_commands": "`!setchannel` → Configure bot channel",
   "help_features_title": "💡 Features",
   "help_features": "• Multi-provider anime search\n• AniList + Jikan support\n• Anime tracking\n• Episode notifications\n• Smart search system\n• Anime selection menus", 
-  "join_support_server": "💬 Support Server"
+  "join_support_server": "Support Server"
 
 }

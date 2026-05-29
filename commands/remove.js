@@ -3,6 +3,9 @@ const {
   saveAnimeData
 } = require('../utils/animeStorage');
 const { t } = require('../utils/language');
+const {
+  createRemoveNavigationRow
+} = require('../utils/navigationButtons');
 
 function remove(message, animeName) {
 
@@ -35,15 +38,18 @@ console.log(animeName);
 
   saveAnimeData(data);
 
-  return message.reply(
+  return message.reply({
+    content:
+      t(
+        message.guild.id,
+        'anime_removed'
+      ) +
+      ` ${removed.title}`,
 
-  t(
-    message.guild.id,
-    'anime_removed'
-  ) +
-
-  ` ${removed.title}`
-);
+    components: [
+      createRemoveNavigationRow()
+    ]
+  });
 }
 
 module.exports = remove;

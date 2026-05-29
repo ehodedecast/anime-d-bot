@@ -35,6 +35,9 @@ const {
   ButtonStyle
 } = require('discord.js');
 
+const runtimeStatus =
+  require('../state/runtimeStatus');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -101,6 +104,10 @@ async function checkAnime(
   console.log(
     chalk.cyan('🔄 [CHECK] Iniciando verificação...')
   );
+
+  runtimeStatus.tracker.lastStartedAt =
+    new Date().toISOString();
+  runtimeStatus.tracker.lastError = null;
 
   const cache = loadCache();
   if (!cache.animes) {
@@ -976,6 +983,9 @@ await target.send({
       }
 
     } catch (err) {
+      runtimeStatus.tracker.lastError =
+        err.message;
+
       if (
 
   err.response?.data?.errors
@@ -1067,6 +1077,9 @@ saveCache(cache);
 
   } 
   await repairInvalidAnime();
+
+  runtimeStatus.tracker.lastFinishedAt =
+    new Date().toISOString();
 }
 
 

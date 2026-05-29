@@ -87,6 +87,12 @@ const { t } =
     '../utils/language'
   );
 
+const {
+  createAddNavigationRow
+} = require(
+  '../utils/navigationButtons'
+);
+
 async function add(
 
   message,
@@ -304,7 +310,11 @@ syncAnimeProviders(
 
     return message.reply({
 
-      embeds: [embed]
+      embeds: [embed],
+
+      components: [
+        createAddNavigationRow()
+      ]
     });
 
   } catch (err) {

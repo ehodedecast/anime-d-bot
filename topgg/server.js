@@ -8,6 +8,9 @@ const {
   '../utils/voteStorage'
 );
 
+const runtimeStatus =
+  require('../state/runtimeStatus');
+
 const app =
   express();
 
@@ -44,9 +47,7 @@ function startVoteServer(
         ) {
 
           votes[userId] = {
-
             totalVotes: 0,
-
             lastVote: null
           };
         }
@@ -61,33 +62,26 @@ function startVoteServer(
 
         saveVotes(votes);
 
-        // 📩 USER DM
-
         try {
 
           const user =
-
             await client.users.fetch(
               userId
             );
 
           await user.send(
-
-            '🗳️ Thank you for voting for AnimeDBot on Top.gg!\n\n' +
-
-            'Your support helps AnimeDBot grow 💖'
+            'Thank you for voting for AnimeDBot on Top.gg.'
           );
 
         } catch (err) {
 
           console.log(
-            `⚠️ Could not DM user ${userId}`
+            `Could not DM vote user ${userId}`
           );
         }
 
         console.log(
-
-          `🗳️ New vote from ${userId}`
+          `New Top.gg vote from ${userId}`
         );
 
         res.sendStatus(200);
@@ -95,7 +89,7 @@ function startVoteServer(
       } catch (err) {
 
         console.log(
-          `💥 Vote webhook error: ${err.message}`
+          `Vote webhook error: ${err.message}`
         );
 
         res.sendStatus(500);
@@ -103,13 +97,34 @@ function startVoteServer(
     }
   );
 
+  const port =
+    process.env.PORT || 3000;
+
   app.listen(
-    3000,
+    port,
 
     () => {
 
+      runtimeStatus.topggServer.started = true;
+      runtimeStatus.topggServer.port = port;
+      runtimeStatus.topggServer.error = null;
+      runtimeStatus.topggServer.startedAt =
+        new Date().toISOString();
+
       console.log(
-        '🗳️ Top.gg Vote Server Online'
+        'Top.gg Vote Server Online'
+      );
+    }
+  ).on(
+    'error',
+    err => {
+
+      runtimeStatus.topggServer.started = false;
+      runtimeStatus.topggServer.error =
+        err.message;
+
+      console.log(
+        `Top.gg Vote Server error: ${err.message}`
       );
     }
   );

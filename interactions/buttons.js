@@ -1,23 +1,14 @@
 const fs = require('fs');
 const chalk = require('chalk').default;
 
-const add =
-  require('../commands/add');
-
 const list =
   require('../commands/list');
 
 const next =
   require('../commands/next');
 
-const info =
-  require('../commands/info');
-
 const clear =
   require('../commands/clear');
-
-const remove =
-  require('../commands/remove');
 
 const help =
   require('../commands/help');
@@ -64,543 +55,384 @@ function clearUserStates(
   ];
 }
 
+function createReplyAdapter(
+  interaction
+) {
+
+  return {
+    reply: (msg) =>
+      interaction.editReply(msg),
+
+    guild:
+      interaction.guild
+  };
+}
+
+function loadAnimeData() {
+
+  return JSON.parse(
+    fs.readFileSync(
+      './data/animes.json',
+      'utf8'
+    )
+  );
+}
+
+function beginAddFlow(
+  interaction,
+  guildId
+) {
+
+  clearUserStates(
+    interaction.user.id
+  );
+
+  state.waitingForAdd[
+    interaction.user.id
+  ] = true;
+
+  return interaction.reply({
+    content:
+      t(
+        guildId,
+        'prompt_type_anime_name'
+      ),
+    flags: 64
+  });
+}
+
+function beginInfoFlow(
+  interaction,
+  guildId
+) {
+
+  clearUserStates(
+    interaction.user.id
+  );
+
+  state.waitingForInfo =
+    state.waitingForInfo || {};
+
+  state.waitingForInfo[
+    interaction.user.id
+  ] = true;
+
+  return interaction.reply({
+    content:
+      t(
+        guildId,
+        'prompt_type_anime_name'
+      ),
+    flags: 64
+  });
+}
+
+function beginRemoveFlow(
+  interaction,
+  guildId
+) {
+
+  clearUserStates(
+    interaction.user.id
+  );
+
+  state.waitingForRemove =
+    state.waitingForRemove || {};
+
+  state.waitingForRemove[
+    interaction.user.id
+  ] = true;
+
+  return interaction.reply({
+    content:
+      t(
+        guildId,
+        'prompt_type_anime_name'
+      ),
+    flags: 64
+  });
+}
 
 module.exports = async (
   interaction,
-  animeList,
-  waitingForAdd
+  animeList
 ) => {
 
+  const guildId =
+    interaction.guild.id;
+
+  console.log(
+    chalk.cyan(
+      `[${interaction.guild.name}]`
+    ) +
+    chalk.gray(
+      ` (${interaction.guild.id})`
+    ) +
+    chalk.yellow(
+      ` ${interaction.user.username}`
+    ) +
+    ` clicou ${interaction.customId}`
+  );
+
   if (
-    interaction.customId ===
-    'menu_list'
+    interaction.customId === 'menu_back'
   ) {
+
+    clearUserStates(
+      interaction.user.id
+    );
+
+    return sendMenu(
+      interaction
+    );
+  }
+
+  if (
+    interaction.customId === 'menu_add' ||
+    interaction.customId === 'add_again'
+  ) {
+
+    return beginAddFlow(
+      interaction,
+      guildId
+    );
+  }
+
+  if (
+    interaction.customId === 'menu_info' ||
+    interaction.customId === 'info_again'
+  ) {
+
+    return beginInfoFlow(
+      interaction,
+      guildId
+    );
+  }
+
+  if (
+    interaction.customId === 'menu_remove' ||
+    interaction.customId === 'remove_again'
+  ) {
+
+    return beginRemoveFlow(
+      interaction,
+      guildId
+    );
+  }
+
+  if (
+    interaction.customId.startsWith(
+      'next_'
+    )
+  ) {
+
+    const animeData =
+      loadAnimeData();
+
+    let page = 0;
+
+    if (
+      interaction.customId.startsWith(
+        'next_next_'
+      )
+    ) {
+
+      page = Number(
+        interaction.customId
+          .split('_')[2]
+      );
+    }
+
+    if (
+      interaction.customId.startsWith(
+        'next_prev_'
+      )
+    ) {
+
+      page = Number(
+        interaction.customId
+          .split('_')[2]
+      );
+    }
+
+    await interaction.deferUpdate();
+
+    return next(
+      createReplyAdapter(
+        interaction
+      ),
+      animeData,
+      page
+    );
+  }
+
+  if (
+    interaction.customId === 'menu_next'
+  ) {
+
+    clearUserStates(
+      interaction.user.id
+    );
+
+    await interaction.deferReply({
+      flags: 64
+    });
+
+    return next(
+      createReplyAdapter(
+        interaction
+      ),
+      loadAnimeData()
+    );
+  }
+
+  if (
+    interaction.customId === 'menu_list'
+  ) {
+
+    clearUserStates(
+      interaction.user.id
+    );
 
     await interaction.deferReply({
       flags: 64
     });
 
     return list(
-      {
-        reply: (msg) =>
-          interaction.editReply(msg),
-
-        guild:
-          interaction.guild
-      },
-
+      createReplyAdapter(
+        interaction
+      ),
       animeList
     );
   }
 
-  const guildId =
-    interaction.guild.id;
-
-  console.log(
-
-    chalk.cyan(
-      `[${interaction.guild.name}]`
-    ) +
-
-    chalk.gray(
-      ` (${interaction.guild.id})`
-    ) +
-
-    chalk.yellow(
-      ` ${interaction.user.username}`
-    ) +
-
-    ` clicou ${interaction.customId}`
-  );
-
-  console.log(
-    'BOTÃO CLICADO:',
-    interaction.customId
-  );
-
-  console.log(
-    interaction.replied
-  );
-
-  console.log(
-    interaction.deferred
-  );
-  // 🎯 NEXT PAGINATION
-
-if (
-
-  interaction.customId.startsWith(
-    'next_'
-  )
-
-) {
-
-  const animeList =
-
-    JSON.parse(
-
-      fs.readFileSync(
-        './data/animes.json',
-        'utf8'
-      )
-    );
-
-  let page = 0;
-
-  // ➡️ NEXT PAGE
-
   if (
-
-    interaction.customId.startsWith(
-      'next_next_'
-    )
-
-  ) {
-
-    page = Number(
-
-      interaction.customId
-        .split('_')[2]
-    );
-  }
-
-  // ⬅️ PREVIOUS PAGE
-
-  if (
-
-    interaction.customId.startsWith(
-      'next_prev_'
-    )
-
-  ) {
-
-    page = Number(
-
-      interaction.customId
-        .split('_')[2]
-    );
-  }
-
-  await interaction.deferUpdate();
-
-  return next(
-
-    {
-      reply: (msg) =>
-        interaction.editReply(msg),
-
-      guild:
-        interaction.guild
-    },
-
-    animeList,
-
-    page
-  );
-}
-
-  /* =========================================
-     🎛️ MENU BUTTONS
-  ========================================= */
-
-  // 🔹 BOTAO ADD
-
-  if (
-    interaction.customId ===
-    'menu_add'
-  ) {
-
-    clearUserStates(
-      interaction.user.id
-    );
-
-    state.waitingForAdd[
-      interaction.user.id
-    ] = true;
-
-    return interaction.reply({
-
-      content:
-
-        t(
-          guildId,
-          'prompt_type_anime_name'
-        ),
-
-      flags: 64
-    });
-  }
-
-  // 🔹 BOTAO REMOVE
-
-  if (
-    interaction.customId ===
-    'menu_remove'
-  ) {
-
-    clearUserStates(
-      interaction.user.id
-    );
-
-    state.waitingForRemove =
-      state.waitingForRemove || {};
-
-    state.waitingForRemove[
-      interaction.user.id
-    ] = true;
-
-    return interaction.reply({
-
-      content:
-
-        t(
-          guildId,
-          'prompt_type_anime_name'
-        ),
-
-      flags: 64
-    });
-  }
-
-  // 🔹 BOTAO NEXT
-  if (
-  interaction.customId ===
-  'menu_next'
-) {
-
-  clearUserStates(
-    interaction.user.id
-  );
-
-  await interaction.deferReply({
-    flags: 64
-  });
-
-  return next(
-
-    {
-      reply: (msg) =>
-        interaction.editReply(msg),
-
-      guild:
-        interaction.guild
-    },
-
-    JSON.parse(
-
-  fs.readFileSync(
-    './data/animes.json',
-    'utf8'
-  )
-)
-  );
-}
-  // 🔹 BOTAO LISTA
-// 🔹 BOTAO LISTA
-
-if (
-  interaction.customId ===
-  'menu_list'
-) {
-
-  clearUserStates(
-    interaction.user.id
-  );
-
-  await interaction.deferReply({
-    flags: 64
-  });
-
-  return list(
-
-    {
-      reply: (msg) =>
-        interaction.editReply(msg),
-
-      guild:
-        interaction.guild
-    },
-
-    animeList
-  );
-}
-  // 🔹 BOTAO INFO
-
-  if (
-    interaction.customId ===
-    'menu_info'
-  ) {
-
-    clearUserStates(
-      interaction.user.id
-    );
-
-    state.waitingForInfo =
-      state.waitingForInfo || {};
-
-    state.waitingForInfo[
-      interaction.user.id
-    ] = true;
-
-    return interaction.reply({
-
-      content:
-
-        t(
-          guildId,
-          'prompt_type_anime_name'
-        ),
-
-      flags: 64
-    });
-  }
-
-  // 🔹 BOTAO LIMPAR
-
-  if (
-    interaction.customId ===
-    'menu_clear'
+    interaction.customId === 'menu_clear'
   ) {
 
     const row =
       new ActionRowBuilder()
-
         .addComponents(
-
           new ButtonBuilder()
-
             .setCustomId(
               'confirm_clear'
             )
-
             .setLabel(
-
               t(
                 guildId,
                 'clear_confirm_button'
               )
             )
-
-            .setEmoji('✅')
-
             .setStyle(
               ButtonStyle.Danger
             ),
-
           new ButtonBuilder()
-
             .setCustomId(
               'cancel_clear'
             )
-
             .setLabel(
-
               t(
                 guildId,
                 'clear_cancel_button'
               )
             )
-
-            .setEmoji('❌')
-
             .setStyle(
               ButtonStyle.Secondary
             )
         );
 
     return interaction.reply({
-
       content:
-
         t(
           guildId,
           'clear_warning'
         ),
-
       components: [row],
-
       flags: 64
     });
   }
 
-  // 🔹 BOTAO HELP
   if (
-    interaction.customId ===
-    'menu_help'
+    interaction.customId === 'menu_help'
   ) {
-    
+
     return help({
-
-    reply: (msg) =>
-      interaction.reply(msg),
-
-    guild:
-      interaction.guild
-  });
-}
-
-
-  /* =========================================
-     ⚙️ SYSTEM / COMMAND BUTTONS
-  ========================================= */
-
-  // 🔹 BOTAO LANGUAGE PT
-
-  if (
-    interaction.customId ===
-    'lang_pt'
-  ) {
-
-    const config =
-      loadConfig();
-
-    if (
-      !config[
-        interaction.guild.id
-      ]
-    ) {
-
-      config[
-        interaction.guild.id
-      ] = {};
-    }
-
-    config[
-      interaction.guild.id
-    ].language = 'pt';
-
-    saveConfig(config);
-
-    return interaction.reply({
-
-      content:
-        '🇧🇷 Idioma alterado para Português.',
-
-      flags: 64
+      reply: (msg) =>
+        interaction.reply(msg),
+      guild:
+        interaction.guild
     });
   }
 
-  // 🔹 BOTAO LANGUAGE EN
-
   if (
-    interaction.customId ===
-    'lang_en'
-  ) {
-
-    const config =
-      loadConfig();
-
-    if (
-      !config[
-        interaction.guild.id
-      ]
-    ) {
-
-      config[
-        interaction.guild.id
-      ] = {};
-    }
-
-    config[
-      interaction.guild.id
-    ].language = 'en';
-
-    saveConfig(config);
-
-    return interaction.reply({
-
-      content:
-        '🇺🇸 Language changed to English.',
-
-      flags: 64
-    });
-    
-  }
-  // 🔹 BOTAO LANGUAGE ES
-
-  if (
-    interaction.customId ===
-    'lang_es'
-  ) {
-
-    const config =
-      loadConfig();
-
-    if (
-      !config[
-        interaction.guild.id
-      ]
-    ) {
-
-      config[
-        interaction.guild.id
-      ] = {};
-    }
-
-    config[
-      interaction.guild.id
-    ].language = 'es';
-
-    saveConfig(config);
-
-    return interaction.reply({
-
-      content:
-        '🇪🇸 Idioma cambiado a español.',
-
-      flags: 64
-    });
-    
-  }
-
-  /* =========================================
-     🧹 CLEAR CONFIRMATION
-  ========================================= */
-
-  // 🔹 CONFIRMAR LIMPEZA
-
-  if (
-    interaction.customId ===
-    'confirm_clear'
+    interaction.customId === 'confirm_clear'
   ) {
 
     return clear(
-
       {
         reply: (msg) =>
-
           interaction.update({
-
             content: msg,
-
             components: []
           }),
-
         guild:
           interaction.guild
       },
-
       animeList
     );
   }
 
-  // 🔹 CANCELAR LIMPEZA
-
   if (
-    interaction.customId ===
-    'cancel_clear'
+    interaction.customId === 'cancel_clear'
   ) {
 
     return interaction.update({
-
       content:
-
         t(
           guildId,
           'clear_cancelled'
         ),
-
       components: []
+    });
+  }
+
+  if (
+    interaction.customId === 'lang_pt' ||
+    interaction.customId === 'lang_en' ||
+    interaction.customId === 'lang_es'
+  ) {
+
+    const config =
+      loadConfig();
+
+    config[
+      interaction.guild.id
+    ] = config[
+      interaction.guild.id
+    ] || {};
+
+    const language =
+      interaction.customId.replace(
+        'lang_',
+        ''
+      );
+
+    config[
+      interaction.guild.id
+    ].language = language;
+
+    saveConfig(config);
+
+    const messages = {
+      pt: 'Idioma alterado para Portugues.',
+      en: 'Language changed to English.',
+      es: 'Idioma cambiado a Espanol.'
+    };
+
+    return interaction.reply({
+      content:
+        messages[language],
+      flags: 64
     });
   }
 };

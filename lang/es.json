@@ -117,5 +117,5 @@
   "help_admin_commands": "`!setchannel` → Configurar canal del bot",
   "help_features_title": "💡 Funciones",
   "help_features": "• Búsqueda de anime con múltiples proveedores\n• Soporte para AniList + Jikan\n• Seguimiento de anime\n• Notificaciones de episodios\n• Sistema de búsqueda inteligente\n• Menús de selección de anime",
-  "join_support_server": "💬 Servidor de soporte"
+  "join_support_server": "Servidor de soporte"
 }

@@ -10,6 +10,9 @@ const {
 } = require('discord.js');
 const createEmbed = require('../utils/embed');
 const { t } = require('../utils/language');
+const {
+  createMenuBackButton
+} = require('../utils/navigationButtons');
 
 function formatTimeLeft(ms) {
   if (ms <= 0) return "Já lançado";
@@ -383,6 +386,9 @@ const row =
   currentPage >=
   totalPages - 1
 )
+,
+
+    createMenuBackButton()
   );
 
 return message.reply({

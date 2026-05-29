@@ -1,5 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 const { t } = require('../utils/language');
+const {
+  createInfoNavigationRow
+} = require('../utils/navigationButtons');
 
 async function info(message, animeName) {
 
@@ -182,7 +185,10 @@ async function info(message, animeName) {
       .setTimestamp();
 
     return message.reply({
-      embeds: [embed]
+      embeds: [embed],
+      components: [
+        createInfoNavigationRow()
+      ]
     });
 
   } catch (err) {

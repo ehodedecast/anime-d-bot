@@ -2,6 +2,9 @@ const { EmbedBuilder } = require('discord.js');
 const { loadAnimeData } = require('../utils/animeStorage');
 const { loadCache } = require('../utils/cacheManager');
 const { t, getGuildLanguage } = require('../utils/language');
+const {
+  createBackToMenuRow
+} = require('../utils/navigationButtons');
 
 const TEST_COVER =
   'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-ELSYx3yMPcKM.jpg';
@@ -195,7 +198,10 @@ function list(message) {
       .setTimestamp();
 
   return message.reply({
-    embeds: [embed]
+    embeds: [embed],
+    components: [
+      createBackToMenuRow()
+    ]
   });
 }
 
