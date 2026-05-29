@@ -253,8 +253,10 @@ const totalVotes =
     '',
     `Servers: ${client.guilds.cache.size}`,
     `Approx users: ${totalMembers}`,
+    '',
     `Total votes: ${totalVotes}`,
     `Unique voters: ${uniqueVoters}`,
+    '',
     `Global anime: ${animeStats.total}`,
     `Unique anime: ${animeStats.unique}`,
     `Tracking: ${animeStats.tracking}`,
@@ -279,13 +281,18 @@ const totalVotes =
     `Tracker: ${tracker.lastError ? `error (${tracker.lastError})` : 'ok'}`
   ].join('\n');
 
+  try {
+
   await message.author.send(
     `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``
   );
 
+} catch {
+
   return message.reply(
-    'Status enviado no seu PV.'
+    'Não consegui enviar uma DM. Verifique suas configurações de privacidade.'
   );
+}
 }
 
 module.exports =
