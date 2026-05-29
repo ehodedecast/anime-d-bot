@@ -90,8 +90,6 @@
   "// ERRORS": "",
 
   "api_problem": "⚠️ AnimeDBot is currently experiencing temporary issues with the AniList API.\n\nSome commands may not work right now.",
-"search_temporarily_disabled": "⚠️ Anime search is temporarily unavailable.\n\nWe are waiting for the AniList API to stabilize.",
-
   "// CHANNEL": "",
 
   "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!",

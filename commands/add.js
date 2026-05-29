@@ -135,7 +135,7 @@ async function add(
 
         t(
           message.guild.id,
-          'search_temporarily_disabled'
+          'anime_not_found'
         )
       );
     }

@@ -45,7 +45,7 @@ async function info(
         return message.reply(
           t(
             message.guild.id,
-            'search_temporarily_disabled'
+            'anime_not_found'
           )
         );
       }
@@ -170,7 +170,7 @@ async function info(
   return message.reply(
     t(
       message.guild.id,
-      'search_temporarily_disabled'
+      'anime_not_found'
     )
   );
 }
