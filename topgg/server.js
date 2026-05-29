@@ -223,6 +223,10 @@ function startVoteServer(
 
         saveVotes(votes);
 
+        console.log(
+  `Vote saved for ${userId}. Total votes: ${votes[userId].totalVotes}`
+);
+
         try {
 
           const user =
