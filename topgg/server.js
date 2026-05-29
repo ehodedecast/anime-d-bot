@@ -1,6 +1,9 @@
 const express =
   require('express');
 
+const crypto =
+  require('crypto');
+
 const {
   loadVotes,
   saveVotes
@@ -15,8 +18,80 @@ const app =
   express();
 
 app.use(
-  express.json()
+  express.json({
+    verify: (req, res, buffer) => {
+      req.rawBody =
+        buffer.toString('utf8');
+    }
+  })
 );
+
+function verifyTopggWebhook(
+  rawBody,
+  signature,
+  secret
+) {
+
+  if (
+    !rawBody ||
+    !signature ||
+    !secret
+  ) {
+
+    return false;
+  }
+
+  const parts =
+    signature.split(',');
+
+  const timestampPart =
+    parts.find(part =>
+      part.startsWith('t=')
+    );
+
+  const signaturePart =
+    parts.find(part =>
+      part.startsWith('v1=')
+    );
+
+  if (
+    !timestampPart ||
+    !signaturePart
+  ) {
+
+    return false;
+  }
+
+  const timestamp =
+    timestampPart.split('=')[1];
+
+  const receivedSignature =
+    signaturePart.split('=')[1];
+
+  const expectedSignature =
+    crypto
+      .createHmac(
+        'sha256',
+        secret
+      )
+      .update(
+        `${timestamp}.${rawBody}`
+      )
+      .digest('hex');
+
+  if (
+    expectedSignature.length !==
+    receivedSignature.length
+  ) {
+
+    return false;
+  }
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expectedSignature),
+    Buffer.from(receivedSignature)
+  );
+}
 
 function startVoteServer(
   client
@@ -29,10 +104,68 @@ function startVoteServer(
 
       try {
 
-        const userId =
-          req.body.user;
+        const signature =
+          req.headers['x-topgg-signature'];
 
-        if (!userId) {
+        const secret =
+          process.env.TOPGG_WEBHOOK_SECRET;
+
+        const isValid =
+          verifyTopggWebhook(
+            req.rawBody,
+            signature,
+            secret
+          );
+
+        if (
+          !isValid
+        ) {
+
+          console.log(
+            'Invalid Top.gg webhook signature'
+          );
+
+          return res
+            .status(401)
+            .send('Invalid signature');
+        }
+
+        if (
+          req.body.type === 'webhook.test'
+        ) {
+
+          console.log(
+            'Top.gg webhook test received'
+          );
+
+          return res
+            .sendStatus(200);
+        }
+
+        if (
+          req.body.type !== 'vote.create'
+        ) {
+
+          console.log(
+            `Ignored Top.gg event: ${req.body.type}`
+          );
+
+          return res
+            .sendStatus(200);
+        }
+
+        const userId =
+          req.body?.data?.user?.platform_id;
+
+        const voteId =
+          req.body?.data?.id;
+
+        const voteWeight =
+          req.body?.data?.weight || 1;
+
+        if (
+          !userId
+        ) {
 
           return res
             .status(400)
@@ -48,17 +181,51 @@ function startVoteServer(
 
           votes[userId] = {
             totalVotes: 0,
-            lastVote: null
+            lastVote: null,
+            voteHistory: []
           };
         }
 
-        votes[userId]
-          .totalVotes++;
+        const alreadyRegistered =
+          votes[userId].voteHistory?.some(
+            vote =>
+              vote.voteId === voteId
+          );
 
-        votes[userId]
-          .lastVote =
-            new Date()
-              .toISOString();
+        if (
+          alreadyRegistered
+        ) {
+
+          console.log(
+            `Duplicate Top.gg vote ignored from ${userId}`
+          );
+
+          return res
+            .sendStatus(200);
+        }
+
+        votes[userId].totalVotes +=
+          voteWeight;
+
+        votes[userId].lastVote =
+          new Date().toISOString();
+
+        if (
+          !Array.isArray(
+            votes[userId].voteHistory
+          )
+        ) {
+
+          votes[userId].voteHistory = [];
+        }
+
+        votes[userId].voteHistory.push({
+          voteId,
+          weight: voteWeight,
+          votedAt:
+            req.body?.data?.created_at ||
+            new Date().toISOString()
+        });
 
         saveVotes(votes);
 

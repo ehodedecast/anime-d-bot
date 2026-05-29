@@ -14,6 +14,10 @@ const {
   t
 } = require('../utils/language');
 
+const {
+  createMenuBackButton
+} = require('../utils/navigationButtons');
+
 async function help(
   message
 ) {
@@ -102,6 +106,10 @@ async function help(
 
           .setEmoji('💬')
       );
+
+  row.addComponents(
+    createMenuBackButton()
+  );
 
   return message.reply({
 
