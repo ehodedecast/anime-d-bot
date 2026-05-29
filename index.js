@@ -123,11 +123,12 @@ client.once(
 
     startVoteServer(client);
 
-    setInterval(() => {
-
-      checkAnime(client);
-
-    }, 30000);
+    // Temporarily disabled while testing Top.gg webhook
+// setInterval(() => {
+//
+//   checkAnime(client);
+//
+// }, 30000);
   }
 );
 
