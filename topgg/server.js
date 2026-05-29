@@ -103,6 +103,17 @@ function startVoteServer(
     async (req, res) => {
 
       try {
+        if (
+  req.body.type === 'webhook.test'
+) {
+
+  console.log(
+    'Top.gg webhook test received before signature validation'
+  );
+
+  return res
+    .sendStatus(200);
+}
 
         const signature =
           req.headers['x-topgg-signature'];
