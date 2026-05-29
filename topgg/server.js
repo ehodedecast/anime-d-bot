@@ -16,30 +16,6 @@ const runtimeStatus =
 
 const app =
   express();
-  app.get(
-  '/health',
-
-  (req, res) => {
-
-    console.log(
-      'Health check received'
-    );
-
-    res
-      .status(200)
-      .send('AnimeDBot webhook server is alive');
-  }
-);
-  app.use(
-  (req, res, next) => {
-
-    console.log(
-      `Incoming request: ${req.method} ${req.url}`
-    );
-
-    next();
-  }
-);
 
 app.use(
   express.json({
@@ -125,19 +101,10 @@ function startVoteServer(
     '/topgg/vote',
 
     async (req, res) => {
-      console.log(
-  'Top.gg webhook request received:',
-  JSON.stringify(req.body, null, 2)
-);
-
       try {
         if (
   req.body.type === 'webhook.test'
 ) {
-
-  console.log(
-    'Top.gg webhook test received before signature validation'
-  );
 
   return res
     .sendStatus(200);
@@ -167,18 +134,6 @@ function startVoteServer(
           return res
             .status(401)
             .send('Invalid signature');
-        }
-
-        if (
-          req.body.type === 'webhook.test'
-        ) {
-
-          console.log(
-            'Top.gg webhook test received'
-          );
-
-          return res
-            .sendStatus(200);
         }
 
         if (
@@ -318,11 +273,7 @@ function startVoteServer(
         new Date().toISOString();
 
       console.log(
-  `Top.gg Vote Server Online on port ${port}`
-);
-console.log(
-  'Environment PORT:',
-  process.env.PORT
+  `Top.gg Vote Server Online`
 );
     }
   ).on(
