@@ -16,6 +16,15 @@ const help =
 const sendMenu =
   require('./menu');
 
+const add =
+  require('../commands/add');
+
+const info =
+  require('../commands/info');
+
+const remove =
+  require('../commands/remove');
+
 const {
   t
 } = require('../utils/language');
@@ -33,6 +42,14 @@ const {
 
 const state =
   require('../state/state');
+
+const {
+  createAnimeNameModal
+} = require('../utils/modals');
+
+const {
+  createInteractionMessage
+} = require('../utils/interactionAdapter');
 
 function clearUserStates(
   userId
@@ -87,18 +104,13 @@ function beginAddFlow(
     interaction.user.id
   );
 
-  state.waitingForAdd[
-    interaction.user.id
-  ] = true;
-
-  return interaction.reply({
-    content:
-      t(
-        guildId,
-        'prompt_type_anime_name'
-      ),
-    flags: 64
-  });
+  return interaction.showModal(
+    createAnimeNameModal(
+      'modal_add_anime',
+      'Adicionar Anime',
+      t(guildId, 'prompt_type_anime_name')
+    )
+  );
 }
 
 function beginInfoFlow(
@@ -110,21 +122,13 @@ function beginInfoFlow(
     interaction.user.id
   );
 
-  state.waitingForInfo =
-    state.waitingForInfo || {};
-
-  state.waitingForInfo[
-    interaction.user.id
-  ] = true;
-
-  return interaction.reply({
-    content:
-      t(
-        guildId,
-        'prompt_type_anime_name'
-      ),
-    flags: 64
-  });
+  return interaction.showModal(
+    createAnimeNameModal(
+      'modal_info_anime',
+      'Pesquisar Anime',
+      t(guildId, 'prompt_type_anime_name')
+    )
+  );
 }
 
 function beginRemoveFlow(
@@ -136,27 +140,85 @@ function beginRemoveFlow(
     interaction.user.id
   );
 
-  state.waitingForRemove =
-    state.waitingForRemove || {};
+  return interaction.showModal(
+    createAnimeNameModal(
+      'modal_remove_anime',
+      'Remover Anime',
+      t(guildId, 'prompt_type_anime_name')
+    )
+  );
+}
 
-  state.waitingForRemove[
-    interaction.user.id
-  ] = true;
+async function handleAnimeModal(
+  interaction,
+  client
+) {
 
-  return interaction.reply({
-    content:
-      t(
-        guildId,
-        'prompt_type_anime_name'
-      ),
-    flags: 64
-  });
+  const animeName =
+    interaction.fields.getTextInputValue(
+      'anime_name'
+    );
+
+  const message =
+    createInteractionMessage(
+      interaction
+    );
+
+  const animeData =
+    loadAnimeData();
+
+  if (
+    interaction.customId === 'modal_add_anime'
+  ) {
+
+    await interaction.deferReply();
+
+    return add(
+      message,
+      animeData[interaction.guild.id]?.anime || [],
+      animeName,
+      'first'
+    );
+  }
+
+  if (
+    interaction.customId === 'modal_info_anime'
+  ) {
+
+    await interaction.deferReply();
+
+    return info(
+      message,
+      animeName
+    );
+  }
+
+  if (
+    interaction.customId === 'modal_remove_anime'
+  ) {
+
+    return remove(
+      message,
+      animeName
+    );
+  }
 }
 
 module.exports = async (
   interaction,
-  animeList
+  animeList,
+  client
 ) => {
+
+  if (
+    interaction.isModalSubmit?.()
+  ) {
+
+    return handleAnimeModal(
+      interaction,
+      client
+    );
+  }
 
   const guildId =
     interaction.guild.id;
@@ -275,7 +337,7 @@ module.exports = async (
     );
 
     await interaction.deferReply({
-      flags: 64
+      ephemeral: true
     });
 
     return next(
@@ -295,7 +357,7 @@ module.exports = async (
     );
 
     await interaction.deferReply({
-      flags: 64
+      ephemeral: true
     });
 
     return list(
@@ -348,7 +410,7 @@ module.exports = async (
           'clear_warning'
         ),
       components: [row],
-      flags: 64
+      ephemeral: true
     });
   }
 
@@ -432,7 +494,7 @@ module.exports = async (
     return interaction.reply({
       content:
         messages[language],
-      flags: 64
+      ephemeral: true
     });
   }
 };

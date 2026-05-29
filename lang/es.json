@@ -95,7 +95,7 @@
 
   "set_channel_success": "✅ ¡Este canal ha sido configurado como el canal oficial de AnimeDBot!",
   "no_channel_set": "⚠️ Este servidor no ha configurado un canal oficial para AnimeDBot.",
-  "setchannel_instructions": "Usa `!setchannel` en el canal deseado para configurarlo como el canal oficial de AnimeDBot.",
+  "setchannel_instructions": "Usa `/setchannel` en el canal deseado para configurarlo como el canal oficial de AnimeDBot.",
 
   "// LANGUAGE": "",
 
@@ -110,11 +110,11 @@
   "help_title": "📖 Ayuda de AnimeDBot",
   "help_description": "¡Bienvenido al Centro de Ayuda de AnimeDBot! Aquí puedes encontrar todos los comandos y funciones disponibles para aprovechar al máximo tu experiencia de seguimiento de anime.\n\nLa mayoría de las funciones de anime también se pueden acceder a través del menú principal de interacción, haciendo AnimeDBot más fácil de usar sin memorizar comandos.\n\nA continuación se muestran todos los comandos y sistemas disponibles actualmente en AnimeDBot.",
   "help_anime_commands_title": "📺 Comandos de Anime",
-  "help_anime_commands": "`!add` <anime> → Agregar anime al seguimiento\n`!list` → Mostrar anime rastreados\n`!next` <anime> → Información del próximo episodio\n`!info` <anime> → Información detallada del anime\n`!remove` <anime> → Eliminar anime\n`!clearlist` → Limpiar lista de anime del servidor",
+  "help_anime_commands": "`/add` <anime> → Agregar anime al seguimiento\n`/list` → Mostrar anime rastreados\n`/next` <anime> → Información del próximo episodio\n`/info` <anime> → Información detallada del anime\n`/remove` <anime> → Eliminar anime\n`/clear` → Limpiar lista de anime del servidor",
   "help_language_commands_title": "🌍 Comandos de Idioma",
-  "help_language_commands": "`!language` → Cambiar idioma del bot",
+  "help_language_commands": "`/language` → Cambiar idioma del bot",
   "help_admin_commands_title": "⚙️ Comandos de Administración",
-  "help_admin_commands": "`!setchannel` → Configurar canal del bot",
+  "help_admin_commands": "`/setchannel` → Configurar canal del bot",
   "help_features_title": "💡 Funciones",
   "help_features": "• Búsqueda de anime con múltiples proveedores\n• Soporte para AniList + Jikan\n• Seguimiento de anime\n• Notificaciones de episodios\n• Sistema de búsqueda inteligente\n• Menús de selección de anime",
   "join_support_server": "Servidor de soporte"

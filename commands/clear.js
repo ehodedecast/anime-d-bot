@@ -9,7 +9,11 @@ function clear(message) {
 
   const data = loadAnimeData();
 
-  data[message.guild.id] = [];
+  data[message.guild.id] = {
+    guildName:
+      message.guild.name,
+    anime: []
+  };
 
   saveAnimeData(data);
 

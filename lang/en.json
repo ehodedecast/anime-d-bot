@@ -96,7 +96,7 @@
 
   "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!",
   "no_channel_set": "⚠️ This server has not set an official channel for AnimeDBot.",
-  "setchannel_instructions": "Use `!setchannel` in the desired channel to set it as the official AnimeDBot channel.",
+  "setchannel_instructions": "Use `/setchannel` in the desired channel to set it as the official AnimeDBot channel.",
 
    "// LANGUAGE": "",
    
@@ -110,11 +110,11 @@
   "help_title": "📖 AnimeDBot Help",
   "help_description": "Welcome to the AnimeDBot Help Center! Here you can find all available commands and features to make the most out of your anime tracking experience.\n\nMost anime features can also be accessed through the main interaction menu, making AnimeDBot easier to use without memorizing commands.\n\nBelow are all available commands and systems currently available in AnimeDBot.",
   "help_anime_commands_title": "📺 Anime Commands",
-  "help_anime_commands": "`!add` <anime> → Add anime to tracking\n`!list` → Show tracked anime\n`!next` <anime> → Next episode info\n`!info` <anime> → Detailed anime info\n`!remove` <anime> → Remove anime\n`!clearlist` → Clear server anime list",
+  "help_anime_commands": "`/add` <anime> → Add anime to tracking\n`/list` → Show tracked anime\n`/next` <anime> → Next episode info\n`/info` <anime> → Detailed anime info\n`/remove` <anime> → Remove anime\n`/clear` → Clear server anime list",
   "help_language_commands_title": "🌍 Language Commands",
-  "help_language_commands": "`!language` → Change bot language",
+  "help_language_commands": "`/language` → Change bot language",
   "help_admin_commands_title": "⚙️ Admin Commands",
-  "help_admin_commands": "`!setchannel` → Configure bot channel",
+  "help_admin_commands": "`/setchannel` → Configure bot channel",
   "help_features_title": "💡 Features",
   "help_features": "• Multi-provider anime search\n• AniList + Jikan support\n• Anime tracking\n• Episode notifications\n• Smart search system\n• Anime selection menus", 
   "join_support_server": "Support Server"

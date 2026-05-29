@@ -164,6 +164,14 @@ async function add(
     // 📋 SELECTION MENU
 
     if (
+      skipSelection === 'first'
+    ) {
+
+      results = [
+        results[0]
+      ];
+
+    } else if (
       !skipSelection
     ) {
 

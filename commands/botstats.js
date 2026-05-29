@@ -287,6 +287,10 @@ const totalVotes =
     `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``
   );
 
+  return message.reply(
+    'Status enviado no seu PV.'
+  );
+
 } catch {
 
   return message.reply(

@@ -78,21 +78,21 @@ async function info(message, animeName) {
     const data =
       json.data?.Page?.media?.[0];
       
+    if (!data) {
+  return message.reply(
+    t(
+      message.guild.id,
+      'search_temporarily_disabled'
+    )
+  );
+}
+
       if (data.isAdult) {
 
   return message.reply(
     t(
       message.guild.id,
       'adult_content_warning'
-    )
-  );
-}
-
-    if (!data) {
-  return message.reply(
-    t(
-      message.guild.id,
-      'search_temporarily_disabled'
     )
   );
 }

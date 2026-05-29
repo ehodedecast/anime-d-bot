@@ -1,110 +1,79 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const {
+  Client,
+  GatewayIntentBits
+} = require('discord.js');
+
 require('dotenv').config();
 
+const notifier =
+  require('node-notifier');
+
+const guildCreate =
+  require('./events/guildCreate');
+
 const guildDelete =
-  require(
-    './events/guildDelete'
-  );
+  require('./events/guildDelete');
 
 const startVoteServer =
-  require(
-    './topgg/server'
-  );
+  require('./topgg/server');
 
-const fs = require('fs');
-const notifier = require('node-notifier');
-const chalk = require('chalk').default;
-
-const handleCommands = require('./commands');
-const handleButtons = require('./interactions/buttons');
-const sendMenu = require('./interactions/menu');
-
-
-
-const checkAnime = require('./utils/checkAnime');
+const checkAnime =
+  require('./utils/checkAnime');
 
 const validateStorage =
-  require(
-    './utils/storageValidator'
-  );
-
-  const guildCreate =
-  require(
-    './events/guildCreate'
-  );
+  require('./utils/storageValidator');
 
 const {
   getGuildAnimeList
 } = require('./utils/animeStorage');
 
 const {
-  loadConfig
-} = require('./utils/config');
-
-const {
-  t
-} = require('./utils/language');
-
-const state =
-  require('./state/state');
-
-const {
-  shouldIgnoreForLocalTest,
-  getEffectiveChannelId
+  shouldIgnoreForLocalTest
 } = require('./utils/localMode');
+
+const {
+  registerSlashCommands
+} = require('./utils/slashRegistry');
+
+const handleButtons =
+  require('./interactions/buttons');
+
+const handleSlashCommand =
+  require('./interactions/slashCommands');
 
 const TOKEN =
   process.env.TOKEN;
 
-// 🤖 CLIENT
-
 const client =
   new Client({
-
     intents: [
-
-      GatewayIntentBits.Guilds,
-
-      GatewayIntentBits.GuildMessages,
-
-      GatewayIntentBits.MessageContent
+      GatewayIntentBits.Guilds
     ]
   });
 
-  startVoteServer(client);
-
-// 🚨 ERRORS
+startVoteServer(client);
 
 process.on(
   'uncaughtException',
-
   async (err) => {
 
     console.error(err);
 
     notifier.notify({
-
-      title:
-        'Erro no Bot',
-
-      message:
-        err.message
+      title: 'Erro no Bot',
+      message: err.message
     });
   }
 );
 
 process.on(
   'unhandledRejection',
-
   async (err) => {
 
     console.error(err);
 
     notifier.notify({
-
-      title:
-        'Erro Async',
-
+      title: 'Erro Async',
       message:
         err?.message ||
         'Erro desconhecido'
@@ -112,30 +81,21 @@ process.on(
   }
 );
 
-// ✅ BOT READY
-
 client.once(
   'clientReady',
-
   async () => {
 
-    console.log(
-      'Bot online!'
+    console.log('Bot online!');
+
+    await registerSlashCommands(
+      client
     );
 
-    
-
- setInterval(() => {
-
-   checkAnime(client);
-
- }, 30000);
+    setInterval(() => {
+      checkAnime(client);
+    }, 30000);
   }
 );
-
-
-
-// 🌍 BOT JOINED SERVER
 
 client.on(
   'guildCreate',
@@ -147,233 +107,8 @@ client.on(
   guildDelete
 );
 
-// 💬 MESSAGE CREATE
-
-client.on(
-  'messageCreate',
-
-  async (message) => {
-
-    // 🤖 IGNORE BOTS
-
-    if (
-      message.author.bot
-    ) {
-      return;
-    }
-
-    // 📺 GUILD ANIME LIST
-
-    const animeList =
-      getGuildAnimeList(
-        message.guild.id
-      );
-
-    // ⚙️ CONFIG
-
-    const config =
-      loadConfig();
-
-    const guildConfig =
-      config[
-        message.guild?.id
-      ];
-
-    const normalizedContent =
-      (message.content || '')
-        .trim()
-        .toLowerCase();
-
-    if (
-      shouldIgnoreForLocalTest(message)
-    ) {
-      return;
-    }
-
-    const effectiveChannelId =
-      getEffectiveChannelId(
-        guildConfig
-      );
-
-    // ⚠️ NO CHANNEL CONFIGURED
-
-    if (
-
-      (
-        !guildConfig ||
-        !effectiveChannelId
-      ) &&
-
-      normalizedContent !==
-      '!setchannel'
-
-    ) {
-
-      return message.reply(
-    t(message.guild.id, 'no_channel_set') + '\n\n' +
-    t(message.guild.id, 'setchannel_instructions')
-  );
-    }
-
-    // 🚫 WRONG CHANNEL
-
-    if (
-
-      effectiveChannelId &&
-
-      message.channel.id !==
-      effectiveChannelId &&
-
-      normalizedContent !==
-      '!setchannel'
-
-    ) {
-      if (
-        normalizedContent.startsWith('!')
-      ) {
-
-        return message.reply(
-          `Este servidor esta configurado para usar comandos em <#${effectiveChannelId}>.\n` +
-          'Se quiser usar este canal, envie `!setchannel` aqui.'
-        );
-      }
-
-      return;
-    }
-
-    // 🎯 ADD SELECTION
-
-    if (
-
-      state
-        .waitingForAddSelection[
-          message.author.id
-        ]
-
-    ) {
-
-      const choice =
-        parseInt(
-          message.content
-        );
-
-      // ❌ INVALID CHOICE
-
-      if (
-
-        isNaN(choice) ||
-
-        choice < 1 ||
-
-        choice > 5
-
-      ) {
-
-        delete state
-          .waitingForAddSelection[
-            message.author.id
-          ];
-
-        return message.reply(
-
-          t(
-            message.guild.id,
-            'selection_invalid'
-          )
-        );
-      }
-
-      // ✅ SELECTED ANIME
-
-      const selectedAnime =
-
-        state
-          .waitingForAddSelection[
-            message.author.id
-          ]
-          .results[
-            choice - 1
-          ];
-
-      console.log(
-
-        selectedAnime
-          .title
-      );
-
-      // 🧹 CLEAR STATE
-
-      delete state
-        .waitingForAddSelection[
-          message.author.id
-        ];
-
-      // ➕ EXECUTE ADD
-
-      const add =
-        require('./commands/add');
-
-      return add(
-
-  message,
-
-  animeList,
-
-  selectedAnime.title,
-
-  true,
-
-  selectedAnime
-);
-
-    }
-    // 📋 MENU
-
-    if (
-      normalizedContent ===
-      '!menu'
-    ) {
-
-      console.log(
-
-        chalk.cyan(
-          `[${message.guild.name}]`
-        ) +
-
-        chalk.green(
-          ` ${message.author.username}`
-        ) +
-
-        ' abriu o menu'
-      );
-
-      return sendMenu(
-        message
-      );
-    }
-
-    // 🎮 COMMANDS
-
-    console.log(
-      animeList
-    );
-
-    handleCommands(
-
-      message,
-
-      animeList,
-
-      client
-    );
-  }
-);
-
-// 🔘 BUTTON INTERACTIONS
-
 client.on(
   'interactionCreate',
-
   async (interaction) => {
 
     if (
@@ -382,25 +117,57 @@ client.on(
       return;
     }
 
-    if (
-      !interaction.isButton()
-    ) {
-      return;
+    try {
+
+      if (
+        interaction.isChatInputCommand()
+      ) {
+
+        return handleSlashCommand(
+          interaction,
+          client
+        );
+      }
+
+      if (
+        interaction.isButton() ||
+        interaction.isModalSubmit()
+      ) {
+
+        const animeList =
+          getGuildAnimeList(
+            interaction.guild.id
+          );
+
+        return handleButtons(
+          interaction,
+          animeList,
+          client
+        );
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      const payload = {
+        content:
+          'Erro ao processar a interação.',
+        ephemeral: true
+      };
+
+      if (
+        interaction.deferred ||
+        interaction.replied
+      ) {
+        return interaction.editReply(payload);
+      }
+
+      return interaction.reply(payload);
     }
-
-    const animeList =
-      getGuildAnimeList(
-        interaction.guild.id
-      );
-
-    handleButtons(
-      interaction,
-      animeList
-    );
   }
 );
-validateStorage();
 
-// 🔑 LOGIN
+validateStorage();
 
 client.login(TOKEN);
