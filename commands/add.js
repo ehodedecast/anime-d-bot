@@ -57,14 +57,13 @@ const {
 );
 
 const {
+  userAnimeAlreadyExists,
+  saveAnimeToUser
+} = require('../utils/userAnimeStorage');
 
-  animeAlreadyExists,
-
-  saveAnimeToGuild
-
-} = require(
-  '../services/animeStorageService'
-);
+const {
+  ensureUserProfile
+} = require('../utils/userProfileStorage');
 
 const {
 
@@ -229,7 +228,7 @@ async function add(
 
     const alreadyExists =
 
-      animeAlreadyExists(
+      userAnimeAlreadyExists(
 
         animeList,
 
@@ -271,15 +270,20 @@ const mapping =
 
     // 💾 SAVE
 
-    saveAnimeToGuild(
+    saveAnimeToUser(
 
-      message.guild.id,
+      message.author.id,
 
-      message.guild.name,
+      message.author.username,
 
       anime,
 
       mode
+    );
+
+    ensureUserProfile(
+      message.author.id,
+      message.author.username
     );
 
     // 📊 ANALYTICS
@@ -314,6 +318,9 @@ syncAnimeProviders(
       });
 
     return message.reply({
+
+      content:
+        `✅ ${message.author.username} adicionou ${anime.title} à lista pessoal.`,
 
       embeds: [embed],
 

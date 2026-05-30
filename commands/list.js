@@ -1,5 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
-const { loadAnimeData } = require('../utils/animeStorage');
+const {
+  getUserAnimeList
+} = require('../utils/userAnimeStorage');
 const { loadCache } = require('../utils/cacheManager');
 const { t, getGuildLanguage } = require('../utils/language');
 const {
@@ -11,28 +13,31 @@ const TEST_COVER =
 
 const copy = {
   es: {
-    description: 'lista de animes',
+    description: 'lista pessoal de animes',
     tracking: 'Seguimiento',
     library: 'Biblioteca',
+    emptyPersonal: 'Todavia no has añadido anime a tu lista personal.',
     emptyLayer: 'No hay anime en esta capa.',
     quarantine: 'Cuarentena',
-    footer: 'Seguimiento recibe alertas de episodios. Biblioteca solo queda guardada.'
+    footer: 'Lista personal del usuario. Seguimiento recibe alertas cuando el tracker por usuario esté activo.'
   },
   pt: {
-    description: 'Lista de animes',
+    description: 'Lista pessoal de animes',
     tracking: 'Monitorados',
     library: 'Biblioteca',
+    emptyPersonal: 'Você ainda não adicionou animes à sua lista pessoal.',
     emptyLayer: 'Nenhum anime nesta camada.',
     quarantine: 'Quarentena',
-    footer: 'Monitorados recebem alertas. Biblioteca fica apenas salva.'
+    footer: 'Lista pessoal do usuário. Monitorados receberão alertas quando o tracker por usuário estiver ativo.'
   },
   en: {
-    description: 'list of animes',
+    description: 'personal anime list',
     tracking: 'Tracking',
     library: 'Library',
+    emptyPersonal: 'You have not added anime to your personal list yet.',
     emptyLayer: 'No anime in this layer.',
     quarantine: 'Quarantine',
-    footer: 'Tracking receives episode alerts. Library is only saved.'
+    footer: 'Personal user list. Tracking will receive alerts when user tracking is active.'
   }
 };
 
@@ -107,9 +112,6 @@ function formatAnimeRows(
 
 function list(message) {
 
-  const data =
-    loadAnimeData();
-
   const cache =
     loadCache();
 
@@ -117,12 +119,14 @@ function list(message) {
     getCopy(message.guild.id);
 
   const animeList =
-    data[message.guild.id]
-      ?.anime || [];
+    getUserAnimeList(
+      message.author.id,
+      message.author.username
+    );
 
   if (!animeList.length) {
     return message.reply(
-      t(message.guild.id, 'list_empty')
+      labels.emptyPersonal
     );
   }
 

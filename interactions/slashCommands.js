@@ -15,8 +15,8 @@ const {
 } = require('discord.js');
 
 const {
-  loadAnimeData
-} = require('../utils/animeStorage');
+  getUserAnimeList
+} = require('../utils/userAnimeStorage');
 
 const {
   loadConfig
@@ -70,9 +70,6 @@ async function handleSlashCommand(
     createInteractionMessage(
       interaction
     );
-
-  const animeData =
-    loadAnimeData();
 
   const config =
     loadConfig();
@@ -157,12 +154,19 @@ async function handleSlashCommand(
 
     return add(
       message,
-      animeData[interaction.guild.id]?.anime || [],
+      getUserAnimeList(
+        interaction.user.id,
+        interaction.user.username
+      ),
       interaction.options.getString('anime')
     );
   }
 
   if (command === 'list') {
+
+    await interaction.deferReply({
+      ephemeral: true
+    });
 
     return list(
       message
@@ -179,11 +183,16 @@ async function handleSlashCommand(
 
   if (command === 'next') {
 
-    await interaction.deferReply();
+    await interaction.deferReply({
+      ephemeral: true
+    });
 
     return next(
       message,
-      animeData
+      getUserAnimeList(
+        interaction.user.id,
+        interaction.user.username
+      )
     );
   }
 

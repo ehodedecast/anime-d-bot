@@ -21,7 +21,11 @@ const REQUIRED_DATA_FILES = {
 
   'config.json': {},
 
-  'guildHistory.json': {}
+  'guildHistory.json': {},
+
+  'userAnimes.json': {},
+
+  'userProfiles.json': {}
 };
 
 function cloneDefaultData(

@@ -1,7 +1,7 @@
 const {
-  loadAnimeData,
-  saveAnimeData
-} = require('../utils/animeStorage');
+  saveUserAnimes,
+  ensureUserAnimeData
+} = require('../utils/userAnimeStorage');
 const { t } = require('../utils/language');
 const {
   createRemoveNavigationRow
@@ -126,11 +126,15 @@ function remove(
   confirmedAnime = null
 ) {
 
-  const data = loadAnimeData();
+  const data =
+    ensureUserAnimeData(
+      message.author.id,
+      message.author.username
+    );
 
   const animeList =
-  data[message.guild.id]
-    ?.anime || [];
+    data[message.author.id]
+      ?.anime || [];
 
     console.log(animeList);
 console.log(animeName);
@@ -225,10 +229,10 @@ console.log(animeName);
 
   animeList.splice(index, 1);
 
-  data[message.guild.id]
-  .anime = animeList;
+  data[message.author.id]
+    .anime = animeList;
 
-  saveAnimeData(data);
+  saveUserAnimes(data);
 
   return message.reply({
     content:

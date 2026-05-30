@@ -1,4 +1,3 @@
-const fs = require('fs');
 const chalk = require('chalk').default;
 
 const list =
@@ -51,6 +50,10 @@ const {
   createInteractionMessage
 } = require('../utils/interactionAdapter');
 
+const {
+  getUserAnimeList
+} = require('../utils/userAnimeStorage');
+
 function clearUserStates(
   userId
 ) {
@@ -89,7 +92,10 @@ function createReplyAdapter(
       interaction.editReply(msg),
 
     guild:
-      interaction.guild
+      interaction.guild,
+
+    author:
+      interaction.user
   };
 }
 
@@ -122,16 +128,6 @@ function createSelectionReplyAdapter(
       });
     }
   };
-}
-
-function loadAnimeData() {
-
-  return JSON.parse(
-    fs.readFileSync(
-      './data/animes.json',
-      'utf8'
-    )
-  );
 }
 
 function beginAddFlow(
@@ -203,9 +199,6 @@ async function handleAnimeModal(
       interaction
     );
 
-  const animeData =
-    loadAnimeData();
-
   if (
     interaction.customId === 'modal_add_anime'
   ) {
@@ -214,7 +207,10 @@ async function handleAnimeModal(
 
     return add(
       message,
-      animeData[interaction.guild.id]?.anime || [],
+      getUserAnimeList(
+        interaction.user.id,
+        interaction.user.username
+      ),
       animeName
     );
   }
@@ -329,16 +325,16 @@ module.exports = async (
         interaction
       );
 
-    const animeData =
-      loadAnimeData();
-
     if (
       selectionState.action === 'add'
     ) {
 
       return add(
         message,
-        animeData[interaction.guild.id]?.anime || [],
+        getUserAnimeList(
+          interaction.user.id,
+          interaction.user.username
+        ),
         selectedAnime.title,
         true,
         selectedAnime
@@ -484,9 +480,6 @@ module.exports = async (
     )
   ) {
 
-    const animeData =
-      loadAnimeData();
-
     let page = 0;
 
     if (
@@ -519,7 +512,10 @@ module.exports = async (
       createReplyAdapter(
         interaction
       ),
-      animeData,
+      getUserAnimeList(
+        interaction.user.id,
+        interaction.user.username
+      ),
       page
     );
   }
@@ -540,7 +536,10 @@ module.exports = async (
       createReplyAdapter(
         interaction
       ),
-      loadAnimeData()
+      getUserAnimeList(
+        interaction.user.id,
+        interaction.user.username
+      )
     );
   }
 

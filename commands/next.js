@@ -30,35 +30,33 @@ function formatTimeLeft(ms) {
 async function next(
   message,
 
-  animeList,
+  animeList = [],
 
   currentPage = 0
 ) {
 
   try {
 
-    const guildAnime =
-
-      animeList?.[
-        message.guild.id
-      ]?.anime || [];
+    const userAnime =
+      Array.isArray(
+        animeList
+      )
+        ? animeList
+        : [];
 
     if (
-      guildAnime.length === 0
+      userAnime.length === 0
     ) {
 
       return message.reply(
-        t(
-          message.guild.id,
-          'anime_list_empty'
-        )
+        'Você ainda não adicionou animes à sua lista pessoal.'
       );
     }
 
     const results = [];
 
     for (
-      const anime of guildAnime
+      const anime of userAnime
     ) {
 
       try {
