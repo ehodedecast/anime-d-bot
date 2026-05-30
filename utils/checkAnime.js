@@ -5,9 +5,10 @@ const chalk = require('chalk').default;
 const { t } =
   require('./language');
 
-const { loadAnimeData } = require('./animeStorage');
-
-const { loadConfig } = require('./config');
+const {
+  loadUserAnimes,
+  saveUserAnimes
+} = require('./userAnimeStorage');
 
 const {
   loadSentEpisodes,
@@ -23,16 +24,11 @@ const {
   saveCache
 } = require('./cacheManager');
 
-const fs = require('fs');
-
 const repairInvalidAnime =
   require('./repairInvalidAnime');
 
 const {
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
+  EmbedBuilder
 } = require('discord.js');
 
 const runtimeStatus =
@@ -51,7 +47,7 @@ function chunkArray(array, size) {
 
 function quarantineAnime(
 
-  animeData,
+  userAnimeData,
 
   animeId,
 
@@ -61,13 +57,13 @@ function quarantineAnime(
 
   let quarantined = false;
 
-  for (const guildId in animeData) {
+  for (const userId in userAnimeData) {
 
-    const guildAnime =
-      animeData[guildId]
+    const userAnime =
+      userAnimeData[userId]
         ?.anime || [];
 
-    guildAnime.forEach(
+    userAnime.forEach(
       anime => {
 
         if (
@@ -91,6 +87,89 @@ function quarantineAnime(
   }
 
   return quarantined;
+}
+
+function getSentEpisodeEntry(
+  sentEpisodes,
+  userId,
+  animeId,
+  episode
+) {
+
+  const animeKey =
+    String(animeId);
+
+  const episodeKey =
+    String(episode);
+
+  sentEpisodes[userId] =
+    sentEpisodes[userId] || {};
+
+  sentEpisodes[userId][animeKey] =
+    sentEpisodes[userId][animeKey] || {};
+
+  sentEpisodes[userId][animeKey][episodeKey] =
+    sentEpisodes[userId][animeKey][episodeKey] || {
+      '24h': false,
+      release: false
+    };
+
+  return sentEpisodes[userId][animeKey][episodeKey];
+}
+
+async function getNotificationTarget(
+  client,
+  userId,
+  options
+) {
+
+  if (
+    options.testUserId
+  ) {
+
+    return client.users.fetch(
+      options.testUserId
+    );
+  }
+
+  return client.users.fetch(
+    userId
+  );
+}
+
+async function sendUserNotification({
+  client,
+  userId,
+  animeTitle,
+  payload,
+  options
+}) {
+
+  try {
+
+    const user =
+      await getNotificationTarget(
+        client,
+        userId,
+        options
+      );
+
+    await user.send(
+      payload
+    );
+
+    return true;
+
+  } catch {
+
+    console.log(
+      chalk.yellow(
+        `Could not DM user ${userId} for anime ${animeTitle}`
+      )
+    );
+
+    return false;
+  }
 }
 
 async function checkAnime(
@@ -117,25 +196,24 @@ async function checkAnime(
   require('./analyticsStorage')
     .loadAnalytics();
 
-  const animeData = loadAnimeData();
+  const userAnimeData =
+    loadUserAnimes();
 
-  const totalGuilds =
-    Object.keys(animeData).length;
+  const totalUsers =
+    Object.keys(userAnimeData).length;
 
   const totalGlobal =
-  Object.values(animeData)
+  Object.values(userAnimeData)
     .reduce(
 
-      (acc, guild) =>
+      (acc, userData) =>
 
         acc + (
-          guild.anime?.length || 0
+          userData.anime?.length || 0
         ),
 
       0
     );
-
-  const config = loadConfig();
 
   const sentEpisodes =
     loadSentEpisodes();
@@ -145,16 +223,16 @@ async function checkAnime(
 
   const animeCount = {};
 
- for (const guildId in animeData) {
+ for (const userId in userAnimeData) {
 
-  const guildAnime =
+  const userAnime =
 
-    animeData[guildId]
+    userAnimeData[userId]
       ?.anime || [];
 
   for (
     const anime of
-    guildAnime
+    userAnime
   ) {
     if (
   !anime ||
@@ -164,7 +242,7 @@ async function checkAnime(
 
   console.log(
     chalk.red(
-      `💥 Invalid anime entry in guild ${guildId}`
+      `Invalid anime entry for user ${userId}`
     )
   );
 
@@ -348,23 +426,23 @@ const allTimeTop =
     );
   });
 
-  // 🔥 STATS POR SERVIDOR
+  // 🔥 STATS POR USUARIO
   const guildStats = {};
 
   for (
-  const guildId in
-  animeData
+  const userId in
+  userAnimeData
 ) {
 
-  const guildAnime =
+  const userAnime =
 
-    animeData[guildId]
+    userAnimeData[userId]
       ?.anime || [];
 
-  guildStats[guildId] = {
+  guildStats[userId] = {
 
     animeCount:
-      guildAnime.length
+      userAnime.length
   };
 }
 
@@ -374,7 +452,10 @@ const allTimeTop =
     lastCheck:
       new Date().toISOString(),
 
-    totalGuilds,
+    totalGuilds:
+      totalUsers,
+
+    totalUsers,
 
     totalGlobal,
 
@@ -564,18 +645,13 @@ console.log(
   );
 
   quarantineAnime(
-    animeData,
+    userAnimeData,
     anime.id,
     'Invalid AniList ID type'
   );
 
-  fs.writeFileSync(
-    './data/animes.json',
-    JSON.stringify(
-      animeData,
-      null,
-      2
-    )
+  saveUserAnimes(
+    userAnimeData
   );
 
   return;
@@ -708,18 +784,13 @@ results = [
   if (sourceAnime) {
 
     quarantineAnime(
-      animeData,
+      userAnimeData,
       sourceAnime.id,
       'AniList returned empty data'
     );
 
-    fs.writeFileSync(
-      './data/animes.json',
-      JSON.stringify(
-        animeData,
-        null,
-        2
-      )
+    saveUserAnimes(
+      userAnimeData
     );
   }
 
@@ -778,63 +849,35 @@ const force24h =
 const forceRelease =
   options.forceRelease;
 
-        // 🔥 DISTRIBUI PARA SERVIDORES
-        for (const guildId in animeData) {
+        // 🔥 DISTRIBUI PARA USUARIOS
+        for (const userId in userAnimeData) {
 
           const animeList =
-
-  animeData[guildId]
-    ?.anime || [];
+            userAnimeData[userId]
+              ?.anime || [];
 
           if (
             !animeList.find(
-              anime => anime.id === data.id
+              anime =>
+                anime.id === data.id &&
+                anime.mode === 'tracking'
             )
           ) {
             continue;
           }
 
-          const guildConfig =
-            config[guildId];
-
-          if (!guildConfig) continue;
-
-          const channelId =
-            guildConfig.channelId;
-
-          const channel =
-            await client.channels.fetch(channelId);
-            
-            // 🧪 TEST USER
-
-let testUser = null;
-
-if (
-  options.testUserId
-) {
-
-  testUser =
-    await client.users.fetch(
-      options.testUserId
-    );
-}
-
-          const key =
-            `${guildId}-${data.title.romaji}-${data.nextAiringEpisode.episode}`;
-
-          if (!sentEpisodes[key]) {
-
-            sentEpisodes[key] = {
-              initial: false,
-              '24h': false,
-              released: false
-            };
-          }
+          const sentEntry =
+            getSentEpisodeEntry(
+              sentEpisodes,
+              userId,
+              data.id,
+              data.nextAiringEpisode.episode
+            );
 
           // 🔥 AVISO 24H
           console.log(hoursLeft);
-          console.log(sentEpisodes[key]);
-          console.log(typeof sentEpisodes[key]['24h']);
+          console.log(sentEntry);
+          console.log(typeof sentEntry['24h']);
           if (
 
   (
@@ -846,7 +889,7 @@ if (
     force24h
   ) &&
 
-  !sentEpisodes[key]['24h']
+  !sentEntry['24h']
 ) {
 
             let warningMessage;
@@ -855,7 +898,7 @@ if (hoursLeft <= 1) {
 
   warningMessage =
     t(
-      guildId,
+      null,
       'episode_less_than_1h'
     );
 
@@ -863,7 +906,7 @@ if (hoursLeft <= 1) {
 
   warningMessage =
     t(
-      guildId,
+      null,
       'episode_less_than_6h'
     );
 
@@ -871,16 +914,19 @@ if (hoursLeft <= 1) {
 
   warningMessage =
     t(
-      guildId,
+      null,
       'episode_less_than_24h'
     );
 }
 console.log('ENVIANDO ALERTA');
 
-const target =
-  testUser || channel;
-
-await target.send({
+const sent24h =
+  await sendUserNotification({
+    client,
+    userId,
+    animeTitle:
+      data.title.romaji,
+    payload: {
               
               
               content:
@@ -888,24 +934,27 @@ await target.send({
                 `⏰ ${data.title.romaji} • ` +
                 `Episódio ${data.nextAiringEpisode.episode} ` +
                 warningMessage
-            });
+    },
+    options
+  });
 
             if (
+  sent24h &&
   !options.testUserId
 ) {
 
-  sentEpisodes[key]['24h'] = true;
+  sentEntry['24h'] = true;
 
   saveSentEpisodes(
     sentEpisodes
   );
-}
 
-            console.log(
-              chalk.yellow(
-                `⏰ 24H enviado para ${guildId}`
-              )
-            );
+              console.log(
+                chalk.yellow(
+                  `⏰ 24H enviado por DM para ${userId}`
+                )
+              );
+}
           }
 
           // 🔥 EPISÓDIO LANÇADO
@@ -917,13 +966,8 @@ await target.send({
     forceRelease
   ) &&
 
-  !sentEpisodes[key].released
+  !sentEntry.release
 ) {
-
-            const crunchyroll =
-              data.externalLinks?.find(
-                link => link.site === 'Crunchyroll'
-              );
 
             const embed =
               new EmbedBuilder()
@@ -942,42 +986,35 @@ await target.send({
                 })
                 .setTimestamp();
 
-            const row =
-              new ActionRowBuilder()
-                .addComponents(
-                  new ButtonBuilder()
-                    .setLabel('🍿 Assistir')
-                    .setStyle(ButtonStyle.Link)
-                    .setURL(
-                      crunchyroll?.url ||
-                      `https://www.crunchyroll.com/search?q=${encodeURIComponent(data.title.romaji)}`
-                    )
-                );
-
-            const target =
-  testUser || channel;
-
-await target.send({
-              embeds: [embed],
-              components: [row]
-            });
+            const sentRelease =
+              await sendUserNotification({
+                client,
+                userId,
+                animeTitle:
+                  data.title.romaji,
+                payload: {
+                  embeds: [embed]
+                },
+                options
+              });
 
             if (
+  sentRelease &&
   !options.testUserId
 ) {
 
-  sentEpisodes[key].released = true;
+  sentEntry.release = true;
 
   saveSentEpisodes(
     sentEpisodes
   );
-}
 
-            console.log(
-              chalk.magenta(
-                `🚨 Episódio lançado enviado para ${guildId}`
-              )
-            );
+              console.log(
+                chalk.magenta(
+                  `🚨 Episódio lançado enviado por DM para ${userId}`
+                )
+              );
+}
           }
         }
       }
@@ -1031,22 +1068,15 @@ if (
     brokenAnime => {
 
       quarantineAnime(
-        animeData,
+        userAnimeData,
         brokenAnime.id,
         'AniList validation failed'
       );
     }
   );
 
-  fs.writeFileSync(
-
-    './data/animes.json',
-
-    JSON.stringify(
-      animeData,
-      null,
-      2
-    )
+  saveUserAnimes(
+    userAnimeData
   );
 }
       console.log(
