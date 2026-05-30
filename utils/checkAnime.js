@@ -256,6 +256,19 @@ async function checkAnime(
       continue;
     }
 
+    if (
+      anime.invalid
+    ) {
+
+      console.log(
+        chalk.gray(
+          `Skipping quarantined anime for user ${userId}: ${anime.title}`
+        )
+      );
+
+      continue;
+    }
+
     uniqueAnimes.add(
       JSON.stringify(anime)
     );
@@ -513,10 +526,11 @@ yearlyUpdatedAt:
 
 for (const chunk of chunks) {
 
-  try {
+  const filteredChunk = [];
+  const cachedResults = [];
+  let querySources = [];
 
-    const filteredChunk = [];
-    const cachedResults = [];
+  try {
 
     chunk.forEach((anime) => {
 
@@ -576,8 +590,8 @@ return;
           )
         );
       }
-      const oneDay =
-  24 * 60 * 60 * 1000;
+      const noEpisodeCacheTtl =
+  6 * 60 * 60 * 1000;
 
 const lastUpdated =
   cachedAnime?.lastUpdated
@@ -592,7 +606,7 @@ if (
   cachedAnime &&
   !cachedAnime.nextEpisode &&
   Date.now() - lastUpdated <
-    oneDay
+    noEpisodeCacheTtl
 ) {
 
   console.log(
@@ -609,7 +623,7 @@ if (
 
     let results = [...cachedResults];
     let query = null;
-    let querySources = [];
+    querySources = [];
 
 if (!filteredChunk.length) {
 
@@ -622,11 +636,6 @@ if (!filteredChunk.length) {
 } else {
 
     query = 'query {';
-
-
-console.log(
-  filteredChunk
-);
 
     filteredChunk.forEach((anime, index) => {
       if (
@@ -706,7 +715,6 @@ if (
 
     query += '\n}';
 
-    console.log(query);
 totalRequests++;
 
 if (
@@ -875,9 +883,6 @@ const forceRelease =
             );
 
           // 🔥 AVISO 24H
-          console.log(hoursLeft);
-          console.log(sentEntry);
-          console.log(typeof sentEntry['24h']);
           if (
 
   (
@@ -918,7 +923,6 @@ if (hoursLeft <= 1) {
       'episode_less_than_24h'
     );
 }
-console.log('ENVIANDO ALERTA');
 
 const sent24h =
   await sendUserNotification({
@@ -1062,10 +1066,85 @@ if (
   const brokenSources =
     querySources.length
       ? querySources
-      : filteredChunk;
+      : [];
 
-  brokenSources.forEach(
-    brokenAnime => {
+  if (
+    !brokenSources.length
+  ) {
+
+    console.log(
+      chalk.yellow(
+        'No query sources available for quarantine.'
+      )
+    );
+  }
+
+  for (
+    const brokenAnime of brokenSources
+  ) {
+
+    try {
+
+      const retryQuery = `
+        query {
+          Media(id: ${brokenAnime.id}, type: ANIME) {
+            id
+            title { romaji }
+            coverImage { large }
+            nextAiringEpisode {
+              episode
+              airingAt
+            }
+            externalLinks {
+              site
+              url
+            }
+          }
+        }`;
+
+      const retryRes =
+        await axios.post(
+          'https://graphql.anilist.co/graphql',
+          {
+            query: retryQuery
+          }
+        );
+
+      const retryData =
+        retryRes.data?.data?.Media;
+
+      if (
+        !retryData
+      ) {
+
+        throw new Error(
+          'Retry returned empty media'
+        );
+      }
+
+      cache.animes[retryData.id] = {
+        id: retryData.id,
+        title:
+          retryData.title?.romaji ||
+          'Unknown',
+        coverImage:
+          retryData.coverImage?.large ||
+          null,
+        nextEpisode:
+          retryData.nextAiringEpisode || null,
+        externalLinks:
+          retryData.externalLinks || [],
+        lastUpdated:
+          new Date().toISOString()
+      };
+
+      console.log(
+        chalk.green(
+          `Retry recovered anime: ${retryData.title?.romaji || brokenAnime.title}`
+        )
+      );
+
+    } catch {
 
       quarantineAnime(
         userAnimeData,
@@ -1073,7 +1152,7 @@ if (
         'AniList validation failed'
       );
     }
-  );
+  }
 
   saveUserAnimes(
     userAnimeData

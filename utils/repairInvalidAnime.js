@@ -1,24 +1,23 @@
 const axios = require('axios');
 
-const fs = require('fs');
-
 const chalk = require('chalk').default;
+
+const {
+  loadUserAnimes,
+  saveUserAnimes
+} = require('./userAnimeStorage');
 
 async function repairInvalidAnime() {
 
-  const animeData = JSON.parse(
-    fs.readFileSync(
-      './data/animes.json',
-      'utf8'
-    )
-  );
+  const animeData =
+    loadUserAnimes();
 
   let repaired = 0;
 
-  for (const guildId in animeData) {
+  for (const userId in animeData) {
 
     const animeList =
-      animeData[guildId]?.anime || [];
+      animeData[userId]?.anime || [];
 
     for (const anime of animeList) {
 
@@ -158,13 +157,8 @@ continue;
     }
   }
 
-  fs.writeFileSync(
-    './data/animes.json',
-    JSON.stringify(
-      animeData,
-      null,
-      2
-    )
+  saveUserAnimes(
+    animeData
   );
 
   console.log(
