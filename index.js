@@ -135,9 +135,11 @@ client.on(
       ) {
 
         const animeList =
-          getGuildAnimeList(
-            interaction.guild.id
-          );
+          interaction.guild
+            ? getGuildAnimeList(
+                interaction.guild.id
+              )
+            : [];
 
         return handleButtons(
           interaction,

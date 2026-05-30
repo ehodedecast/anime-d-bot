@@ -1193,7 +1193,9 @@ saveCache(cache);
 
 
   } 
-  await repairInvalidAnime();
+  await repairInvalidAnime(
+    client
+  );
 
   runtimeStatus.tracker.lastFinishedAt =
     new Date().toISOString();

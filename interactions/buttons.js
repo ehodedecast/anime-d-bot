@@ -54,6 +54,32 @@ const {
   getUserAnimeList
 } = require('../utils/userAnimeStorage');
 
+const {
+  applyRepair,
+  rejectRepair
+} = require('../utils/repairInvalidAnime');
+
+function getOwnerId() {
+
+  return (
+    process.env.OWNER_ID ||
+    process.env.BOT_OWNER_ID
+  );
+}
+
+function isBotOwner(
+  interaction
+) {
+
+  const ownerId =
+    getOwnerId();
+
+  return Boolean(
+    ownerId &&
+    interaction.user.id === ownerId
+  );
+}
+
 function clearUserStates(
   userId
 ) {
@@ -252,6 +278,86 @@ module.exports = async (
       interaction,
       client
     );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      'repair_apply_'
+    )
+  ) {
+
+    if (
+      !isBotOwner(
+        interaction
+      )
+    ) {
+
+      return interaction.reply({
+        content:
+          'Você não tem permissão para utilizar este botão.',
+        ephemeral: true
+      });
+    }
+
+    const parts =
+      interaction.customId.split('_');
+
+    const brokenId =
+      parts[2];
+
+    const candidateId =
+      parts[3];
+
+    await interaction.deferUpdate();
+
+    const result =
+      await applyRepair(
+        brokenId,
+        candidateId
+      );
+
+    return interaction.editReply({
+      content:
+        `Repair approved.\n\nApplied to ${result.applied} user lists.\nNew anime: ${result.title || candidateId}`,
+      components: []
+    });
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      'repair_reject_'
+    )
+  ) {
+
+    if (
+      !isBotOwner(
+        interaction
+      )
+    ) {
+
+      return interaction.reply({
+        content:
+          'Você não tem permissão para utilizar este botão.',
+        ephemeral: true
+      });
+    }
+
+    const brokenId =
+      interaction.customId
+        .split('_')[2];
+
+    await interaction.deferUpdate();
+
+    const rejected =
+      rejectRepair(
+        brokenId
+      );
+
+    return interaction.editReply({
+      content:
+        `Repair rejected.\n\nKept ${rejected} quarantined entries unchanged.`,
+      components: []
+    });
   }
 
   const guildId =

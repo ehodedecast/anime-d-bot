@@ -56,6 +56,12 @@ function getContextChannelId(context) {
 
 function shouldIgnoreForLocalTest(context) {
 
+  if (
+    !context.guild
+  ) {
+    return false;
+  }
+
   const channelId =
     getContextChannelId(context);
 
