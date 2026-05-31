@@ -30,6 +30,41 @@ const {
   createInteractionMessage
 } = require('../utils/interactionAdapter');
 
+const {
+  runWithDmStatusWarning
+} = require('../utils/dmStatus');
+
+const dmCheckedCommands = new Set([
+  'add',
+  'list',
+  'remove',
+  'next',
+  'info',
+  'menu',
+  'help'
+]);
+
+function runCommand(
+  interaction,
+  command,
+  handler
+) {
+
+  if (
+    dmCheckedCommands.has(
+      command
+    )
+  ) {
+
+    return runWithDmStatusWarning(
+      interaction,
+      handler
+    );
+  }
+
+  return handler();
+}
+
 function requireAdmin(
   interaction
 ) {
@@ -150,73 +185,109 @@ async function handleSlashCommand(
 
   if (command === 'add') {
 
-    await interaction.deferReply();
+    return runCommand(
+      interaction,
+      command,
+      async () => {
+        await interaction.deferReply();
 
-    return add(
-      message,
-      getUserAnimeList(
-        interaction.user.id,
-        interaction.user.username
-      ),
-      interaction.options.getString('anime')
+        return add(
+          message,
+          getUserAnimeList(
+            interaction.user.id,
+            interaction.user.username
+          ),
+          interaction.options.getString('anime')
+        );
+      }
     );
   }
 
   if (command === 'list') {
 
-    await interaction.deferReply({
-      ephemeral: true
-    });
+    return runCommand(
+      interaction,
+      command,
+      async () => {
+        await interaction.deferReply({
+          ephemeral: true
+        });
 
-    return list(
-      message
+        return list(
+          message
+        );
+      }
     );
   }
 
   if (command === 'remove') {
 
-    return remove(
-      message,
-      interaction.options.getString('anime')
+    return runCommand(
+      interaction,
+      command,
+      () => remove(
+        message,
+        interaction.options.getString('anime')
+      )
     );
   }
 
   if (command === 'next') {
 
-    await interaction.deferReply({
-      ephemeral: true
-    });
+    return runCommand(
+      interaction,
+      command,
+      async () => {
+        await interaction.deferReply({
+          ephemeral: true
+        });
 
-    return next(
-      message,
-      getUserAnimeList(
-        interaction.user.id,
-        interaction.user.username
-      )
+        return next(
+          message,
+          getUserAnimeList(
+            interaction.user.id,
+            interaction.user.username
+          )
+        );
+      }
     );
   }
 
   if (command === 'info') {
 
-    await interaction.deferReply();
+    return runCommand(
+      interaction,
+      command,
+      async () => {
+        await interaction.deferReply();
 
-    return info(
-      message,
-      interaction.options.getString('anime')
+        return info(
+          message,
+          interaction.options.getString('anime')
+        );
+      }
     );
   }
 
   if (command === 'help') {
 
-    return help(
-      message
+    return runCommand(
+      interaction,
+      command,
+      () => help(
+        message
+      )
     );
   }
 
   if (command === 'menu') {
 
-    return sendMenu(
-      interaction
+    return runCommand(
+      interaction,
+      command,
+      () => sendMenu(
+        interaction
+      )
     );
   }
 
