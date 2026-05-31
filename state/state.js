@@ -3,6 +3,7 @@ const state = {
   waitingForClear: {},
   waitingForAddSelection: {},
   waitingForAnimeSelection: {},
+  nextPagination: {},
 };
 
 module.exports = state;

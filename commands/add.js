@@ -66,6 +66,10 @@ const {
 } = require('../utils/userProfileStorage');
 
 const {
+  saveAnimeToCache
+} = require('../utils/animeCacheService');
+
+const {
 
   registerSuccessfulAdd,
 
@@ -284,6 +288,10 @@ const mapping =
     ensureUserProfile(
       message.author.id,
       message.author.username
+    );
+
+    saveAnimeToCache(
+      anime
     );
 
     // 📊 ANALYTICS

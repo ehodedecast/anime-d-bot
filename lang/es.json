@@ -24,9 +24,9 @@
   "next_episode_not_found": "⚠️ No hay episodios futuros confirmados.",
   "next_episode_confirmed": "🎯 ¡Próximo episodio confirmado!",
   "next_episode_soon": "⚠️ ¡El próximo episodio llegará pronto!",
-  "episode_less_than_24h": "⏰ ¡Se estrena en menos de 24 horas!",
-  "episode_less_than_6h": "🚨 ¡Se estrena en unas pocas horas!",
-  "episode_less_than_1h": "🔥 ¡Se estrena en menos de 1 hora!",
+  "episode_less_than_24h": "⏰ ¡Próximo episodio en menos de 24 horas!",
+  "episode_less_than_6h": "🚨 ¡Próximo episodio en unas pocas horas!",
+  "episode_less_than_1h": "🔥 ¡Próximo episodio en menos de 1 hora!",
   "sequel_found": "⚠️ ¡Se encontró una secuela!",
 
   "// INFO": "",

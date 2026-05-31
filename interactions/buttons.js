@@ -107,6 +107,10 @@ function clearUserStates(
   delete state.waitingForAnimeSelection?.[
     userId
   ];
+
+  delete state.nextPagination?.[
+    userId
+  ];
 }
 
 function createReplyAdapter(
@@ -622,7 +626,10 @@ module.exports = async (
         interaction.user.id,
         interaction.user.username
       ),
-      page
+      page,
+      {
+        useStored: true
+      }
     );
   }
 
