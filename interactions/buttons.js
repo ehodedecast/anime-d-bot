@@ -59,6 +59,18 @@ const {
   rejectRepair
 } = require('../utils/repairInvalidAnime');
 
+const {
+  createWatchReadyRow,
+  createWatchedRow,
+  parseWatchCustomId
+} = require('../utils/episodeActionButtons');
+
+const {
+  getEpisodeProgress,
+  markEpisodeOpened,
+  markEpisodeWatched
+} = require('../utils/userProfileStorage');
+
 function getOwnerId() {
 
   return (
@@ -78,6 +90,46 @@ function isBotOwner(
     ownerId &&
     interaction.user.id === ownerId
   );
+}
+
+function getWatchUrl(
+  parsed
+) {
+
+  const progress =
+    getEpisodeProgress({
+      userId:
+        parsed.userId,
+      animeId:
+        parsed.animeId,
+      episode:
+        parsed.episode
+    });
+
+  return (
+    progress?.watchUrl ||
+    `https://anilist.co/anime/${parsed.animeId}`
+  );
+}
+
+function validateWatchButtonOwner(
+  interaction,
+  parsed
+) {
+
+  if (
+    parsed.userId !==
+    interaction.user.id
+  ) {
+
+    return interaction.reply({
+      content:
+        'Este botao pertence a outro usuario.',
+      ephemeral: true
+    });
+  }
+
+  return null;
 }
 
 function clearUserStates(
@@ -361,6 +413,129 @@ module.exports = async (
       content:
         `Repair rejected.\n\nKept ${rejected} quarantined entries unchanged.`,
       components: []
+    });
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      'watch_open:'
+    )
+  ) {
+
+    const parsed =
+      parseWatchCustomId(
+        interaction.customId
+      );
+
+    const blocked =
+      validateWatchButtonOwner(
+        interaction,
+        parsed
+      );
+
+    if (blocked) {
+      return blocked;
+    }
+
+    markEpisodeOpened({
+      userId:
+        parsed.userId,
+      username:
+        interaction.user.username,
+      animeId:
+        parsed.animeId,
+      episode:
+        parsed.episode
+    });
+
+    return interaction.update({
+      content:
+        'Episodio aberto.',
+      components: [
+        createWatchReadyRow({
+          userId:
+            parsed.userId,
+          animeId:
+            parsed.animeId,
+          episode:
+            parsed.episode,
+          url:
+            getWatchUrl(
+              parsed
+            )
+        })
+      ]
+    });
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      'watch_done:'
+    )
+  ) {
+
+    const parsed =
+      parseWatchCustomId(
+        interaction.customId
+      );
+
+    const blocked =
+      validateWatchButtonOwner(
+        interaction,
+        parsed
+      );
+
+    if (blocked) {
+      return blocked;
+    }
+
+    const progress =
+      getEpisodeProgress({
+        userId:
+          parsed.userId,
+        animeId:
+          parsed.animeId,
+        episode:
+          parsed.episode
+      });
+
+    if (
+      !progress?.openedAt
+    ) {
+
+      return interaction.reply({
+        content:
+          'Clique em Assistir antes de marcar como assistido.',
+        ephemeral: true
+      });
+    }
+
+    markEpisodeWatched({
+      userId:
+        parsed.userId,
+      username:
+        interaction.user.username,
+      animeId:
+        parsed.animeId,
+      episode:
+        parsed.episode
+    });
+
+    const watchedRow =
+      createWatchedRow({
+        url:
+          getWatchUrl(
+            parsed
+          )
+      });
+
+    return interaction.update({
+      content:
+        '✅ Episodio marcado como assistido.',
+      components:
+        watchedRow
+          ? [watchedRow]
+          : []
     });
   }
 

@@ -34,6 +34,15 @@ const {
 const runtimeStatus =
   require('../state/runtimeStatus');
 
+const {
+  createWatchOpenRow,
+  getBestWatchUrl
+} = require('./episodeActionButtons');
+
+const {
+  markEpisodeNotified
+} = require('./userProfileStorage');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -990,6 +999,11 @@ const sent24h =
                 })
                 .setTimestamp();
 
+            const watchUrl =
+              getBestWatchUrl(
+                data
+              );
+
             const sentRelease =
               await sendUserNotification({
                 client,
@@ -997,7 +1011,19 @@ const sent24h =
                 animeTitle:
                   data.title.romaji,
                 payload: {
-                  embeds: [embed]
+                  embeds: [embed],
+                  components: [
+                    createWatchOpenRow({
+                      userId,
+                      animeId:
+                        data.id,
+                      episode:
+                        data.nextAiringEpisode
+                          .episode,
+                      url:
+                        watchUrl
+                    })
+                  ]
                 },
                 options
               });
@@ -1006,6 +1032,20 @@ const sent24h =
   sentRelease &&
   !options.testUserId
 ) {
+
+  markEpisodeNotified({
+    userId,
+    username:
+      userAnimeData[userId]
+        ?.username ||
+      'Unknown User',
+    animeId:
+      data.id,
+    episode:
+      data.nextAiringEpisode
+        .episode,
+    watchUrl
+  });
 
   sentEntry.release = true;
 
