@@ -25,9 +25,8 @@ const {
 
 
 
-const OWNER_ID =
-  process.env.OWNER_ID ||
-  process.env.BOT_OWNER_ID;
+const GUILD_EVENT_CHANNEL_ID =
+  '1511057069166559263';
 
 function getCurrentServerCount(
   guild
@@ -46,11 +45,6 @@ async function guildCreate(
 
       await guild.fetchOwner();
 
-    const user =
-
-      await guild.client.users.fetch(
-        OWNER_ID
-      );
 const history =
 
   loadGuildHistory();
@@ -157,7 +151,12 @@ saveGuildHistory(
 
         .setTimestamp();
 
-    await user.send({
+    const notificationChannel =
+      await guild.client.channels.fetch(
+        GUILD_EVENT_CHANNEL_ID
+      );
+
+    await notificationChannel.send({
       embeds: [embed]
     });
 const channel =

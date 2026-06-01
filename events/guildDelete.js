@@ -13,9 +13,8 @@ const {
   EmbedBuilder
 } = require('discord.js');
 
-const OWNER_ID =
-  process.env.OWNER_ID ||
-  process.env.BOT_OWNER_ID;
+const GUILD_EVENT_CHANNEL_ID =
+  '1511057069166559263';
 
 function getCurrentServerCount(
   guild
@@ -43,15 +42,6 @@ async function guildDelete(
     let sessionTimeMs = 0;
 
     if (!guildData) {
-
-      if (
-        OWNER_ID
-      ) {
-
-        const owner =
-          await guild.client.users.fetch(
-            OWNER_ID
-          );
 
         const embed =
           new EmbedBuilder()
@@ -83,10 +73,14 @@ async function guildDelete(
             })
             .setTimestamp();
 
-        await owner.send({
+        const notificationChannel =
+          await guild.client.channels.fetch(
+            GUILD_EVENT_CHANNEL_ID
+          );
+
+        await notificationChannel.send({
           embeds: [embed]
         });
-      }
 
       return;
     }
@@ -129,15 +123,6 @@ async function guildDelete(
       history
     );
 
-    if (
-      OWNER_ID
-    ) {
-
-      const owner =
-        await guild.client.users.fetch(
-          OWNER_ID
-        );
-
       const embed =
         new EmbedBuilder()
           .setColor(0xED4245)
@@ -170,10 +155,14 @@ async function guildDelete(
           })
           .setTimestamp();
 
-      await owner.send({
+      const notificationChannel =
+        await guild.client.channels.fetch(
+          GUILD_EVENT_CHANNEL_ID
+        );
+
+      await notificationChannel.send({
         embeds: [embed]
       });
-    }
 
     console.log(
 

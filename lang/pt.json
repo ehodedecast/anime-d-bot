@@ -115,5 +115,9 @@
   "help_admin_commands": "`/setchannel` → Configurar canal do bot",
   "help_features_title": "💡 Recursos",
   "help_features": "• Busca de animes em múltiplos provedores\n• Suporte ao AniList + Jikan\n• Rastreamento de animes\n• Notificações de episódios\n• Sistema de busca inteligente\n• Menus de seleção de animes",
-  "join_support_server": "Servidor de Suporte"
+  "join_support_server": "Servidor de Suporte",
+
+  "// WELCOME": "",
+  "welcome_message": "Obrigado por adicionar o AnimeDBot a este servidor.",
+  "setup_instructions": "Use `/setchannel` no canal onde o AnimeDBot deve funcionar. Depois disso, abra `/menu` para começar a adicionar animes."
 }
