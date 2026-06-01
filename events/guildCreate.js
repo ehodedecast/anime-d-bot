@@ -26,7 +26,15 @@ const {
 
 
 const OWNER_ID =
-  process.env.OWNER_ID;
+  process.env.OWNER_ID ||
+  process.env.BOT_OWNER_ID;
+
+function getCurrentServerCount(
+  guild
+) {
+
+  return guild.client.guilds.cache.size;
+}
 
 async function guildCreate(
   guild
@@ -127,6 +135,19 @@ saveGuildHistory(
 
           `👥 **Members:** ${guild.memberCount}`
         )
+
+        .addFields({
+          name:
+            '🌍 Current servers',
+          value:
+            String(
+              getCurrentServerCount(
+                guild
+              )
+            ),
+          inline:
+            true
+        })
 
         .setFooter({
 

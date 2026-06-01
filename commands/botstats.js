@@ -4,8 +4,8 @@ const {
 } = require('discord.js');
 
 const {
-  loadAnimeData
-} = require('../utils/animeStorage');
+  loadUserAnimes
+} = require('../utils/userAnimeStorage');
 
 const {
   loadConfig
@@ -114,18 +114,46 @@ function getStorageStatus() {
   return 'ok';
 }
 
-function getAnimeStats(animeData) {
+function getUserAnimeEntries(
+  userAnimeData
+) {
 
-  const allAnime = [];
+  const entries = [];
 
-  Object.values(animeData)
-    .forEach(guild => {
+  Object.entries(userAnimeData || {})
+    .forEach(([userId, userData]) => {
 
-      (guild.anime || [])
+      const animeList =
+        Array.isArray(userData)
+          ? userData
+          : userData?.anime || [];
+
+      animeList
         .forEach(anime => {
-          allAnime.push(anime);
+          entries.push({
+            userId,
+            username:
+              userData?.username ||
+              'Unknown User',
+            anime
+          });
         });
     });
+
+  return entries;
+}
+
+function getAnimeStats(userAnimeData) {
+
+  const entries =
+    getUserAnimeEntries(
+      userAnimeData
+    );
+
+  const allAnime =
+    entries.map(entry =>
+      entry.anime
+    );
 
   const uniqueIds =
     new Set(
@@ -167,18 +195,35 @@ function getAnimeStats(animeData) {
   };
 }
 
-function getTopServers(animeData) {
+function getTopUsers(userAnimeData) {
 
-  return Object.entries(animeData)
-    .map(([guildId, guild]) => ({
-      name: guild.guildName || guildId,
-      count: (guild.anime || []).length
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+  return Object.entries(userAnimeData || {})
+    .map(([userId, userData]) => {
+
+      const animeList =
+        Array.isArray(userData)
+          ? userData
+          : userData?.anime || [];
+
+      return {
+        userId,
+        username:
+          userData?.username ||
+          'Unknown User',
+        count:
+          animeList.length
+      };
+    })
+    .filter(user =>
+      user.count > 0
+    )
+    .sort((a, b) =>
+      b.count - a.count
+    )
+    .slice(0, 10);
 }
 
-function formatTop(items) {
+function formatTopAnime(items) {
 
   if (!items.length) {
     return 'none';
@@ -186,8 +231,22 @@ function formatTop(items) {
 
   return items
     .map((item, index) =>
-      `${index + 1}. ${item.title || item.name} (${item.count})`
+      `${index + 1}. ${item.title} (${item.count})`
     )
+    .join('\n');
+}
+
+function formatTopUsers(items) {
+
+  if (!items.length) {
+    return 'none';
+  }
+
+  return items
+    .map((item, index) => (
+      `${index + 1}. ${item.username} ` +
+      `(${item.userId}) - ${item.count}`
+    ))
     .join('\n');
 }
 
@@ -196,8 +255,8 @@ async function botstats(
   client
 ) {
 
-  const animeData =
-    loadAnimeData();
+  const userAnimeData =
+    loadUserAnimes();
 
   const config =
     loadConfig();
@@ -222,7 +281,7 @@ const totalVotes =
     );
 
   const animeStats =
-    getAnimeStats(animeData);
+    getAnimeStats(userAnimeData);
 
   const currentGuildConfig =
     config[message.guild?.id];
@@ -271,10 +330,12 @@ const totalVotes =
     `Cache misses: ${cache.stats?.cacheMisses || 0}`,
     '',
     'Top anime:',
-    formatTop(animeStats.topAnime),
+    formatTopAnime(animeStats.topAnime),
     '',
-    'Top servers:',
-    formatTop(getTopServers(animeData)),
+    'Top users:',
+    formatTopUsers(
+      getTopUsers(userAnimeData)
+    ),
     '',
     `Top.gg server: ${topgg.started ? `online on port ${topgg.port}` : 'offline'}${topgg.error ? ` (${topgg.error})` : ''}`,
     `Storage: ${getStorageStatus()}`,

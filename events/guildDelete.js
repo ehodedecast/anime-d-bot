@@ -9,6 +9,21 @@ const {
   '../utils/guildHistoryStorage'
 );
 
+const {
+  EmbedBuilder
+} = require('discord.js');
+
+const OWNER_ID =
+  process.env.OWNER_ID ||
+  process.env.BOT_OWNER_ID;
+
+function getCurrentServerCount(
+  guild
+) {
+
+  return guild.client.guilds.cache.size;
+}
+
 async function guildDelete(
   guild
 ) {
@@ -22,16 +37,62 @@ async function guildDelete(
     const guildData =
       history[guild.id];
 
+    const now =
+      new Date();
+
+    let sessionTimeMs = 0;
+
     if (!guildData) {
+
+      if (
+        OWNER_ID
+      ) {
+
+        const owner =
+          await guild.client.users.fetch(
+            OWNER_ID
+          );
+
+        const embed =
+          new EmbedBuilder()
+            .setColor(0xED4245)
+            .setTitle(
+              '📤 AnimeDBot Removed'
+            )
+            .setDescription(
+              `📚 **Server:** ${guild.name}\n` +
+              `🆔 **Server ID:** ${guild.id}\n` +
+              `👥 **Members:** ${guild.memberCount || 'Unknown'}\n\n` +
+              'No previous guild history was found for this server.'
+            )
+            .setFooter({
+              text:
+                'AnimeDBot • Growth Tracker'
+            })
+            .addFields({
+              name:
+                '🌍 Current servers',
+              value:
+                String(
+                  getCurrentServerCount(
+                    guild
+                  )
+                ),
+              inline:
+                true
+            })
+            .setTimestamp();
+
+        await owner.send({
+          embeds: [embed]
+        });
+      }
 
       return;
     }
 
     guildData.currentlyInServer =
       false;
-
-    const now =
-      new Date();
 
     guildData.lastLeftAt =
       now.toISOString();
@@ -57,14 +118,62 @@ async function guildDelete(
           lastSession.joinedAt
         );
 
-      guildData.totalTimeMs +=
-
+      sessionTimeMs =
         now - joinedAt;
+
+      guildData.totalTimeMs +=
+        sessionTimeMs;
     }
 
     saveGuildHistory(
       history
     );
+
+    if (
+      OWNER_ID
+    ) {
+
+      const owner =
+        await guild.client.users.fetch(
+          OWNER_ID
+        );
+
+      const embed =
+        new EmbedBuilder()
+          .setColor(0xED4245)
+          .setTitle(
+            '📤 AnimeDBot Removed'
+          )
+          .setDescription(
+            `📚 **Server:** ${guild.name}\n` +
+            `🆔 **Server ID:** ${guild.id}\n` +
+            `👥 **Members:** ${guild.memberCount || 'Unknown'}\n` +
+            `🔁 **Join count:** ${guildData.joinCount || 0}\n` +
+            `⏱️ **This session:** ${formatDuration(sessionTimeMs)}\n` +
+            `📊 **Total time:** ${formatDuration(guildData.totalTimeMs || 0)}`
+          )
+          .setFooter({
+            text:
+              'AnimeDBot • Growth Tracker'
+          })
+          .addFields({
+            name:
+              '🌍 Current servers',
+            value:
+              String(
+                getCurrentServerCount(
+                  guild
+                )
+              ),
+            inline:
+              true
+          })
+          .setTimestamp();
+
+      await owner.send({
+        embeds: [embed]
+      });
+    }
 
     console.log(
 
@@ -78,6 +187,40 @@ async function guildDelete(
       `💥 guildDelete error: ${err.message}`
     );
   }
+}
+
+function formatDuration(
+  ms
+) {
+
+  if (
+    !ms ||
+    ms < 0
+  ) {
+    return 'Unknown';
+  }
+
+  const totalMinutes =
+    Math.floor(ms / 60000);
+
+  const days =
+    Math.floor(totalMinutes / 1440);
+
+  const hours =
+    Math.floor((totalMinutes % 1440) / 60);
+
+  const minutes =
+    totalMinutes % 60;
+
+  if (days > 0) {
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
 }
 
 module.exports =
