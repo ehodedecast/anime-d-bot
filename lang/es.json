@@ -4,6 +4,8 @@
   "menu_title": "AnimeDBot",
   "menu_description": "Agrega anime y recibe notificaciones automáticas de episodios.\n\n**📺 Anime**\n➕ Agregar anime\n📋 Ver lista de anime\n🧹 Limpiar lista de anime\n\n**⏰ Episodios**\n🎯 Próximo episodio\n\n**📚 Información**\nℹ️ Detalles del anime",
 
+  "menu_v2_description": "Gestiona tu lista personal de anime, revisa proximos episodios y sigue todo desde un solo lugar.",
+
   "// BUTTONS": "",
 
   "button_add_anime": "Agregar anime",

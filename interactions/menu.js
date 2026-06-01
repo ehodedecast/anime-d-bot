@@ -1,108 +1,27 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { t } = require('../utils/language');
+const {
+  createMainMenuPayload
+} = require('../utils/componentsV2Menu');
 
 function sendMenu(target) {
-  const guildId = target.guild.id;
-  console.log('SENDMENU EXECUTADO');
+  const guildId =
+    target.guild.id;
 
-  const embed = new EmbedBuilder()
-    .setColor(0x5865F2)
-    .setTitle(
-  t(guildId, 'menu_title')
-  )
-  .setURL(
-    'https://top.gg/bot/1500880961603244112'
-  )
-    .setImage(
-      'https://raw.githubusercontent.com/ehodedecast/anime-d-bot/refs/heads/main/assets/banner.png'
-    )
-    .setFooter({
-      text: 'AnimeDBot • DBots'
-    })
-    .setTimestamp();
+  const payload =
+    createMainMenuPayload(
+      guildId
+    );
 
-  const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('menu_add')
-      .setLabel(
-  t(guildId, 'button_add_anime')
-)
-      .setEmoji('➕')
-      .setStyle(ButtonStyle.Primary),
+  if (
+    target.isButton?.()
+  ) {
+    return target.update(
+      payload
+    );
+  }
 
-      new ButtonBuilder()
-      .setCustomId('menu_next')
-      .setLabel(
-  t(guildId, 'button_next_episode')
-)
-      .setEmoji('🎯')
-      .setStyle(ButtonStyle.Secondary),
-
-    new ButtonBuilder()
-      .setCustomId('menu_info')
-      .setLabel(
-  t(guildId, 'button_anime_info')
-)
-      .setEmoji('ℹ️')
-      .setStyle(ButtonStyle.Secondary)
+  return target.reply(
+    payload
   );
-
-  const row2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('menu_list')
-      .setLabel(
-  t(guildId, 'button_anime_list')
-)
-      .setEmoji('📋')
-      .setStyle(ButtonStyle.Secondary),
-
-      new ButtonBuilder()
-      .setCustomId('menu_remove')
-      .setLabel(
-  t(guildId, 'button_remove_anime')
-)
-      .setEmoji('🗑️')
-      .setStyle(ButtonStyle.Secondary),
-
-      new ButtonBuilder()
-      .setCustomId('menu_clear')
-      .setLabel(
-  t(guildId, 'button_clear_list')
-)
-      .setEmoji('🧹')
-      .setStyle(ButtonStyle.Danger)
-
-  );
-  const row3 = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-      .setCustomId('menu_help')
-      .setLabel(
-  t(guildId, 'button_help')
-)
-      .setEmoji('❓')
-      .setStyle(ButtonStyle.Primary),
-
-      new ButtonBuilder()
-  .setLabel('⭐ Vote')
-  .setStyle(ButtonStyle.Link)
-  .setURL(
-    'https://top.gg/bot/1500880961603244112/vote'
-  )
-  );
-
- if (target.isButton?.()) {
-console.log('USANDO UPDATE');
-  return target.update({
-    embeds: [embed],
-    components: [row1, row2, row3]
-  });
-}
-
-console.log('USANDO REPLY');
-return target.reply({
-  embeds: [embed],
-  components: [row1, row2, row3]
-});
 }
 
 module.exports = sendMenu;
