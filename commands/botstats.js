@@ -22,6 +22,9 @@ const {
 const runtimeStatus =
   require('../state/runtimeStatus');
 
+const BOTSTATS_CHANNEL_ID =
+  '1511002770532995112';
+
 function formatDuration(ms) {
 
   if (!ms) {
@@ -344,22 +347,28 @@ const totalVotes =
 
   try {
 
-  await message.author.send(
+  const channel =
+    await client.channels.fetch(
+      BOTSTATS_CHANNEL_ID
+    );
+
+  await channel.send(
     `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``
   );
 
-  return message.reply(
-    'Status enviado no seu PV.',
-    {
-      ephemeral: true
-    }
-  );
+  return message.reply({
+    content:
+      `Status enviado em botstats.`,
+    ephemeral: true
+  });
 
 } catch {
 
-  return message.reply(
-    'Não consegui enviar uma DM. Verifique suas configurações de privacidade.'
-  );
+  return message.reply({
+    content:
+      `Não consegui enviar o status no canal botstats.`,
+    ephemeral: true
+  });
 }
 }
 
