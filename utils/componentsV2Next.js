@@ -52,12 +52,50 @@ function formatAnimeItem({
   timeLeft
 }) {
 
+  const timeLeftLabel =
+    getTimeLeftLabel(
+      guildId,
+      anime.timeLeft
+    );
+
   return [
     `### ${anime.title}`,
     `${t(guildId, 'next_field_episode')}: Ep ${anime.episode}`,
-    `${t(guildId, 'next_field_time_left')}: ${timeLeft}`,
+    `${timeLeftLabel}: ${timeLeft}`,
     `${t(guildId, 'next_field_airing')}: ${formattedDate}`
   ].join('\n');
+}
+
+function getTimeLeftLabel(
+  guildId,
+  timeLeftMs
+) {
+
+  const label =
+    t(
+      guildId,
+      'next_field_time_left'
+    );
+
+  if (
+    timeLeftMs <= 60 * 60 * 1000
+  ) {
+    return `🔴 ${label}`;
+  }
+
+  if (
+    timeLeftMs <= 6 * 60 * 60 * 1000
+  ) {
+    return `🟠 ${label}`;
+  }
+
+  if (
+    timeLeftMs <= 24 * 60 * 60 * 1000
+  ) {
+    return `🟡 ${label}`;
+  }
+
+  return `🟢 ${label}`;
 }
 
 function addAnimeCard({
