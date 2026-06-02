@@ -36,12 +36,16 @@ const runtimeStatus =
 
 const {
   createWatchOpenRow,
-  getBestWatchUrl
+  getBestWatchTarget
 } = require('./episodeActionButtons');
 
 const {
   markEpisodeNotified
 } = require('./userProfileStorage');
+
+const {
+  getAnimeLinkFields
+} = require('./animeLinks');
 
 function chunkArray(array, size) {
 
@@ -124,6 +128,51 @@ function getSentEpisodeEntry(
     };
 
   return sentEpisodes[userId][animeKey][episodeKey];
+}
+
+function createCacheEntry(data, previous = {}) {
+  const externalLinks =
+    data.externalLinks?.length
+      ? data.externalLinks
+      : previous.externalLinks || [];
+
+  const linkFields =
+    getAnimeLinkFields({
+      ...previous,
+      ...data,
+      externalLinks
+    });
+
+  return {
+    id: data.id,
+    title:
+      data.title?.romaji ||
+      data.title ||
+      'Unknown',
+    coverImage:
+      data.coverImage?.large ||
+      data.coverImage ||
+      null,
+    nextEpisode:
+      data.nextAiringEpisode || null,
+    externalLinks:
+      externalLinks,
+    animePageUrl:
+      linkFields.animePageUrl ||
+      previous.animePageUrl ||
+      previous.siteUrl ||
+      null,
+    streamingUrl:
+      linkFields.streamingUrl ||
+      previous.streamingUrl ||
+      null,
+    streamingProvider:
+      linkFields.streamingProvider ||
+      previous.streamingProvider ||
+      null,
+    lastUpdated:
+      new Date().toISOString()
+  };
 }
 
 async function getNotificationTarget(
@@ -573,6 +622,10 @@ for (const chunk of chunks) {
       cachedAnime.title
   },
 
+  siteUrl:
+    cachedAnime.animePageUrl ||
+    cachedAnime.siteUrl,
+
   coverImage: {
     large:
       cachedAnime.coverImage
@@ -582,7 +635,16 @@ for (const chunk of chunks) {
     cachedAnime.nextEpisode,
 
   externalLinks:
-    cachedAnime.externalLinks || []
+    cachedAnime.externalLinks || [],
+
+  animePageUrl:
+    cachedAnime.animePageUrl,
+
+  streamingUrl:
+    cachedAnime.streamingUrl,
+
+  streamingProvider:
+    cachedAnime.streamingProvider
 });
 
         if (
@@ -705,6 +767,8 @@ if (
 
           id
 
+          siteUrl
+
           title { romaji }
 
           coverImage { large }
@@ -813,29 +877,11 @@ results = [
 
   continue;
 }
-        cache.animes[data.id] = {
-
-  id: data.id,
-
-  title:
-    data.title?.romaji ||
-
-    'Unknown',
-
-  coverImage:
-    data.coverImage?.large ||
-
-    null,
-
-  nextEpisode:
-    data.nextAiringEpisode || null,
-
-  externalLinks:
-    data.externalLinks || [],
-
-  lastUpdated:
-    new Date().toISOString()
-};
+        cache.animes[data.id] =
+          createCacheEntry(
+            data,
+            cache.animes[data.id]
+          );
 
         if (!data.nextAiringEpisode) {
           continue;
@@ -999,8 +1045,8 @@ const sent24h =
                 })
                 .setTimestamp();
 
-            const watchUrl =
-              getBestWatchUrl(
+            const watchTarget =
+              getBestWatchTarget(
                 data
               );
 
@@ -1020,8 +1066,8 @@ const sent24h =
                       episode:
                         data.nextAiringEpisode
                           .episode,
-                      url:
-                        watchUrl
+                      label:
+                        watchTarget.label
                     })
                   ]
                 },
@@ -1044,7 +1090,14 @@ const sent24h =
     episode:
       data.nextAiringEpisode
         .episode,
-    watchUrl
+    watchUrl:
+      watchTarget.url,
+    watchLabel:
+      watchTarget.label,
+    watchIsStreaming:
+      watchTarget.isStreaming,
+    streamingProvider:
+      watchTarget.provider
   });
 
   sentEntry.release = true;
@@ -1129,6 +1182,7 @@ if (
         query {
           Media(id: ${brokenAnime.id}, type: ANIME) {
             id
+            siteUrl
             title { romaji }
             coverImage { large }
             nextAiringEpisode {
@@ -1162,21 +1216,11 @@ if (
         );
       }
 
-      cache.animes[retryData.id] = {
-        id: retryData.id,
-        title:
-          retryData.title?.romaji ||
-          'Unknown',
-        coverImage:
-          retryData.coverImage?.large ||
-          null,
-        nextEpisode:
-          retryData.nextAiringEpisode || null,
-        externalLinks:
-          retryData.externalLinks || [],
-        lastUpdated:
-          new Date().toISOString()
-      };
+      cache.animes[retryData.id] =
+        createCacheEntry(
+          retryData,
+          cache.animes[retryData.id]
+        );
 
       console.log(
         chalk.green(

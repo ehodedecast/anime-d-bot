@@ -4,6 +4,11 @@ const {
   ButtonStyle
 } = require('discord.js');
 
+const {
+  getBestWatchTarget,
+  isValidUrl
+} = require('./animeLinks');
+
 function createWatchOpenCustomId({
   userId,
   animeId,
@@ -36,40 +41,11 @@ function parseWatchCustomId(customId) {
   };
 }
 
-function isValidUrl(value) {
-  try {
-    const url = new URL(value);
-    return (
-      url.protocol === 'http:' ||
-      url.protocol === 'https:'
-    );
-  } catch {
-    return false;
-  }
-}
-
-function getBestWatchUrl(anime) {
-  const externalLink =
-    (anime.externalLinks || [])
-      .find(link =>
-        isValidUrl(link?.url)
-      );
-
-  if (externalLink?.url) {
-    return externalLink.url;
-  }
-
-  if (anime.id) {
-    return `https://anilist.co/anime/${anime.id}`;
-  }
-
-  return null;
-}
-
 function createWatchOpenRow({
   userId,
   animeId,
-  episode
+  episode,
+  label = 'Assistir'
 }) {
   return new ActionRowBuilder()
     .addComponents(
@@ -81,7 +57,7 @@ function createWatchOpenRow({
             episode
           })
         )
-        .setLabel('Assistir')
+        .setLabel(label)
         .setStyle(ButtonStyle.Primary)
     );
 }
@@ -90,7 +66,8 @@ function createWatchReadyRow({
   userId,
   animeId,
   episode,
-  url
+  url,
+  label = 'Assistir novamente'
 }) {
   const row =
     new ActionRowBuilder();
@@ -100,7 +77,7 @@ function createWatchReadyRow({
   ) {
     row.addComponents(
       new ButtonBuilder()
-        .setLabel('Assistir novamente')
+        .setLabel(label)
         .setStyle(ButtonStyle.Link)
         .setURL(url)
     );
@@ -123,7 +100,8 @@ function createWatchReadyRow({
 }
 
 function createWatchedRow({
-  url
+  url,
+  label = 'Assistir novamente'
 }) {
   const row =
     new ActionRowBuilder();
@@ -133,7 +111,7 @@ function createWatchedRow({
   ) {
     row.addComponents(
       new ButtonBuilder()
-        .setLabel('Assistir novamente')
+        .setLabel(label)
         .setStyle(ButtonStyle.Link)
         .setURL(url)
     );
@@ -148,6 +126,6 @@ module.exports = {
   createWatchOpenRow,
   createWatchReadyRow,
   createWatchedRow,
-  getBestWatchUrl,
+  getBestWatchTarget,
   parseWatchCustomId
 };

@@ -204,7 +204,10 @@ function markEpisodeNotified({
   username,
   animeId,
   episode,
-  watchUrl = null
+  watchUrl = null,
+  watchLabel = null,
+  watchIsStreaming = false,
+  streamingProvider = null
 }) {
 
   const profiles =
@@ -228,6 +231,23 @@ function markEpisodeNotified({
   ) {
     entry.watchUrl =
       watchUrl;
+  }
+
+  if (
+    watchLabel
+  ) {
+    entry.watchLabel =
+      watchLabel;
+  }
+
+  entry.watchIsStreaming =
+    Boolean(watchIsStreaming);
+
+  if (
+    streamingProvider
+  ) {
+    entry.streamingProvider =
+      streamingProvider;
   }
 
   saveUserProfiles(

@@ -92,7 +92,7 @@ function isBotOwner(
   );
 }
 
-function getWatchUrl(
+function getWatchTarget(
   parsed
 ) {
 
@@ -106,10 +106,16 @@ function getWatchUrl(
         parsed.episode
     });
 
-  return (
+  const url =
     progress?.watchUrl ||
-    `https://anilist.co/anime/${parsed.animeId}`
-  );
+    `https://anilist.co/anime/${parsed.animeId}`;
+
+  return {
+    url,
+    label:
+      progress?.watchLabel ||
+      'Ver pagina do anime'
+  };
 }
 
 function validateWatchButtonOwner(
@@ -448,6 +454,11 @@ module.exports = async (
         parsed.episode
     });
 
+    const watchTarget =
+      getWatchTarget(
+        parsed
+      );
+
     return interaction.update({
       content:
         'Episodio aberto.',
@@ -460,9 +471,9 @@ module.exports = async (
           episode:
             parsed.episode,
           url:
-            getWatchUrl(
-              parsed
-            )
+            watchTarget.url,
+          label:
+            watchTarget.label
         })
       ]
     });
@@ -521,12 +532,17 @@ module.exports = async (
         parsed.episode
     });
 
+    const watchTarget =
+      getWatchTarget(
+        parsed
+      );
+
     const watchedRow =
       createWatchedRow({
         url:
-          getWatchUrl(
-            parsed
-          )
+          watchTarget.url,
+        label:
+          watchTarget.label
       });
 
     return interaction.update({

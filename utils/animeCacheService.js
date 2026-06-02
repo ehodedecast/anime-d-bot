@@ -3,6 +3,10 @@ const {
   saveCache
 } = require('./cacheManager');
 
+const {
+  getAnimeLinkFields
+} = require('./animeLinks');
+
 const NO_EPISODE_TTL_MS = 6 * 60 * 60 * 1000;
 
 function getAnimeTitle(anime) {
@@ -59,12 +63,41 @@ function upsertAnimeCacheEntry(
     return cache;
   }
 
+  const previous =
+    cache.animes[anime.id] || {};
+
+  const externalLinks =
+    anime.externalLinks?.length
+      ? anime.externalLinks
+      : previous.externalLinks || [];
+
+  const linkFields =
+    getAnimeLinkFields({
+      ...previous,
+      ...anime,
+      externalLinks
+    });
+
   cache.animes[anime.id] = {
     id: anime.id,
     title: getAnimeTitle(anime),
     coverImage: getCoverImage(anime),
     nextEpisode: getNextEpisode(anime),
-    externalLinks: anime.externalLinks || [],
+    externalLinks:
+      externalLinks,
+    animePageUrl:
+      linkFields.animePageUrl ||
+      previous.animePageUrl ||
+      previous.siteUrl ||
+      null,
+    streamingUrl:
+      linkFields.streamingUrl ||
+      previous.streamingUrl ||
+      null,
+    streamingProvider:
+      linkFields.streamingProvider ||
+      previous.streamingProvider ||
+      null,
     status: anime.status,
     lastUpdated: new Date().toISOString()
   };

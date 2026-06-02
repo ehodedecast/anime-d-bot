@@ -21,6 +21,8 @@ query ($search: String) {
 
       id
 
+      siteUrl
+
       isAdult
 
       status
@@ -44,6 +46,13 @@ query ($search: String) {
         episode
 
         airingAt
+      }
+
+      externalLinks {
+
+        site
+
+        url
       }
 
       relations {
@@ -105,6 +114,9 @@ console.log(
     id:
       anime.id,
 
+    siteUrl:
+      anime.siteUrl,
+
     title:
       anime.title
         ?.romaji ||
@@ -128,6 +140,9 @@ console.log(
 
     nextAiringEpisode:
       anime.nextAiringEpisode,
+
+    externalLinks:
+      anime.externalLinks || [],
 
     relations:
       anime.relations

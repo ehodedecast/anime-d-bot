@@ -80,6 +80,8 @@ async function fetchUpcomingEpisodes(
       const query = `
         query {
           Media(id: ${anime.id}, type: ANIME) {
+            id
+            siteUrl
             isAdult
             title {
               romaji
@@ -91,6 +93,10 @@ async function fetchUpcomingEpisodes(
             nextAiringEpisode {
               episode
               airingAt
+            }
+            externalLinks {
+              site
+              url
             }
           }
         }`;
