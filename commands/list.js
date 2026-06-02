@@ -110,6 +110,29 @@ function formatAnimeRows(
   return rows.join('\n');
 }
 
+function getUserAvatarUrl(
+  user
+) {
+
+  if (
+    typeof user.displayAvatarURL === 'function'
+  ) {
+    return user.displayAvatarURL({
+      size: 128
+    });
+  }
+
+  if (
+    typeof user.avatarURL === 'function'
+  ) {
+    return user.avatarURL({
+      size: 128
+    });
+  }
+
+  return null;
+}
+
 function list(message) {
 
   const cache =
@@ -156,6 +179,14 @@ function list(message) {
   const embed =
     new EmbedBuilder()
       .setColor(0x7c3aed)
+      .setAuthor({
+        name:
+          message.author.username,
+        iconURL:
+          getUserAvatarUrl(
+            message.author
+          )
+      })
       .setTitle(
         t(message.guild.id, 'list_header')
       )

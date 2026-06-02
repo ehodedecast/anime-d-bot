@@ -284,7 +284,9 @@ async function next(
         pageItems,
         safePage,
         totalPages,
-        formatTimeLeft
+        formatTimeLeft,
+        user:
+          message.author
       })
     );
   } catch (err) {

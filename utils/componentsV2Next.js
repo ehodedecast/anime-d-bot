@@ -45,6 +45,29 @@ function isValidImageUrl(value) {
   }
 }
 
+function getUserAvatarUrl(
+  user
+) {
+
+  if (
+    typeof user?.displayAvatarURL === 'function'
+  ) {
+    return user.displayAvatarURL({
+      size: 128
+    });
+  }
+
+  if (
+    typeof user?.avatarURL === 'function'
+  ) {
+    return user.avatarURL({
+      size: 128
+    });
+  }
+
+  return null;
+}
+
 function formatAnimeItem({
   guildId,
   anime,
@@ -145,16 +168,34 @@ function createNextPayload({
   pageItems,
   safePage,
   totalPages,
-  formatTimeLeft
+  formatTimeLeft,
+  user
 }) {
+
+  const avatarUrl =
+    getUserAvatarUrl(
+      user
+    );
 
   const container =
     new ContainerBuilder()
       .setAccentColor(0x00ccff)
-      .addTextDisplayComponents(
-        new TextDisplayBuilder()
-          .setContent(
-            `# ${t(guildId, 'next_dashboard_title')}`
+      .addSectionComponents(
+        new SectionBuilder()
+          .addTextDisplayComponents(
+            new TextDisplayBuilder()
+              .setContent(
+                `# ${t(guildId, 'next_dashboard_title')}`
+              )
+          )
+          .setThumbnailAccessory(
+            isValidImageUrl(avatarUrl)
+              ? new ThumbnailBuilder()
+                .setURL(avatarUrl)
+              : new ThumbnailBuilder()
+                .setURL(
+                  'https://cdn.discordapp.com/embed/avatars/0.png'
+                )
           )
       )
       .addTextDisplayComponents(

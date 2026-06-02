@@ -101,7 +101,7 @@ async function help(
           )
 
           .setURL(
-            'https://discord.com/invite/YFvye4hkuV'
+            'https://discord.com/invite/bxbZv4mmhw'
           )
 
           .setEmoji('💬')
