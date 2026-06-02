@@ -118,7 +118,7 @@ function getCachedUpcomingEpisode(
           anime.title,
         image:
           cachedAnime.coverImage ||
-          null,
+          getCoverImage(anime),
         episode:
           cachedAnime.nextEpisode.episode,
         airingTime:

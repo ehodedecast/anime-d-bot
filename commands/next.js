@@ -129,7 +129,11 @@ async function fetchUpcomingEpisodes(
         title:
           data.title.romaji,
         image:
-          data.coverImage?.medium,
+          data.coverImage?.medium ||
+          anime.coverImage?.large ||
+          anime.coverImage?.medium ||
+          anime.coverImage ||
+          null,
         episode:
           data.nextAiringEpisode.episode,
         airingTime,

@@ -4,8 +4,10 @@ const {
   ButtonStyle,
   ContainerBuilder,
   MessageFlags,
+  SectionBuilder,
   SeparatorBuilder,
-  TextDisplayBuilder
+  TextDisplayBuilder,
+  ThumbnailBuilder
 } = require('discord.js');
 
 const { t } =
@@ -29,6 +31,20 @@ function createPageButton({
     .setDisabled(disabled);
 }
 
+function isValidImageUrl(value) {
+  try {
+    const url =
+      new URL(value);
+
+    return (
+      url.protocol === 'http:' ||
+      url.protocol === 'https:'
+    );
+  } catch {
+    return false;
+  }
+}
+
 function formatAnimeItem({
   guildId,
   anime,
@@ -42,6 +58,48 @@ function formatAnimeItem({
     `${t(guildId, 'next_field_time_left')}: ${timeLeft}`,
     `${t(guildId, 'next_field_airing')}: ${formattedDate}`
   ].join('\n');
+}
+
+function addAnimeCard({
+  container,
+  guildId,
+  anime,
+  formattedDate,
+  timeLeft
+}) {
+
+  const content =
+    formatAnimeItem({
+      guildId,
+      anime,
+      formattedDate,
+      timeLeft
+    });
+
+  if (
+    isValidImageUrl(
+      anime.image
+    )
+  ) {
+    container.addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder()
+            .setContent(content)
+        )
+        .setThumbnailAccessory(
+          new ThumbnailBuilder()
+            .setURL(anime.image)
+        )
+    );
+
+    return;
+  }
+
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder()
+      .setContent(content)
+  );
 }
 
 function createNextPayload({
@@ -75,7 +133,7 @@ function createNextPayload({
           .setDivider(true)
       );
 
-  pageItems.forEach(anime => {
+  pageItems.forEach((anime, index) => {
     const formattedDate =
       new Date(
         anime.airingTime
@@ -89,20 +147,23 @@ function createNextPayload({
         }
       );
 
-    container.addTextDisplayComponents(
-      new TextDisplayBuilder()
-        .setContent(
-          formatAnimeItem({
-            guildId,
-            anime,
-            formattedDate,
-            timeLeft:
-              formatTimeLeft(
-                anime.timeLeft
-              )
-          })
+    if (index > 0) {
+      container.addSeparatorComponents(
+        new SeparatorBuilder()
+          .setDivider(false)
+      );
+    }
+
+    addAnimeCard({
+      container,
+      guildId,
+      anime,
+      formattedDate,
+      timeLeft:
+        formatTimeLeft(
+          anime.timeLeft
         )
-    );
+    });
   });
 
   container
