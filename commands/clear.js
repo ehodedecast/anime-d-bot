@@ -1,21 +1,21 @@
 const {
-  loadAnimeData,
-  saveAnimeData
-} = require('../utils/animeStorage');
+  ensureUserAnimeData,
+  saveUserAnimes
+} = require('../utils/userAnimeStorage');
 
 const { t } = require('../utils/language');
 
 function clear(message) {
 
-  const data = loadAnimeData();
+  const data =
+    ensureUserAnimeData(
+      message.author.id,
+      message.author.username
+    );
 
-  data[message.guild.id] = {
-    guildName:
-      message.guild.name,
-    anime: []
-  };
+  data[message.author.id].anime = [];
 
-  saveAnimeData(data);
+  saveUserAnimes(data);
 
   return message.reply(
     t(message.guild.id, 'anime_list_cleared')

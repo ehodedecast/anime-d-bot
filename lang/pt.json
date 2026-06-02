@@ -1,14 +1,9 @@
-
- {
+{
   "// MENU": "",
-
   "menu_title": "AnimeDBot",
   "menu_description": "Adicione animes e receba notificações automáticas de episódios.\n\n**📺 Anime**\n➕ Adicionar anime\n📋 Ver lista de animes\n🧹 Limpar lista de animes\n\n**⏰ Episódios**\n🎯 Próximo episódio\n\n**📚 Informações**\nℹ️ Detalhes do anime",
-
   "menu_v2_description": "Gerencie sua lista pessoal de animes, veja os proximos episodios e acompanhe tudo em um so lugar.",
-
   "// BUTTONS": "",
-
   "button_add_anime": "Adicionar anime",
   "button_next_episode": "Próximo episódio",
   "button_anime_info": "Informações do anime",
@@ -18,11 +13,13 @@
   "button_help": "Ajuda",
   "button_vote": "Votar",
   "// PROMPTS": "",
-
   "prompt_type_anime_name": "✏️ Digite o nome do anime:",
-
   "// NEXT": "",
-
+  "next_dashboard_title": "Proximos episodios",
+  "next_dashboard_description": "Proximos episodios da sua lista pessoal monitorada.",
+  "next_field_episode": "Episodio",
+  "next_field_time_left": "Tempo restante",
+  "next_field_airing": "Exibicao",
   "next_episode_not_found": "⚠️ Nenhum episódio futuro confirmado.",
   "next_episode_confirmed": "🎯 Próximo episódio confirmado!",
   "next_episode_soon": "⚠️ Próximo episódio saindo em breve!",
@@ -30,9 +27,7 @@
   "episode_less_than_6h": "🚨 Próximo episódio em poucas horas!",
   "episode_less_than_1h": "🔥 Próximo episódio em menos de 1 hora!",
   "sequel_found": "⚠️ Uma continuação foi encontrada!",
-  
   "// INFO": "",
-
   "anime_info_not_found": "⚠️ Informações do anime não encontradas.",
   "average_score": "⭐ Nota Média",
   "episodes": "🎬 Episódios",
@@ -40,28 +35,20 @@
   "studio": "🎥 Estúdio",
   "studio_unknown": "Desconhecido",
   "no_description_available": "Nenhuma descrição disponível.",
-
   "// REMOVE": "",
-
   "anime_removed": "Anime removido com sucesso.",
   "anime_not_found": "Anime não encontrado.",
   "invalid_anime": "Anime inválido.",
-
   "// LIST": "",
-
   "list_header": "📋 Lista de Animes",
   "list_empty": "📭 Nenhum anime na lista.",
-
   "// CLEAR": "",
-
   "clear_confirm_button": "Confirmar limpeza",
   "clear_cancel_button": "Cancelar",
   "clear_cancelled": "❌ Limpeza cancelada.",
   "anime_list_cleared": "✅ Lista de animes limpa com sucesso.",
   "clear_warning": "⚠️ Você está prestes a limpar a lista de animes deste servidor.\n\nAnimeDBot deixará de notificar novos episódios dos animes removidos.",
-
   "// ADD": "",
-
   "anime_added": "🎉 Anime adicionado com sucesso.",
   "anime_already_exists": "⚠️ Anime já está na lista.",
   "adult_content_warning": "🔞 AnimeDBot não permite animes +18.",
@@ -75,38 +62,27 @@
   "selection_prompt": "✏️ Responda com o número do anime que você deseja adicionar.",
   "selection_invalid": "❌ Seleção inválida.",
   "selection_confirmed": "✅ Selecionado:",
-
   "// status": "",
-
   "finished": "Finalizado",
   "releasing": "Em lançamento",
   "not_yet_released": "Ainda não lançado",
   "cancelled": "Cancelado",
   "hiatus": "Em hiato",
-
   "// PERMISSIONS": "",
-
   "no_permission": "Você não tem permissão.",
-
   "// ERRORS": "",
-
   "api_problem": "⚠️ AnimeDBot está enfrentando problemas temporários com a API da AniList.\n\nAlguns comandos podem não funcionar no momento.",
   "// CHANNEL": "",
-
   "set_channel_success": "✅ Este canal foi definido como canal oficial do AnimeDBot!",
   "no_channel_set": "⚠️ Este servidor não configurou um canal oficial para o AnimeDBot.",
   "setchannel_instructions": "Use `/setchannel` no canal desejado para defini-lo como o canal oficial do AnimeDBot.",
-
   "// LANGUAGE": "",
-
   "language.title": "🌍 Seleção de Idioma",
   "language.description": "Selecione o idioma do AnimeDBot.",
   "language.portuguese": "Português",
   "language.english": "English",
   "language.spanish": "Español",
-
   "// HELP": "",
-  
   "help_title": "📖 Ajuda do AnimeDBot",
   "help_description": "Bem-vindo ao Centro de Ajuda do AnimeDBot! Aqui você pode encontrar todos os comandos e recursos disponíveis para aproveitar ao máximo sua experiência de rastreamento de animes.\n\nA maioria dos recursos de anime também pode ser acessada através do menu principal de interação, tornando o AnimeDBot mais fácil de usar sem memorizar comandos.\n\nAbaixo estão todos os comandos e sistemas atualmente disponíveis no AnimeDBot.",
   "help_anime_commands_title": "📺 Comandos de Anime",
@@ -118,7 +94,6 @@
   "help_features_title": "💡 Recursos",
   "help_features": "• Busca de animes em múltiplos provedores\n• Suporte ao AniList + Jikan\n• Rastreamento de animes\n• Notificações de episódios\n• Sistema de busca inteligente\n• Menus de seleção de animes",
   "join_support_server": "Servidor de Suporte",
-
   "// WELCOME": "",
   "welcome_message": "Obrigado por adicionar o AnimeDBot a este servidor.",
   "setup_instructions": "Use `/setchannel` no canal onde o AnimeDBot deve funcionar. Depois disso, abra `/menu` para começar a adicionar animes."

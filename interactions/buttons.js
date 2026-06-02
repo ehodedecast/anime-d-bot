@@ -921,7 +921,9 @@ module.exports = async (
             components: []
           }),
         guild:
-          interaction.guild
+          interaction.guild,
+        author:
+          interaction.user
       },
       animeList
     );

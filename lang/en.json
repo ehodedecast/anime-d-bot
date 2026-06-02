@@ -1,13 +1,9 @@
 {
   "// MENU": "",
-
   "menu_title": "AnimeDBot",
   "menu_description": "Add anime and receive automatic episode notifications.\n\n**📺 Anime**\n➕ Add anime\n📋 View anime list\n🧹 Clear anime list\n\n**⏰ Episodes**\n🎯 Next episode\n\n**📚 Information**\nℹ️ Anime details",
-
   "menu_v2_description": "Manage your personal anime list, check upcoming episodes, and keep tracking from one place.",
-
   "// BUTTONS": "",
-
   "button_add_anime": "Add anime",
   "button_next_episode": "Next episode",
   "button_anime_info": "Anime information",
@@ -16,13 +12,14 @@
   "button_clear_list": "Clear list",
   "button_help": "Help",
   "button_vote": "Vote",
-
   "// PROMPTS": "",
-
   "prompt_type_anime_name": "✏️ Type the anime name:",
-
   "// NEXT": "",
-
+  "next_dashboard_title": "Upcoming Episodes",
+  "next_dashboard_description": "Upcoming episodes from your personal tracked anime list.",
+  "next_field_episode": "Episode",
+  "next_field_time_left": "Time left",
+  "next_field_airing": "Airing",
   "next_episode_not_found": "⚠️ No future episodes confirmed.",
   "next_episode_confirmed": "🎯 Next episode confirmed!",
   "next_episode_soon": "⚠️ Next episode coming soon!",
@@ -30,9 +27,7 @@
   "episode_less_than_6h": "🚨 Next episode in a few hours!",
   "episode_less_than_1h": "🔥 Next episode in less than 1 hour!",
   "sequel_found": "⚠️ A sequel has been found!",
-
   "// INFO": "",
-
   "anime_info_not_found": "⚠️ Anime information not found.",
   "average_score": "⭐ Average Score",
   "episodes": "🎬 Episodes",
@@ -40,28 +35,20 @@
   "studio": "🎥 Studio",
   "studio_unknown": "Unknown",
   "no_description_available": "No description available.",
-
   "// REMOVE": "",
-
   "anime_removed": "Anime removed successfully.",
   "anime_not_found": "Anime not found.",
   "invalid_anime": "Invalid anime.",
-
   "// LIST": "",
-
   "list_header": "📋 Anime List",
   "list_empty": "📭 No anime in the list.",
-
   "// CLEAR": "",
-
   "clear_confirm_button": "Confirm Clear",
   "clear_cancel_button": "Cancel",
   "clear_cancelled": "❌ Clear cancelled.",
   "anime_list_cleared": "✅ Anime list cleared successfully.",
   "clear_warning": "⚠️ You are about to clear this server anime list.\n\nAnimeDBot will stop notifying new episodes from removed anime.",
-
   "// ADD": "",
-
   "anime_added": " 🎉 Anime added successfully.",
   "anime_already_exists": "⚠️ Anime is already on the list.",
   "adult_content_warning": "🔞 AnimeDBot does not allow +18 anime.",
@@ -75,37 +62,26 @@
   "selection_prompt": "✏️ Reply with the number of the anime you want to add.",
   "selection_invalid": "❌ Invalid selection.",
   "selection_confirmed": "✅ Selected:",
-  
-
   "// status": "",
-
   "finished": "Finished",
   "releasing": "Releasing",
   "not_yet_released": "Not yet released",
   "cancelled": "Cancelled",
   "hiatus": "Hiatus",
-
   "// PERMISSIONS": "",
-
   "no_permission": "You do not have permission.",
-
   "// ERRORS": "",
-
   "api_problem": "⚠️ AnimeDBot is currently experiencing temporary issues with the AniList API.\n\nSome commands may not work right now.",
   "// CHANNEL": "",
-
   "set_channel_success": "✅ This channel has been set as AnimeDBot official channel!",
   "no_channel_set": "⚠️ This server has not set an official channel for AnimeDBot.",
   "setchannel_instructions": "Use `/setchannel` in the desired channel to set it as the official AnimeDBot channel.",
-
-   "// LANGUAGE": "",
-   
+  "// LANGUAGE": "",
   "language.title": "🌍 Language Selection",
   "language.description": "Select the AnimeDBot language.",
   "language.portuguese": "Português",
   "language.english": "English",
   "language.spanish": "Español",
-
   "// HELP": "",
   "help_title": "📖 AnimeDBot Help",
   "help_description": "Welcome to the AnimeDBot Help Center! Here you can find all available commands and features to make the most out of your anime tracking experience.\n\nMost anime features can also be accessed through the main interaction menu, making AnimeDBot easier to use without memorizing commands.\n\nBelow are all available commands and systems currently available in AnimeDBot.",
@@ -116,11 +92,9 @@
   "help_admin_commands_title": "⚙️ Admin Commands",
   "help_admin_commands": "`/setchannel` → Configure bot channel",
   "help_features_title": "💡 Features",
-  "help_features": "• Multi-provider anime search\n• AniList + Jikan support\n• Anime tracking\n• Episode notifications\n• Smart search system\n• Anime selection menus", 
+  "help_features": "• Multi-provider anime search\n• AniList + Jikan support\n• Anime tracking\n• Episode notifications\n• Smart search system\n• Anime selection menus",
   "join_support_server": "Support Server",
-
   "// WELCOME": "",
   "welcome_message": "Thanks for adding AnimeDBot to this server.",
   "setup_instructions": "Use `/setchannel` in the channel where AnimeDBot should work. After that, open `/menu` to start adding anime."
-
 }
