@@ -9,6 +9,7 @@ const language = require('../commands/language');
 const help = require('../commands/help');
 const botstats = require('../commands/botstats');
 const resetdata = require('../commands/resetdata');
+const profile = require('../commands/profile');
 const sendMenu = require('./menu');
 const {
   PermissionFlagsBits
@@ -41,6 +42,7 @@ const dmCheckedCommands = new Set([
   'next',
   'info',
   'menu',
+  'profile',
   'help'
 ]);
 
@@ -288,6 +290,23 @@ async function handleSlashCommand(
       () => sendMenu(
         interaction
       )
+    );
+  }
+
+  if (command === 'profile') {
+
+    return runCommand(
+      interaction,
+      command,
+      async () => {
+        await interaction.deferReply({
+          ephemeral: true
+        });
+
+        return profile(
+          message
+        );
+      }
     );
   }
 

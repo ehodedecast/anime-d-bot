@@ -51,6 +51,10 @@ const commands = [
     .setDescription('Open the AnimeDBot main menu.'),
 
   new SlashCommandBuilder()
+    .setName('profile')
+    .setDescription('Show your AnimeDBot profile.'),
+
+  new SlashCommandBuilder()
     .setName('language')
     .setDescription('Choose this server language.')
     .setDefaultMemberPermissions(

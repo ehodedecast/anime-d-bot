@@ -727,6 +727,26 @@ module.exports = async (
   }
 
   if (
+    [
+      'profile_achievements',
+      'profile_titles',
+      'profile_history'
+    ].includes(
+      interaction.customId
+    )
+  ) {
+
+    return interaction.reply({
+      content:
+        t(
+          guildId,
+          'profile_coming_soon'
+        ),
+      ephemeral: true
+    });
+  }
+
+  if (
     interaction.customId === 'menu_add' ||
     interaction.customId === 'add_again'
   ) {

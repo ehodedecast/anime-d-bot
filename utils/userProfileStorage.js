@@ -139,6 +139,22 @@ function ensureUserProfile(
     data[userId].username ||
     'Unknown User';
 
+  data[userId].profile =
+    data[userId].profile || {
+      level: 0,
+      xp: 0,
+      totalXp: 0
+    };
+
+  data[userId].profile.level =
+    data[userId].profile.level || 0;
+
+  data[userId].profile.xp =
+    data[userId].profile.xp || 0;
+
+  data[userId].profile.totalXp =
+    data[userId].profile.totalXp || 0;
+
   saveUserProfiles(
     data
   );

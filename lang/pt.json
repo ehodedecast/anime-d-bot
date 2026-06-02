@@ -96,5 +96,12 @@
   "join_support_server": "Servidor de Suporte",
   "// WELCOME": "",
   "welcome_message": "Obrigado por adicionar o AnimeDBot a este servidor.",
-  "setup_instructions": "Use `/setchannel` no canal onde o AnimeDBot deve funcionar. Depois disso, abra `/menu` para começar a adicionar animes."
+  "setup_instructions": "Use `/setchannel` no canal onde o AnimeDBot deve funcionar. Depois disso, abra `/menu` para começar a adicionar animes.",
+  "// PROFILE": "",
+  "profile_title": "Perfil AnimeDBot",
+  "profile_achievements": "Conquistas",
+  "profile_titles": "Titulos",
+  "profile_history": "Historico",
+  "profile_back": "Voltar",
+  "profile_coming_soon": "Em breve."
 }
