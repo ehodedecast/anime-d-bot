@@ -47,6 +47,10 @@ const {
   getAnimeLinkFields
 } = require('./animeLinks');
 
+const {
+  notifyPartnerChannels
+} = require('./partnerNotifications');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -173,6 +177,27 @@ function createCacheEntry(data, previous = {}) {
     lastUpdated:
       new Date().toISOString()
   };
+}
+
+function getWarningMessage(hoursLeft) {
+  if (hoursLeft <= 1) {
+    return t(
+      null,
+      'episode_less_than_1h'
+    );
+  }
+
+  if (hoursLeft <= 6) {
+    return t(
+      null,
+      'episode_less_than_6h'
+    );
+  }
+
+  return t(
+    null,
+    'episode_less_than_24h'
+  );
 }
 
 async function getNotificationTarget(
@@ -912,6 +937,26 @@ const force24h =
 const forceRelease =
   options.forceRelease;
 
+const shouldSend24h =
+  (
+    (
+      hoursLeft <= 24 &&
+      hoursLeft > 0
+    ) ||
+    force24h
+  );
+
+const shouldSendRelease =
+  (
+    diff <= 0 ||
+    forceRelease
+  );
+
+const warningMessage =
+  getWarningMessage(
+    hoursLeft
+  );
+
         // 🔥 DISTRIBUI PARA USUARIOS
         for (const userId in userAnimeData) {
 
@@ -940,44 +985,10 @@ const forceRelease =
           // 🔥 AVISO 24H
           if (
 
-  (
-    (
-      hoursLeft <= 24 &&
-      hoursLeft > 0
-    ) ||
-
-    force24h
-  ) &&
+  shouldSend24h &&
 
   !sentEntry['24h']
 ) {
-
-            let warningMessage;
-
-if (hoursLeft <= 1) {
-
-  warningMessage =
-    t(
-      null,
-      'episode_less_than_1h'
-    );
-
-} else if (hoursLeft <= 6) {
-
-  warningMessage =
-    t(
-      null,
-      'episode_less_than_6h'
-    );
-
-} else {
-
-  warningMessage =
-    t(
-      null,
-      'episode_less_than_24h'
-    );
-}
 
 const sent24h =
   await sendUserNotification({
@@ -1019,11 +1030,7 @@ const sent24h =
           // 🔥 EPISÓDIO LANÇADO
           if (
 
-  (
-    diff <= 0 ||
-
-    forceRelease
-  ) &&
+  shouldSendRelease &&
 
   !sentEntry.release
 ) {
@@ -1113,6 +1120,29 @@ const sent24h =
               );
 }
           }
+        }
+
+        if (
+          shouldSend24h
+        ) {
+          await notifyPartnerChannels({
+            client,
+            anime: data,
+            notificationType: '24h',
+            warningMessage,
+            options
+          });
+        }
+
+        if (
+          shouldSendRelease
+        ) {
+          await notifyPartnerChannels({
+            client,
+            anime: data,
+            notificationType: 'release',
+            options
+          });
         }
       }
 

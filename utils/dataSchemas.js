@@ -25,7 +25,26 @@ const REQUIRED_DATA_FILES = {
 
   'userAnimes.json': {},
 
-  'userProfiles.json': {}
+  'userProfiles.json': {},
+
+  'partnerChannels.json': {
+    blueLockArena: {
+      enabled: true,
+      channelId: '1511527059946471435',
+      animeIds: [
+        137822,
+        163146,
+        199404
+      ],
+      titleIncludes: [
+        'blue lock'
+      ],
+      send24h: true,
+      sendRelease: true
+    }
+  },
+
+  'partnerSentEpisodes.json': {}
 };
 
 function cloneDefaultData(
