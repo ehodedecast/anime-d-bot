@@ -226,6 +226,30 @@ function getTopUsers(userAnimeData) {
     .slice(0, 10);
 }
 
+function getUserStats(userAnimeData) {
+
+  const users =
+    Object.entries(userAnimeData || {});
+
+  const usersWithAnime =
+    users.filter(([, userData]) => {
+
+      const animeList =
+        Array.isArray(userData)
+          ? userData
+          : userData?.anime || [];
+
+      return animeList.length > 0;
+    });
+
+  return {
+    total:
+      users.length,
+    withAnime:
+      usersWithAnime.length
+  };
+}
+
 function formatTopAnime(items) {
 
   if (!items.length) {
@@ -286,6 +310,9 @@ const totalVotes =
   const animeStats =
     getAnimeStats(userAnimeData);
 
+  const userStats =
+    getUserStats(userAnimeData);
+
   const currentGuildConfig =
     config[message.guild?.id];
 
@@ -334,6 +361,9 @@ const totalVotes =
     '',
     'Top anime:',
     formatTopAnime(animeStats.topAnime),
+    '',
+    `AnimeDBot users: ${userStats.total}`,
+    `Users with anime: ${userStats.withAnime}`,
     '',
     'Top users:',
     formatTopUsers(
