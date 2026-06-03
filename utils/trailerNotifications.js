@@ -3,12 +3,6 @@ const axios = require('axios');
 const chalk = require('chalk').default;
 
 const {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
-} = require('discord.js');
-
-const {
   getAnimeLinkFields,
   isTrailerUrl,
   isValidUrl
@@ -111,23 +105,11 @@ async function sendTrailerDm({
         targetUserId
       );
 
-    await user.send({
-      content:
-        t(guildId, 'trailer_available')
-          .replace('{anime}', animeTitle) +
-        `\n${trailerUrl}`,
-      components: [
-        new ActionRowBuilder()
-          .addComponents(
-            new ButtonBuilder()
-              .setLabel(
-                t(guildId, 'watch_trailer_button')
-              )
-              .setStyle(ButtonStyle.Link)
-              .setURL(trailerUrl)
-          )
-      ]
-    });
+    await user.send(
+      t(guildId, 'trailer_available')
+        .replace('{anime}', animeTitle) +
+      `\n\n${trailerUrl}`
+    );
 
     return true;
   } catch (err) {

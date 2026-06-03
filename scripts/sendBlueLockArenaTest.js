@@ -8,11 +8,7 @@ const axios = require('axios');
 
 const {
   Client,
-  GatewayIntentBits,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  EmbedBuilder
+  GatewayIntentBits
 } = require('discord.js');
 
 const {
@@ -177,11 +173,6 @@ async function getBlueLockSecondSeasonTrailerAnime() {
   };
 }
 
-function getTrailerThumbnailUrl(anime) {
-  return anime.trailer?.thumbnail ||
-    null;
-}
-
 async function sendBlueLockSecondSeasonTrailer() {
   const anime =
     await getBlueLockSecondSeasonTrailerAnime();
@@ -189,12 +180,8 @@ async function sendBlueLockSecondSeasonTrailer() {
   const trailerUrl =
     getTrailerUrl(anime);
 
-  const trailerThumbnail =
-    getTrailerThumbnailUrl(anime);
-
   if (
-    !trailerUrl &&
-    !trailerThumbnail
+    !trailerUrl
   ) {
     console.log(
       `Trailer da 2 temporada nao encontrado na AniList. ID: ${BLUE_LOCK_SECOND_SEASON_ID}`
@@ -219,62 +206,12 @@ async function sendBlueLockSecondSeasonTrailer() {
       BLUE_LOCK_ARENA_CHANNEL_ID
     );
 
-  const embed =
-    new EmbedBuilder()
-      .setColor(0xff6600)
-      .setTitle(
-        'Trailer disponivel'
-      )
-      .setDescription(
-        `O trailer de **${anime.title.romaji}** ja esta disponivel!`
-      )
-      .setTimestamp();
-
-  if (
-    !trailerUrl &&
-    trailerThumbnail
-  ) {
-    embed.setImage(
-      trailerThumbnail
-    );
-  }
-
-  const payload = {
-    content:
-      trailerUrl
-        ? `Trailer da 2 temporada de Blue Lock (AniList ID ${BLUE_LOCK_SECOND_SEASON_ID}):\n${trailerUrl}`
-        : 'Trailer da 2 temporada de Blue Lock encontrado como imagem.',
-    embeds: [
-      embed
-    ]
-  };
-
-  if (
-    trailerUrl
-  ) {
-    payload.components = [
-      new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setLabel(
-              'Assistir trailer'
-            )
-            .setStyle(ButtonStyle.Link)
-            .setURL(
-              trailerUrl
-            )
-        )
-    ]
-  }
-
   await channel.send(
-    payload
+    `🎬 O trailer de ${anime.title.romaji} acabou de ser lançado!\n\n${trailerUrl}`
   );
 
   console.log(
-    trailerUrl
-      ? `Trailer enviado: ${trailerUrl}`
-      : `Thumbnail do trailer enviada: ${trailerThumbnail}`
+    `Trailer enviado: ${trailerUrl}`
   );
 
   return true;

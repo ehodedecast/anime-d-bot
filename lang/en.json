@@ -115,7 +115,6 @@
   "watch_first_required": "Click Watch before marking this episode as watched.",
   "watch_marked": "Episode marked as watched.",
   "// TRAILER": "",
-  "trailer_available": "The trailer for {anime} is now available!",
-  "watch_trailer_button": "Watch trailer",
+  "trailer_available": "🎬 The trailer for {anime} has just been released!",
   "trailer_dm_failed": "Could not send trailer DM to"
 }
