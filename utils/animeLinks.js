@@ -221,10 +221,10 @@ function findSocialLink(anime) {
 
 function findTrailerLink(anime) {
   if (
-    isValidUrl(anime?.trailerUrl) &&
-    isTrailerUrl(anime.trailerUrl)
+    anime?.trailer?.id &&
+    normalize(anime?.trailer?.site).includes('youtube')
   ) {
-    return anime.trailerUrl;
+    return `https://www.youtube.com/watch?v=${anime.trailer.id}`;
   }
 
   if (
@@ -235,10 +235,10 @@ function findTrailerLink(anime) {
   }
 
   if (
-    anime?.trailer?.id &&
-    normalize(anime?.trailer?.site).includes('youtube')
+    isValidUrl(anime?.trailerUrl) &&
+    isTrailerUrl(anime.trailerUrl)
   ) {
-    return `https://www.youtube.com/watch?v=${anime.trailer.id}`;
+    return anime.trailerUrl;
   }
 
   const trailer =

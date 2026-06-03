@@ -114,7 +114,8 @@ async function sendTrailerDm({
     await user.send({
       content:
         t(guildId, 'trailer_available')
-          .replace('{anime}', animeTitle),
+          .replace('{anime}', animeTitle) +
+        `\n${trailerUrl}`,
       components: [
         new ActionRowBuilder()
           .addComponents(

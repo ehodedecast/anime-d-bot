@@ -26,6 +26,12 @@ const {
 const BLUE_LOCK_ARENA_CHANNEL_ID =
   '1511527059946471435';
 
+const BLUE_LOCK_ANIME_ID =
+  137822;
+
+const BLUE_LOCK_SECOND_SEASON_ID =
+  163146;
+
 const token =
   process.env.DISCORD_TOKEN ||
   process.env.TOKEN ||
@@ -56,7 +62,7 @@ const client =
 async function getBlueLockTestAnime() {
   const query = `
     query {
-      Media(id: 137822, type: ANIME) {
+      Media(id: ${BLUE_LOCK_ANIME_ID}, type: ANIME) {
         id
         siteUrl
         title {
@@ -122,7 +128,7 @@ async function getBlueLockTestAnime() {
 async function getBlueLockSecondSeasonTrailerAnime() {
   const query = `
     query {
-      Media(id: 163146, type: ANIME) {
+      Media(id: ${BLUE_LOCK_SECOND_SEASON_ID}, type: ANIME) {
         id
         siteUrl
         title {
@@ -171,13 +177,9 @@ async function getBlueLockSecondSeasonTrailerAnime() {
   };
 }
 
-function getCoverImageUrl(anime) {
-  return (
-    anime.coverImage?.extraLarge ||
-    anime.coverImage?.large ||
-    anime.coverImage?.medium ||
-    null
-  );
+function getTrailerThumbnailUrl(anime) {
+  return anime.trailer?.thumbnail ||
+    null;
 }
 
 async function sendBlueLockSecondSeasonTrailer() {
@@ -187,11 +189,29 @@ async function sendBlueLockSecondSeasonTrailer() {
   const trailerUrl =
     getTrailerUrl(anime);
 
-  if (!trailerUrl) {
+  const trailerThumbnail =
+    getTrailerThumbnailUrl(anime);
+
+  if (
+    !trailerUrl &&
+    !trailerThumbnail
+  ) {
     console.log(
-      'Trailer da 2 temporada nao encontrado na AniList.'
+      `Trailer da 2 temporada nao encontrado na AniList. ID: ${BLUE_LOCK_SECOND_SEASON_ID}`
     );
     return false;
+  }
+
+  console.log(
+    `Trailer teste AniList ID: ${BLUE_LOCK_SECOND_SEASON_ID}`
+  );
+
+  if (
+    trailerUrl
+  ) {
+    console.log(
+      `Trailer YouTube encontrado: ${trailerUrl}`
+    );
   }
 
   const channel =
@@ -210,20 +230,29 @@ async function sendBlueLockSecondSeasonTrailer() {
       )
       .setTimestamp();
 
-  const coverImage =
-    getCoverImageUrl(anime);
-
-  if (coverImage) {
+  if (
+    !trailerUrl &&
+    trailerThumbnail
+  ) {
     embed.setImage(
-      coverImage
+      trailerThumbnail
     );
   }
 
-  await channel.send({
+  const payload = {
+    content:
+      trailerUrl
+        ? `Trailer da 2 temporada de Blue Lock (AniList ID ${BLUE_LOCK_SECOND_SEASON_ID}):\n${trailerUrl}`
+        : 'Trailer da 2 temporada de Blue Lock encontrado como imagem.',
     embeds: [
       embed
-    ],
-    components: [
+    ]
+  };
+
+  if (
+    trailerUrl
+  ) {
+    payload.components = [
       new ActionRowBuilder()
         .addComponents(
           new ButtonBuilder()
@@ -236,10 +265,16 @@ async function sendBlueLockSecondSeasonTrailer() {
             )
         )
     ]
-  });
+  }
+
+  await channel.send(
+    payload
+  );
 
   console.log(
-    `Trailer enviado: ${trailerUrl}`
+    trailerUrl
+      ? `Trailer enviado: ${trailerUrl}`
+      : `Thumbnail do trailer enviada: ${trailerThumbnail}`
   );
 
   return true;
