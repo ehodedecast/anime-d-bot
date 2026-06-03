@@ -220,6 +220,27 @@ function findSocialLink(anime) {
 }
 
 function findTrailerLink(anime) {
+  if (
+    isValidUrl(anime?.trailerUrl) &&
+    isTrailerUrl(anime.trailerUrl)
+  ) {
+    return anime.trailerUrl;
+  }
+
+  if (
+    isValidUrl(anime?.trailer?.url) &&
+    isTrailerUrl(anime.trailer.url)
+  ) {
+    return anime.trailer.url;
+  }
+
+  if (
+    anime?.trailer?.id &&
+    normalize(anime?.trailer?.site).includes('youtube')
+  ) {
+    return `https://www.youtube.com/watch?v=${anime.trailer.id}`;
+  }
+
   const trailer =
     getExternalLinks(anime)
       .find(link =>

@@ -113,5 +113,9 @@
   "watch_link_not_found_notice": "I could not find an exact link to watch this episode.",
   "watch_opened": "Episode opened.",
   "watch_first_required": "Click Watch before marking this episode as watched.",
-  "watch_marked": "Episode marked as watched."
+  "watch_marked": "Episode marked as watched.",
+  "// TRAILER": "",
+  "trailer_available": "The trailer for {anime} is now available!",
+  "watch_trailer_button": "Watch trailer",
+  "trailer_dm_failed": "Could not send trailer DM to"
 }

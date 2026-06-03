@@ -31,6 +31,15 @@ query ($search: String) {
 
       seasonYear
 
+      startDate {
+
+        year
+
+        month
+
+        day
+      }
+
       title {
 
         romaji
@@ -53,6 +62,15 @@ query ($search: String) {
         site
 
         url
+      }
+
+      trailer {
+
+        id
+
+        site
+
+        thumbnail
       }
 
       relations {
@@ -135,6 +153,9 @@ console.log(
     seasonYear:
       anime.seasonYear,
 
+    startDate:
+      anime.startDate,
+
     coverImage:
       anime.coverImage,
 
@@ -143,6 +164,9 @@ console.log(
 
     externalLinks:
       anime.externalLinks || [],
+
+    trailer:
+      anime.trailer,
 
     relations:
       anime.relations

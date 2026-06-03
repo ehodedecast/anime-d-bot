@@ -51,6 +51,10 @@ const {
   notifyPartnerChannels
 } = require('./partnerNotifications');
 
+const {
+  processPendingTrailers
+} = require('./trailerNotifications');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -176,6 +180,18 @@ function createCacheEntry(data, previous = {}) {
       linkFields.socialUrl,
     trailerUrl:
       linkFields.trailerUrl,
+    trailer:
+      data.trailer ||
+      previous.trailer ||
+      null,
+    startDate:
+      data.startDate ||
+      previous.startDate ||
+      null,
+    status:
+      data.status ||
+      previous.status ||
+      null,
     lastUpdated:
       new Date().toISOString()
   };
@@ -653,6 +669,12 @@ for (const chunk of chunks) {
     cachedAnime.animePageUrl ||
     cachedAnime.siteUrl,
 
+  status:
+    cachedAnime.status,
+
+  startDate:
+    cachedAnime.startDate,
+
   coverImage: {
     large:
       cachedAnime.coverImage
@@ -680,7 +702,10 @@ for (const chunk of chunks) {
     cachedAnime.socialUrl,
 
   trailerUrl:
-    cachedAnime.trailerUrl
+    cachedAnime.trailerUrl,
+
+  trailer:
+    cachedAnime.trailer
 });
 
         if (
@@ -805,6 +830,14 @@ if (
 
           siteUrl
 
+          status
+
+          startDate {
+            year
+            month
+            day
+          }
+
           title { romaji }
 
           coverImage { large }
@@ -816,6 +849,12 @@ if (
           externalLinks {
             site
             url
+          }
+
+          trailer {
+            id
+            site
+            thumbnail
           }
           
         }
@@ -1240,6 +1279,12 @@ if (
           Media(id: ${brokenAnime.id}, type: ANIME) {
             id
             siteUrl
+            status
+            startDate {
+              year
+              month
+              day
+            }
             title { romaji }
             coverImage { large }
             nextAiringEpisode {
@@ -1249,6 +1294,11 @@ if (
             externalLinks {
               site
               url
+            }
+            trailer {
+              id
+              site
+              thumbnail
             }
           }
         }`;
@@ -1334,6 +1384,12 @@ saveCache(cache);
 
 
   } 
+
+  await processPendingTrailers(
+    client,
+    options
+  );
+
   await repairInvalidAnime(
     client
   );

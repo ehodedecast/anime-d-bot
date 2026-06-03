@@ -155,11 +155,185 @@ function ensureUserProfile(
   data[userId].profile.totalXp =
     data[userId].profile.totalXp || 0;
 
+  data[userId].trailers =
+    data[userId].trailers || {};
+
   saveUserProfiles(
     data
   );
 
   return data[userId];
+}
+
+function getTrailerEntry(
+  profiles,
+  userId,
+  animeId,
+  username = 'Unknown User'
+) {
+
+  profiles[userId] =
+    profiles[userId] || {
+      username
+    };
+
+  profiles[userId].username =
+    username ||
+    profiles[userId].username ||
+    'Unknown User';
+
+  profiles[userId].trailers =
+    profiles[userId].trailers || {};
+
+  const animeKey =
+    String(animeId);
+
+  profiles[userId].trailers[animeKey] =
+    profiles[userId].trailers[animeKey] || {
+      waiting: false,
+      sent: false,
+      trailerUrl: null,
+      addedAt:
+        new Date().toISOString(),
+      sentAt: null
+    };
+
+  return profiles[userId].trailers[animeKey];
+}
+
+function markTrailerWaiting({
+  userId,
+  username,
+  animeId,
+  animeTitle,
+  trailerUrl = null
+}) {
+
+  const profiles =
+    loadUserProfiles();
+
+  const entry =
+    getTrailerEntry(
+      profiles,
+      userId,
+      animeId,
+      username
+    );
+
+  entry.waiting = true;
+  entry.sent =
+    Boolean(entry.sent);
+  entry.animeTitle =
+    animeTitle ||
+    entry.animeTitle ||
+    'Unknown';
+  entry.trailerUrl =
+    trailerUrl ||
+    entry.trailerUrl ||
+    null;
+  entry.addedAt =
+    entry.addedAt ||
+    new Date().toISOString();
+
+  saveUserProfiles(
+    profiles
+  );
+
+  return entry;
+}
+
+function markTrailerSent({
+  userId,
+  username,
+  animeId,
+  animeTitle,
+  trailerUrl
+}) {
+
+  const profiles =
+    loadUserProfiles();
+
+  const entry =
+    getTrailerEntry(
+      profiles,
+      userId,
+      animeId,
+      username
+    );
+
+  entry.waiting = false;
+  entry.sent = true;
+  entry.animeTitle =
+    animeTitle ||
+    entry.animeTitle ||
+    'Unknown';
+  entry.trailerUrl =
+    trailerUrl;
+  entry.sentAt =
+    entry.sentAt ||
+    new Date().toISOString();
+
+  saveUserProfiles(
+    profiles
+  );
+
+  return entry;
+}
+
+function getPendingTrailerEntries() {
+
+  const profiles =
+    loadUserProfiles();
+
+  const entries = [];
+
+  for (
+    const [userId, profile] of
+    Object.entries(profiles)
+  ) {
+
+    const trailers =
+      profile?.trailers || {};
+
+    for (
+      const [animeId, trailer] of
+      Object.entries(trailers)
+    ) {
+
+      if (
+        trailer?.waiting &&
+        !trailer?.sent
+      ) {
+        entries.push({
+          userId,
+          username:
+            profile.username ||
+            'Unknown User',
+          animeId,
+          animeTitle:
+            trailer.animeTitle ||
+            'Unknown',
+          trailer
+        });
+      }
+    }
+  }
+
+  return entries;
+}
+
+function getTrailerProgress({
+  userId,
+  animeId
+}) {
+
+  const profiles =
+    loadUserProfiles();
+
+  return profiles[userId]
+    ?.trailers
+    ?.[String(animeId)] ||
+    null;
 }
 
 function getEpisodeHistoryEntry(
@@ -349,6 +523,10 @@ module.exports = {
   loadUserProfiles,
   saveUserProfiles,
   ensureUserProfile,
+  markTrailerWaiting,
+  markTrailerSent,
+  getPendingTrailerEntries,
+  getTrailerProgress,
   markEpisodeNotified,
   markEpisodeOpened,
   markEpisodeWatched,

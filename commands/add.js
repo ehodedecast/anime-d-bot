@@ -70,6 +70,10 @@ const {
 } = require('../utils/animeCacheService');
 
 const {
+  handleTrailerAfterAdd
+} = require('../utils/trailerNotifications');
+
+const {
 
   registerSuccessfulAdd,
 
@@ -293,6 +297,18 @@ const mapping =
     saveAnimeToCache(
       anime
     );
+
+    await handleTrailerAfterAdd({
+      client:
+        message.client,
+      userId:
+        message.author.id,
+      username:
+        message.author.username,
+      anime,
+      guildId:
+        message.guild.id
+    });
 
     // 📊 ANALYTICS
 

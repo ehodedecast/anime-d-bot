@@ -100,6 +100,14 @@ function upsertAnimeCacheEntry(
       linkFields.socialUrl,
     trailerUrl:
       linkFields.trailerUrl,
+    trailer:
+      anime.trailer ||
+      previous.trailer ||
+      null,
+    startDate:
+      anime.startDate ||
+      previous.startDate ||
+      null,
     status: anime.status,
     lastUpdated: new Date().toISOString()
   };

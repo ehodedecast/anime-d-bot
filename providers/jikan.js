@@ -48,6 +48,9 @@ async function searchAnime(
       seasonYear:
         anime.year,
 
+      startDate:
+        null,
+
       title:
   anime.title,
 
@@ -61,6 +64,17 @@ async function searchAnime(
 
       nextAiringEpisode:
         null,
+
+      trailer:
+        anime.trailer?.url
+          ? {
+              site: 'youtube',
+              id:
+                anime.trailer.youtube_id,
+              url:
+                anime.trailer.url
+            }
+          : null,
 
       relations: {
 

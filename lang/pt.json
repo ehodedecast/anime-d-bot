@@ -113,5 +113,9 @@
   "watch_link_not_found_notice": "Nao encontrei um link exato para assistir este episodio.",
   "watch_opened": "Episodio aberto.",
   "watch_first_required": "Clique em Assistir antes de marcar como assistido.",
-  "watch_marked": "Episodio marcado como assistido."
+  "watch_marked": "Episodio marcado como assistido.",
+  "// TRAILER": "",
+  "trailer_available": "O trailer de {anime} ja esta disponivel!",
+  "watch_trailer_button": "Assistir trailer",
+  "trailer_dm_failed": "Nao consegui enviar o trailer por DM para"
 }
