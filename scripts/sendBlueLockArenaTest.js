@@ -4,6 +4,8 @@ require('dotenv').config({
 
 const fs = require('fs');
 
+const axios = require('axios');
+
 const {
   Client,
   GatewayIntentBits
@@ -40,37 +42,71 @@ const client =
     ]
   });
 
-const testAnime = {
-  id: 137822,
-  title: {
-    romaji:
-      '[TESTE] Blue Lock Arena'
-  },
-  siteUrl:
-    'https://anilist.co/anime/137822',
-  coverImage: {
-    large:
-      'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx137822-T4f5XTfW4jsw.jpg'
-  },
-  nextAiringEpisode: {
-    episode: 9999,
-    airingAt:
-      Math.floor(Date.now() / 1000) +
-      23 * 60 * 60
-  },
-  externalLinks: [
-    {
-      site: 'Crunchyroll',
-      url:
-        'https://www.crunchyroll.com/series/G4PH0WEKE/blue-lock'
+async function getBlueLockTestAnime() {
+  const query = `
+    query {
+      Media(id: 137822, type: ANIME) {
+        id
+        siteUrl
+        title {
+          romaji
+        }
+        coverImage {
+          extraLarge
+          large
+          medium
+        }
+        externalLinks {
+          site
+          url
+        }
+      }
+    }`;
+
+  const response =
+    await axios.post(
+      'https://graphql.anilist.co/graphql',
+      {
+        query
+      }
+    );
+
+  const data =
+    response.data?.data?.Media;
+
+  if (!data) {
+    throw new Error(
+      'Nao consegui carregar Blue Lock na AniList.'
+    );
+  }
+
+  return {
+    ...data,
+    title: {
+      romaji:
+        `[TESTE] ${data.title?.romaji || 'Blue Lock Arena'}`
     },
-    {
-      site: 'Official Site',
-      url:
-        'https://bluelock-pr.com/'
-    }
-  ]
-};
+    nextAiringEpisode: {
+      episode: 9999,
+      airingAt:
+        Math.floor(Date.now() / 1000) +
+        23 * 60 * 60
+    },
+    externalLinks: [
+      ...(data.externalLinks || []),
+      {
+        site: 'Crunchyroll',
+        url:
+          'https://www.crunchyroll.com/series/G4PH0WEKE/blue-lock'
+      },
+      {
+        site: 'Official Site',
+        url:
+          'https://bluelock-pr.com/'
+      }
+    ]
+  };
+}
 
 async function main() {
   try {
@@ -82,6 +118,18 @@ async function main() {
 
     console.log(
       `Bot conectado como ${client.user.tag}`
+    );
+
+    const testAnime =
+      await getBlueLockTestAnime();
+
+    console.log(
+      `Capa usada: ${
+        testAnime.coverImage?.extraLarge ||
+        testAnime.coverImage?.large ||
+        testAnime.coverImage?.medium ||
+        'nenhuma'
+      }`
     );
 
     await notifyPartnerChannels({

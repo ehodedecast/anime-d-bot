@@ -40,6 +40,7 @@ function getCoverImageUrl(anime) {
   }
 
   return (
+    anime?.coverImage?.extraLarge ||
     anime?.coverImage?.large ||
     anime?.coverImage?.medium ||
     null
