@@ -103,5 +103,15 @@
   "profile_titles": "Titles",
   "profile_history": "History",
   "profile_back": "Back",
-  "profile_coming_soon": "Coming soon."
+  "profile_coming_soon": "Coming soon.",
+  "// WATCH": "",
+  "watch_button": "Watch",
+  "watch_again_button": "Watch again",
+  "watched_button": "Watched",
+  "official_site_button": "Official site",
+  "watch_link_not_found": "Episode link not found",
+  "watch_link_not_found_notice": "I could not find an exact link to watch this episode.",
+  "watch_opened": "Episode opened.",
+  "watch_first_required": "Click Watch before marking this episode as watched.",
+  "watch_marked": "Episode marked as watched."
 }

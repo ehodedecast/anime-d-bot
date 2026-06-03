@@ -207,7 +207,8 @@ function markEpisodeNotified({
   watchUrl = null,
   watchLabel = null,
   watchIsStreaming = false,
-  streamingProvider = null
+  streamingProvider = null,
+  officialSiteUrl = null
 }) {
 
   const profiles =
@@ -248,6 +249,13 @@ function markEpisodeNotified({
   ) {
     entry.streamingProvider =
       streamingProvider;
+  }
+
+  if (
+    officialSiteUrl
+  ) {
+    entry.officialSiteUrl =
+      officialSiteUrl;
   }
 
   saveUserProfiles(

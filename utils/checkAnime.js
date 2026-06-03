@@ -167,13 +167,15 @@ function createCacheEntry(data, previous = {}) {
       previous.siteUrl ||
       null,
     streamingUrl:
-      linkFields.streamingUrl ||
-      previous.streamingUrl ||
-      null,
+      linkFields.streamingUrl,
     streamingProvider:
-      linkFields.streamingProvider ||
-      previous.streamingProvider ||
-      null,
+      linkFields.streamingProvider,
+    officialSiteUrl:
+      linkFields.officialSiteUrl,
+    socialUrl:
+      linkFields.socialUrl,
+    trailerUrl:
+      linkFields.trailerUrl,
     lastUpdated:
       new Date().toISOString()
   };
@@ -669,7 +671,16 @@ for (const chunk of chunks) {
     cachedAnime.streamingUrl,
 
   streamingProvider:
-    cachedAnime.streamingProvider
+    cachedAnime.streamingProvider,
+
+  officialSiteUrl:
+    cachedAnime.officialSiteUrl,
+
+  socialUrl:
+    cachedAnime.socialUrl,
+
+  trailerUrl:
+    cachedAnime.trailerUrl
 });
 
         if (
@@ -1064,6 +1075,17 @@ const sent24h =
                 animeTitle:
                   data.title.romaji,
                 payload: {
+                  ...(
+                    watchTarget.isStreaming
+                      ? {}
+                      : {
+                          content:
+                            t(
+                              null,
+                              'watch_link_not_found_notice'
+                            )
+                        }
+                  ),
                   embeds: [embed],
                   components: [
                     createWatchOpenRow({
@@ -1073,8 +1095,11 @@ const sent24h =
                       episode:
                         data.nextAiringEpisode
                           .episode,
-                      label:
-                        watchTarget.label
+                      guildId: null,
+                      hasStreaming:
+                        watchTarget.isStreaming,
+                      officialSiteUrl:
+                        watchTarget.officialSiteUrl
                     })
                   ]
                 },
@@ -1104,7 +1129,9 @@ const sent24h =
     watchIsStreaming:
       watchTarget.isStreaming,
     streamingProvider:
-      watchTarget.provider
+      watchTarget.provider,
+    officialSiteUrl:
+      watchTarget.officialSiteUrl
   });
 
   sentEntry.release = true;

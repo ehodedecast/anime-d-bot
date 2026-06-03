@@ -103,5 +103,15 @@
   "profile_titles": "Titulos",
   "profile_history": "Historico",
   "profile_back": "Voltar",
-  "profile_coming_soon": "Em breve."
+  "profile_coming_soon": "Em breve.",
+  "// WATCH": "",
+  "watch_button": "Assistir",
+  "watch_again_button": "Assistir novamente",
+  "watched_button": "Ja Assisti",
+  "official_site_button": "Site oficial",
+  "watch_link_not_found": "Link do episodio nao encontrado",
+  "watch_link_not_found_notice": "Nao encontrei um link exato para assistir este episodio.",
+  "watch_opened": "Episodio aberto.",
+  "watch_first_required": "Clique em Assistir antes de marcar como assistido.",
+  "watch_marked": "Episodio marcado como assistido."
 }

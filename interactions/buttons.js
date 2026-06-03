@@ -107,14 +107,26 @@ function getWatchTarget(
     });
 
   const url =
-    progress?.watchUrl ||
-    `https://anilist.co/anime/${parsed.animeId}`;
+    progress?.watchIsStreaming
+      ? progress?.watchUrl || null
+      : null;
 
   return {
     url,
     label:
       progress?.watchLabel ||
-      'Ver pagina do anime'
+      t(
+        null,
+        'watch_again_button'
+      ),
+    isStreaming:
+      Boolean(
+        progress?.watchIsStreaming &&
+        progress?.watchUrl
+      ),
+    officialSiteUrl:
+      progress?.officialSiteUrl ||
+      null
   };
 }
 
@@ -443,6 +455,24 @@ module.exports = async (
       return blocked;
     }
 
+    const watchTarget =
+      getWatchTarget(
+        parsed
+      );
+
+    if (
+      !watchTarget.isStreaming
+    ) {
+      return interaction.reply({
+        content:
+          t(
+            interaction.guild?.id || null,
+            'watch_link_not_found_notice'
+          ),
+        ephemeral: true
+      });
+    }
+
     markEpisodeOpened({
       userId:
         parsed.userId,
@@ -454,14 +484,12 @@ module.exports = async (
         parsed.episode
     });
 
-    const watchTarget =
-      getWatchTarget(
-        parsed
-      );
-
     return interaction.update({
       content:
-        'Episodio aberto.',
+        t(
+          interaction.guild?.id || null,
+          'watch_opened'
+        ),
       components: [
         createWatchReadyRow({
           userId:
@@ -472,8 +500,11 @@ module.exports = async (
             parsed.episode,
           url:
             watchTarget.url,
-          label:
-            watchTarget.label
+          officialSiteUrl:
+            watchTarget.officialSiteUrl,
+          guildId:
+            interaction.guild?.id ||
+            null
         })
       ]
     });
@@ -516,7 +547,10 @@ module.exports = async (
 
       return interaction.reply({
         content:
-          'Clique em Assistir antes de marcar como assistido.',
+          t(
+            interaction.guild?.id || null,
+            'watch_first_required'
+          ),
         ephemeral: true
       });
     }
@@ -541,13 +575,19 @@ module.exports = async (
       createWatchedRow({
         url:
           watchTarget.url,
-        label:
-          watchTarget.label
+        officialSiteUrl:
+          watchTarget.officialSiteUrl,
+        guildId:
+          interaction.guild?.id ||
+          null
       });
 
     return interaction.update({
       content:
-        '✅ Episodio marcado como assistido.',
+        `✅ ${t(
+          interaction.guild?.id || null,
+          'watch_marked'
+        )}`,
       components:
         watchedRow
           ? [watchedRow]

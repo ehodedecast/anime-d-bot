@@ -9,6 +9,10 @@ const {
   isValidUrl
 } = require('./animeLinks');
 
+const {
+  t
+} = require('./language');
+
 function createWatchOpenCustomId({
   userId,
   animeId,
@@ -45,10 +49,17 @@ function createWatchOpenRow({
   userId,
   animeId,
   episode,
-  label = 'Assistir'
+  guildId = null,
+  hasStreaming = true,
+  officialSiteUrl = null
 }) {
-  return new ActionRowBuilder()
-    .addComponents(
+  const row =
+    new ActionRowBuilder();
+
+  if (
+    hasStreaming
+  ) {
+    row.addComponents(
       new ButtonBuilder()
         .setCustomId(
           createWatchOpenCustomId({
@@ -57,9 +68,41 @@ function createWatchOpenRow({
             episode
           })
         )
-        .setLabel(label)
+        .setLabel(
+          t(guildId, 'watch_button')
+        )
         .setStyle(ButtonStyle.Primary)
     );
+  } else {
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(
+          `watch_missing:${userId}:${animeId}:${episode}`
+        )
+        .setLabel(
+          t(guildId, 'watch_link_not_found')
+        )
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true)
+    );
+  }
+
+  if (
+    isValidUrl(officialSiteUrl)
+  ) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel(
+          t(guildId, 'official_site_button')
+        )
+        .setStyle(ButtonStyle.Link)
+        .setURL(
+          officialSiteUrl
+        )
+    );
+  }
+
+  return row;
 }
 
 function createWatchReadyRow({
@@ -67,7 +110,8 @@ function createWatchReadyRow({
   animeId,
   episode,
   url,
-  label = 'Assistir novamente'
+  officialSiteUrl = null,
+  guildId = null
 }) {
   const row =
     new ActionRowBuilder();
@@ -77,31 +121,55 @@ function createWatchReadyRow({
   ) {
     row.addComponents(
       new ButtonBuilder()
-        .setLabel(label)
+        .setLabel(
+          t(guildId, 'watch_again_button')
+        )
         .setStyle(ButtonStyle.Link)
         .setURL(url)
     );
   }
 
-  row.addComponents(
-    new ButtonBuilder()
-      .setCustomId(
-        createWatchDoneCustomId({
-          userId,
-          animeId,
-          episode
-        })
-      )
-      .setLabel('Ja Assisti')
-      .setStyle(ButtonStyle.Success)
-  );
+  if (
+    isValidUrl(officialSiteUrl)
+  ) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel(
+          t(guildId, 'official_site_button')
+        )
+        .setStyle(ButtonStyle.Link)
+        .setURL(
+          officialSiteUrl
+        )
+    );
+  }
+
+  if (
+    isValidUrl(url)
+  ) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(
+          createWatchDoneCustomId({
+            userId,
+            animeId,
+            episode
+          })
+        )
+        .setLabel(
+          t(guildId, 'watched_button')
+        )
+        .setStyle(ButtonStyle.Success)
+    );
+  }
 
   return row;
 }
 
 function createWatchedRow({
   url,
-  label = 'Assistir novamente'
+  officialSiteUrl = null,
+  guildId = null
 }) {
   const row =
     new ActionRowBuilder();
@@ -111,9 +179,26 @@ function createWatchedRow({
   ) {
     row.addComponents(
       new ButtonBuilder()
-        .setLabel(label)
+        .setLabel(
+          t(guildId, 'watch_again_button')
+        )
         .setStyle(ButtonStyle.Link)
         .setURL(url)
+    );
+  }
+
+  if (
+    isValidUrl(officialSiteUrl)
+  ) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel(
+          t(guildId, 'official_site_button')
+        )
+        .setStyle(ButtonStyle.Link)
+        .setURL(
+          officialSiteUrl
+        )
     );
   }
 

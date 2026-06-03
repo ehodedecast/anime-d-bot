@@ -85,19 +85,21 @@ function upsertAnimeCacheEntry(
     nextEpisode: getNextEpisode(anime),
     externalLinks:
       externalLinks,
+    streamingUrl:
+      linkFields.streamingUrl,
+    streamingProvider:
+      linkFields.streamingProvider,
+    officialSiteUrl:
+      linkFields.officialSiteUrl,
     animePageUrl:
       linkFields.animePageUrl ||
       previous.animePageUrl ||
       previous.siteUrl ||
       null,
-    streamingUrl:
-      linkFields.streamingUrl ||
-      previous.streamingUrl ||
-      null,
-    streamingProvider:
-      linkFields.streamingProvider ||
-      previous.streamingProvider ||
-      null,
+    socialUrl:
+      linkFields.socialUrl,
+    trailerUrl:
+      linkFields.trailerUrl,
     status: anime.status,
     lastUpdated: new Date().toISOString()
   };

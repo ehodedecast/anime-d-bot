@@ -1,41 +1,36 @@
 const STREAMING_PROVIDERS = [
   {
     key: 'crunchyroll',
-    label: 'Crunchyroll'
+    label: 'Crunchyroll',
+    hosts: [
+      'crunchyroll.com'
+    ]
   },
   {
     key: 'netflix',
-    label: 'Netflix'
-  },
-  {
-    key: 'hidive',
-    label: 'HIDIVE'
-  },
-  {
-    key: 'disney',
-    label: 'Disney+'
-  },
-  {
-    key: 'hulu',
-    label: 'Hulu'
-  },
-  {
-    key: 'amazon',
-    label: 'Amazon Prime Video'
-  },
-  {
-    key: 'prime video',
-    label: 'Amazon Prime Video'
+    label: 'Netflix',
+    hosts: [
+      'netflix.com'
+    ]
   }
 ];
 
-const BLOCKED_HOSTS = [
+const SOCIAL_HOSTS = [
   'x.com',
   'twitter.com',
   'instagram.com',
   'facebook.com',
+  'tiktok.com'
+];
+
+const TRAILER_HOSTS = [
   'youtube.com',
   'youtu.be'
+];
+
+const REFERENCE_HOSTS = [
+  'anilist.co',
+  'myanimelist.net'
 ];
 
 function isValidUrl(value) {
@@ -68,24 +63,42 @@ function getHostname(value) {
   }
 }
 
-function isBlockedUrl(value) {
+function hostMatches(value, hosts) {
   const hostname =
     getHostname(value);
 
-  return BLOCKED_HOSTS.some(host =>
+  return hosts.some(host =>
     hostname === host ||
     hostname.endsWith(`.${host}`)
   );
 }
 
-function getProviderMatch(link) {
-  const haystack =
-    `${normalize(link?.site)} ` +
-    `${normalize(link?.name)} ` +
-    `${normalize(link?.url)}`;
+function isSocialUrl(value) {
+  return hostMatches(
+    value,
+    SOCIAL_HOSTS
+  );
+}
 
-  return STREAMING_PROVIDERS.find(provider =>
-    haystack.includes(provider.key)
+function isTrailerUrl(value) {
+  return hostMatches(
+    value,
+    TRAILER_HOSTS
+  );
+}
+
+function isReferenceUrl(value) {
+  return hostMatches(
+    value,
+    REFERENCE_HOSTS
+  );
+}
+
+function isBlockedUrl(value) {
+  return (
+    isSocialUrl(value) ||
+    isTrailerUrl(value) ||
+    isReferenceUrl(value)
   );
 }
 
@@ -95,28 +108,50 @@ function getExternalLinks(anime) {
     : [];
 }
 
+function getProviderMatch(link) {
+  const haystack =
+    `${normalize(link?.site)} ` +
+    `${normalize(link?.name)} ` +
+    `${normalize(link?.url)}`;
+
+  return STREAMING_PROVIDERS.find(provider =>
+    haystack.includes(provider.key) ||
+    provider.hosts.some(host =>
+      hostMatches(link?.url, [host])
+    )
+  );
+}
+
 function findStreamingLink(anime) {
   if (
     isValidUrl(anime?.streamingUrl) &&
     !isBlockedUrl(anime.streamingUrl)
   ) {
-    return {
-      url: anime.streamingUrl,
-      provider:
-        anime.streamingProvider ||
-        'Streaming'
-    };
+    const provider =
+      STREAMING_PROVIDERS.find(item =>
+        hostMatches(
+          anime.streamingUrl,
+          item.hosts
+        )
+      );
+
+    if (provider) {
+      return {
+        url:
+          anime.streamingUrl,
+        provider:
+          anime.streamingProvider ||
+          provider.label
+      };
+    }
   }
 
-  const links =
+  const candidates =
     getExternalLinks(anime)
       .filter(link =>
         isValidUrl(link?.url) &&
         !isBlockedUrl(link.url)
-      );
-
-  const candidates =
-    links
+      )
       .map(link => ({
         link,
         provider:
@@ -146,6 +181,55 @@ function findStreamingLink(anime) {
   };
 }
 
+function findOfficialSite(anime) {
+  if (
+    isValidUrl(anime?.officialSiteUrl) &&
+    !isBlockedUrl(anime.officialSiteUrl)
+  ) {
+    return anime.officialSiteUrl;
+  }
+
+  const official =
+    getExternalLinks(anime)
+      .find(link => {
+        const label =
+          `${normalize(link?.site)} ${normalize(link?.name)}`;
+
+        return (
+          isValidUrl(link?.url) &&
+          !isBlockedUrl(link.url) &&
+          (
+            label.includes('official') ||
+            label.includes('site oficial')
+          )
+        );
+      });
+
+  return official?.url || null;
+}
+
+function findSocialLink(anime) {
+  const social =
+    getExternalLinks(anime)
+      .find(link =>
+        isValidUrl(link?.url) &&
+        isSocialUrl(link.url)
+      );
+
+  return social?.url || null;
+}
+
+function findTrailerLink(anime) {
+  const trailer =
+    getExternalLinks(anime)
+      .find(link =>
+        isValidUrl(link?.url) &&
+        isTrailerUrl(link.url)
+      );
+
+  return trailer?.url || null;
+}
+
 function getAnimePageUrl(anime) {
   if (
     isValidUrl(anime?.animePageUrl)
@@ -171,12 +255,18 @@ function getAnimeLinkFields(anime) {
     findStreamingLink(anime);
 
   return {
-    animePageUrl:
-      getAnimePageUrl(anime),
     streamingUrl:
       streaming?.url || null,
     streamingProvider:
-      streaming?.provider || null
+      streaming?.provider || null,
+    officialSiteUrl:
+      findOfficialSite(anime),
+    animePageUrl:
+      getAnimePageUrl(anime),
+    socialUrl:
+      findSocialLink(anime),
+    trailerUrl:
+      findTrailerLink(anime)
   };
 }
 
@@ -184,37 +274,19 @@ function getBestWatchTarget(anime) {
   const fields =
     getAnimeLinkFields(anime);
 
-  if (fields.streamingUrl) {
-    return {
-      url:
-        fields.streamingUrl,
-      label:
-        fields.streamingProvider
-          ? `Assistir no ${fields.streamingProvider}`
-          : 'Assistir',
-      isStreaming: true,
-      provider:
-        fields.streamingProvider
-    };
-  }
-
-  if (fields.animePageUrl) {
-    return {
-      url:
-        fields.animePageUrl,
-      label:
-        'Ver pagina do anime',
-      isStreaming: false,
-      provider: null
-    };
-  }
-
   return {
-    url: null,
+    url:
+      fields.streamingUrl,
     label:
-      'Ver pagina do anime',
-    isStreaming: false,
-    provider: null
+      'Assistir',
+    isStreaming:
+      Boolean(fields.streamingUrl),
+    provider:
+      fields.streamingProvider,
+    officialSiteUrl:
+      fields.officialSiteUrl,
+    animePageUrl:
+      fields.animePageUrl
   };
 }
 
@@ -222,5 +294,8 @@ module.exports = {
   getAnimeLinkFields,
   getBestWatchTarget,
   isBlockedUrl,
+  isReferenceUrl,
+  isSocialUrl,
+  isTrailerUrl,
   isValidUrl
 };
