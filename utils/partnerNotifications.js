@@ -325,5 +325,6 @@ async function notifyPartnerChannels({
 }
 
 module.exports = {
+  createReleasePayload,
   notifyPartnerChannels
 };
