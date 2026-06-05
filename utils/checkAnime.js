@@ -1114,17 +1114,6 @@ const sent24h =
                 animeTitle:
                   data.title.romaji,
                 payload: {
-                  ...(
-                    watchTarget.isStreaming
-                      ? {}
-                      : {
-                          content:
-                            t(
-                              null,
-                              'watch_link_not_found_notice'
-                            )
-                        }
-                  ),
                   embeds: [embed],
                   components: [
                     createWatchOpenRow({
