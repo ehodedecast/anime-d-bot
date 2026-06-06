@@ -6,6 +6,7 @@ const clear = require('../commands/clear');
 const remove = require('../commands/remove');
 const setChannel = require('../commands/setchannel');
 const language = require('../commands/language');
+const userlanguage = require('../commands/userlanguage');
 const help = require('../commands/help');
 const botstats = require('../commands/botstats');
 const resetdata = require('../commands/resetdata');
@@ -143,7 +144,8 @@ async function handleSlashCommand(
     ) &&
     command !== 'setchannel' &&
     command !== 'botstats' &&
-    command !== 'resetdata'
+    command !== 'resetdata' &&
+    command !== 'userlanguage'
   ) {
 
     return interaction.reply({
@@ -158,7 +160,8 @@ async function handleSlashCommand(
     interaction.channelId !== effectiveChannelId &&
     command !== 'setchannel' &&
     command !== 'botstats' &&
-    command !== 'resetdata'
+    command !== 'resetdata' &&
+    command !== 'userlanguage'
   ) {
 
     return interaction.reply({
@@ -314,6 +317,17 @@ async function handleSlashCommand(
 
     return language(
       message
+    );
+  }
+
+  if (command === 'userlanguage') {
+
+    return runCommand(
+      interaction,
+      command,
+      () => userlanguage(
+        message
+      )
     );
   }
 

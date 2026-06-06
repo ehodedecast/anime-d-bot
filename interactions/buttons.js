@@ -25,7 +25,9 @@ const remove =
   require('../commands/remove');
 
 const {
-  t
+  t,
+  tUser,
+  normalizeLanguage
 } = require('../utils/language');
 
 const {
@@ -36,7 +38,8 @@ const {
 const {
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle
+  ButtonStyle,
+  PermissionFlagsBits
 } = require('discord.js');
 
 const state =
@@ -66,6 +69,7 @@ const {
 } = require('../utils/episodeActionButtons');
 
 const {
+  setUserLanguage,
   getEpisodeProgress,
   markEpisodeOpened,
   markEpisodeWatched
@@ -465,8 +469,8 @@ module.exports = async (
     ) {
       return interaction.reply({
         content:
-          t(
-            interaction.guild?.id || null,
+          tUser(
+            interaction.user.id,
             'watch_link_not_found_notice'
           ),
         ephemeral: true
@@ -486,8 +490,8 @@ module.exports = async (
 
     return interaction.update({
       content:
-        t(
-          interaction.guild?.id || null,
+        tUser(
+          interaction.user.id,
           'watch_opened'
         ),
       components: [
@@ -504,7 +508,9 @@ module.exports = async (
             watchTarget.officialSiteUrl,
           guildId:
             interaction.guild?.id ||
-            null
+            null,
+          userIdForLanguage:
+            interaction.user.id
         })
       ]
     });
@@ -547,8 +553,8 @@ module.exports = async (
 
       return interaction.reply({
         content:
-          t(
-            interaction.guild?.id || null,
+          tUser(
+            interaction.user.id,
             'watch_first_required'
           ),
         ephemeral: true
@@ -579,13 +585,15 @@ module.exports = async (
           watchTarget.officialSiteUrl,
         guildId:
           interaction.guild?.id ||
-          null
+          null,
+        userIdForLanguage:
+          interaction.user.id
       });
 
     return interaction.update({
       content:
-        `✅ ${t(
-          interaction.guild?.id || null,
+        `✅ ${tUser(
+          interaction.user.id,
           'watch_marked'
         )}`,
       components:
@@ -628,7 +636,10 @@ module.exports = async (
 
       return interaction.reply({
         content:
-          'Esta selecao expirou. Execute o comando novamente.',
+          t(
+            guildId,
+            'selection_expired'
+          ),
         ephemeral: true
       });
     }
@@ -650,7 +661,10 @@ module.exports = async (
 
       return interaction.reply({
         content:
-          'Selecao invalida. Execute o comando novamente.',
+          t(
+            guildId,
+            'selection_invalid'
+          ),
         ephemeral: true
       });
     }
@@ -794,8 +808,8 @@ module.exports = async (
 
     return interaction.reply({
       content:
-        t(
-          guildId,
+        tUser(
+          interaction.user.id,
           'profile_coming_soon'
         ),
       ephemeral: true
@@ -1025,6 +1039,21 @@ module.exports = async (
     interaction.customId === 'lang_es'
   ) {
 
+    if (
+      !interaction.memberPermissions?.has(
+        PermissionFlagsBits.ManageGuild
+      )
+    ) {
+      return interaction.reply({
+        content:
+          t(
+            guildId,
+            'no_permission'
+          ),
+        ephemeral: true
+      });
+    }
+
     const config =
       loadConfig();
 
@@ -1046,15 +1075,57 @@ module.exports = async (
 
     saveConfig(config);
 
-    const messages = {
-      pt: 'Idioma alterado para Portugues.',
-      en: 'Language changed to English.',
-      es: 'Idioma cambiado a Espanol.'
-    };
+    return interaction.reply({
+      content:
+        t(
+          guildId,
+          'language.updated'
+        ),
+      ephemeral: true
+    });
+  }
+
+  if (
+    interaction.customId === 'user_lang_pt' ||
+    interaction.customId === 'user_lang_en' ||
+    interaction.customId === 'user_lang_es'
+  ) {
+
+    const language =
+      normalizeLanguage(
+        interaction.customId.replace(
+          'user_lang_',
+          ''
+        )
+      );
+
+    if (
+      !language
+    ) {
+      return interaction.reply({
+        content:
+          tUser(
+            interaction.user.id,
+            'language.invalid',
+            guildId
+          ),
+        ephemeral: true
+      });
+    }
+
+    setUserLanguage(
+      interaction.user.id,
+      interaction.user.username,
+      language
+    );
 
     return interaction.reply({
       content:
-        messages[language],
+        tUser(
+          interaction.user.id,
+          'user_language.updated',
+          guildId
+        ),
       ephemeral: true
     });
   }

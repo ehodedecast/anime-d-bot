@@ -26,7 +26,8 @@ const {
 } = require('./userProfileStorage');
 
 const {
-  t
+  t,
+  tUser
 } = require('./language');
 
 function getAnimeTitle(anime) {
@@ -106,7 +107,7 @@ async function sendTrailerDm({
       );
 
     await user.send(
-      t(guildId, 'trailer_available')
+      tUser(targetUserId, 'trailer_available', guildId)
         .replace('{anime}', animeTitle) +
       `\n\n${trailerUrl}`
     );

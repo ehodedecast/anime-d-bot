@@ -4,6 +4,9 @@ const chalk = require('chalk').default;
 
 const { t } =
   require('./language');
+const {
+  tUser
+} = require('./language');
 
 const {
   loadUserAnimes,
@@ -214,6 +217,30 @@ function getWarningMessage(hoursLeft) {
 
   return t(
     null,
+    'episode_less_than_24h'
+  );
+}
+
+function getUserWarningMessage(
+  userId,
+  hoursLeft
+) {
+  if (hoursLeft <= 1) {
+    return tUser(
+      userId,
+      'episode_less_than_1h'
+    );
+  }
+
+  if (hoursLeft <= 6) {
+    return tUser(
+      userId,
+      'episode_less_than_6h'
+    );
+  }
+
+  return tUser(
+    userId,
     'episode_less_than_24h'
   );
 }
@@ -1052,8 +1079,11 @@ const sent24h =
               content:
               
                 `⏰ ${data.title.romaji} • ` +
-                `Episódio ${data.nextAiringEpisode.episode} ` +
-                warningMessage
+                `${tUser(userId, 'episode_label')} ${data.nextAiringEpisode.episode} ` +
+                getUserWarningMessage(
+                  userId,
+                  hoursLeft
+                )
     },
     options
   });
@@ -1088,17 +1118,32 @@ const sent24h =
             const embed =
               new EmbedBuilder()
                 .setColor(0xff6600)
-                .setTitle('🚨 Episódio Disponível!')
+                .setTitle(
+                  tUser(
+                    userId,
+                    'release_embed_title'
+                  )
+                )
                 .setDescription(
-                  `📺 **${data.title.romaji}**\n` +
-                  `🎯 Episódio ${data.nextAiringEpisode.episode} já está disponível!`
+                  tUser(
+                    userId,
+                    'release_embed_description'
+                  )
+                    .replace('{anime}', data.title.romaji)
+                    .replace(
+                      '{episode}',
+                      data.nextAiringEpisode.episode
+                    )
                 )
                 .setImage(
                   data.coverImage?.large
                 )
                 .setFooter({
                   text:
-                    'AnimeDBot • Boa sessão 🍿'
+                    tUser(
+                      userId,
+                      'release_embed_footer'
+                    )
                 })
                 .setTimestamp();
 
@@ -1124,6 +1169,8 @@ const sent24h =
                         data.nextAiringEpisode
                           .episode,
                       guildId: null,
+                      userIdForLanguage:
+                        userId,
                       hasStreaming:
                         watchTarget.isStreaming,
                       officialSiteUrl:

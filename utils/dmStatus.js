@@ -1,7 +1,6 @@
-const DM_CLOSED_WARNING =
-  '⚠️ Nao consegui te enviar uma DM.\n\n' +
-  'O AnimeDBot usa mensagens privadas para avisar sobre novos episodios.\n\n' +
-  'Ative suas DMs para receber avisos de 24h e lancamentos.';
+const {
+  tUser
+} = require('./language');
 
 async function canSendDm(user) {
   try {
@@ -24,7 +23,11 @@ async function warnDmClosed(
   try {
     const payload = {
       content:
-        DM_CLOSED_WARNING,
+        tUser(
+          interaction.user.id,
+          'dm_closed_warning',
+          interaction.guild?.id
+        ),
       ephemeral: true
     };
 
@@ -78,6 +81,5 @@ async function runWithDmStatusWarning(
 module.exports = {
   canSendDm,
   warnDmClosed,
-  runWithDmStatusWarning,
-  DM_CLOSED_WARNING
+  runWithDmStatusWarning
 };

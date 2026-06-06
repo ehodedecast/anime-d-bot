@@ -10,8 +10,26 @@ const {
 } = require('./animeLinks');
 
 const {
-  t
+  t,
+  tUser
 } = require('./language');
+
+function translate({
+  guildId,
+  userIdForLanguage,
+  key
+}) {
+  return userIdForLanguage
+    ? tUser(
+        userIdForLanguage,
+        key,
+        guildId
+      )
+    : t(
+        guildId,
+        key
+      );
+}
 
 function createWatchOpenCustomId({
   userId,
@@ -50,6 +68,7 @@ function createWatchOpenRow({
   animeId,
   episode,
   guildId = null,
+  userIdForLanguage = null,
   hasStreaming = true,
   officialSiteUrl = null
 }) {
@@ -69,7 +88,11 @@ function createWatchOpenRow({
           })
         )
         .setLabel(
-          t(guildId, 'watch_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'watch_button'
+          })
         )
         .setStyle(ButtonStyle.Primary)
     );
@@ -80,7 +103,11 @@ function createWatchOpenRow({
           `watch_missing:${userId}:${animeId}:${episode}`
         )
         .setLabel(
-          t(guildId, 'watch_link_not_found')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'watch_link_not_found'
+          })
         )
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(true)
@@ -93,7 +120,11 @@ function createWatchOpenRow({
     row.addComponents(
       new ButtonBuilder()
         .setLabel(
-          t(guildId, 'official_site_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'official_site_button'
+          })
         )
         .setStyle(ButtonStyle.Link)
         .setURL(
@@ -111,7 +142,8 @@ function createWatchReadyRow({
   episode,
   url,
   officialSiteUrl = null,
-  guildId = null
+  guildId = null,
+  userIdForLanguage = null
 }) {
   const row =
     new ActionRowBuilder();
@@ -122,7 +154,11 @@ function createWatchReadyRow({
     row.addComponents(
       new ButtonBuilder()
         .setLabel(
-          t(guildId, 'watch_again_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'watch_again_button'
+          })
         )
         .setStyle(ButtonStyle.Link)
         .setURL(url)
@@ -135,7 +171,11 @@ function createWatchReadyRow({
     row.addComponents(
       new ButtonBuilder()
         .setLabel(
-          t(guildId, 'official_site_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'official_site_button'
+          })
         )
         .setStyle(ButtonStyle.Link)
         .setURL(
@@ -157,7 +197,11 @@ function createWatchReadyRow({
           })
         )
         .setLabel(
-          t(guildId, 'watched_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'watched_button'
+          })
         )
         .setStyle(ButtonStyle.Success)
     );
@@ -169,7 +213,8 @@ function createWatchReadyRow({
 function createWatchedRow({
   url,
   officialSiteUrl = null,
-  guildId = null
+  guildId = null,
+  userIdForLanguage = null
 }) {
   const row =
     new ActionRowBuilder();
@@ -180,7 +225,11 @@ function createWatchedRow({
     row.addComponents(
       new ButtonBuilder()
         .setLabel(
-          t(guildId, 'watch_again_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'watch_again_button'
+          })
         )
         .setStyle(ButtonStyle.Link)
         .setURL(url)
@@ -193,7 +242,11 @@ function createWatchedRow({
     row.addComponents(
       new ButtonBuilder()
         .setLabel(
-          t(guildId, 'official_site_button')
+          translate({
+            guildId,
+            userIdForLanguage,
+            key: 'official_site_button'
+          })
         )
         .setStyle(ButtonStyle.Link)
         .setURL(

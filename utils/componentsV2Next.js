@@ -10,7 +10,10 @@ const {
   ThumbnailBuilder
 } = require('discord.js');
 
-const { t } =
+const {
+  t,
+  tUser
+} =
   require('./language');
 
 const {
@@ -70,6 +73,7 @@ function getUserAvatarUrl(
 
 function formatAnimeItem({
   guildId,
+  userIdForLanguage,
   anime,
   formattedDate,
   timeLeft
@@ -78,26 +82,29 @@ function formatAnimeItem({
   const timeLeftLabel =
     getTimeLeftLabel(
       guildId,
+      userIdForLanguage,
       anime.timeLeft
     );
 
   return [
     `### ${anime.title}`,
-    `${t(guildId, 'next_field_episode')}: Ep ${anime.episode}`,
+    `${tUser(userIdForLanguage, 'next_field_episode', guildId)}: Ep ${anime.episode}`,
     `${timeLeftLabel}: ${timeLeft}`,
-    `${t(guildId, 'next_field_airing')}: ${formattedDate}`
+    `${tUser(userIdForLanguage, 'next_field_airing', guildId)}: ${formattedDate}`
   ].join('\n');
 }
 
 function getTimeLeftLabel(
   guildId,
+  userIdForLanguage,
   timeLeftMs
 ) {
 
   const label =
-    t(
-      guildId,
-      'next_field_time_left'
+    tUser(
+      userIdForLanguage,
+      'next_field_time_left',
+      guildId
     );
 
   if (
@@ -124,6 +131,7 @@ function getTimeLeftLabel(
 function addAnimeCard({
   container,
   guildId,
+  userIdForLanguage,
   anime,
   formattedDate,
   timeLeft
@@ -132,6 +140,7 @@ function addAnimeCard({
   const content =
     formatAnimeItem({
       guildId,
+      userIdForLanguage,
       anime,
       formattedDate,
       timeLeft
@@ -171,6 +180,9 @@ function createNextPayload({
   formatTimeLeft,
   user
 }) {
+  const userIdForLanguage =
+    user?.id;
+
 
   const avatarUrl =
     getUserAvatarUrl(
@@ -185,7 +197,7 @@ function createNextPayload({
           .addTextDisplayComponents(
             new TextDisplayBuilder()
               .setContent(
-                `# ${t(guildId, 'next_dashboard_title')}`
+                `# ${tUser(userIdForLanguage, 'next_dashboard_title', guildId)}`
               )
           )
           .setThumbnailAccessory(
@@ -201,9 +213,10 @@ function createNextPayload({
       .addTextDisplayComponents(
         new TextDisplayBuilder()
           .setContent(
-            t(
-              guildId,
-              'next_dashboard_description'
+            tUser(
+              userIdForLanguage,
+              'next_dashboard_description',
+              guildId
             )
           )
       )
@@ -236,6 +249,7 @@ function createNextPayload({
     addAnimeCard({
       container,
       guildId,
+      userIdForLanguage,
       anime,
       formattedDate,
       timeLeft:
@@ -283,7 +297,10 @@ function createNextPayload({
             disabled:
               safePage >= totalPages - 1
           }),
-          createMenuBackButton()
+          createMenuBackButton(
+            guildId,
+            userIdForLanguage
+          )
         )
     );
 

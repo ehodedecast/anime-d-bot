@@ -158,11 +158,57 @@ function ensureUserProfile(
   data[userId].trailers =
     data[userId].trailers || {};
 
+  data[userId].preferences =
+    data[userId].preferences || {};
+
   saveUserProfiles(
     data
   );
 
   return data[userId];
+}
+
+function setUserLanguage(
+  userId,
+  username,
+  language
+) {
+
+  const profiles =
+    loadUserProfiles();
+
+  profiles[userId] =
+    profiles[userId] || {
+      username
+    };
+
+  profiles[userId].username =
+    username ||
+    profiles[userId].username ||
+    'Unknown User';
+
+  profiles[userId].preferences =
+    profiles[userId].preferences || {};
+
+  profiles[userId].preferences.language =
+    language;
+
+  saveUserProfiles(
+    profiles
+  );
+
+  return profiles[userId];
+}
+
+function getUserPreferences(
+  userId
+) {
+
+  const profiles =
+    loadUserProfiles();
+
+  return profiles[userId]
+    ?.preferences || {};
 }
 
 function getTrailerEntry(
@@ -523,6 +569,8 @@ module.exports = {
   loadUserProfiles,
   saveUserProfiles,
   ensureUserProfile,
+  setUserLanguage,
+  getUserPreferences,
   markTrailerWaiting,
   markTrailerSent,
   getPendingTrailerEntries,

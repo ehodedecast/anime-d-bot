@@ -62,6 +62,10 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
+    .setName('userlanguage')
+    .setDescription('Choose your personal AnimeDBot language.'),
+
+  new SlashCommandBuilder()
     .setName('setchannel')
     .setDescription('Set the current channel as AnimeDBot channel.')
     .setDefaultMemberPermissions(

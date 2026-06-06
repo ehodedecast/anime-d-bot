@@ -3,7 +3,10 @@ const {
   getUserAnimeList
 } = require('../utils/userAnimeStorage');
 const { loadCache } = require('../utils/cacheManager');
-const { t, getGuildLanguage } = require('../utils/language');
+const {
+  tUser,
+  getUserLanguage
+} = require('../utils/language');
 const {
   createBackToMenuRow
 } = require('../utils/navigationButtons');
@@ -41,10 +44,10 @@ const copy = {
   }
 };
 
-function getCopy(guildId) {
+function getCopy(userId, guildId) {
 
   const language =
-    getGuildLanguage(guildId);
+    getUserLanguage(userId, guildId);
 
   return copy[language] || copy.en;
 }
@@ -139,7 +142,10 @@ function list(message) {
     loadCache();
 
   const labels =
-    getCopy(message.guild.id);
+    getCopy(
+      message.author.id,
+      message.guild.id
+    );
 
   const animeList =
     getUserAnimeList(
@@ -188,7 +194,11 @@ function list(message) {
           )
       })
       .setTitle(
-        t(message.guild.id, 'list_header')
+        tUser(
+          message.author.id,
+          'list_header',
+          message.guild.id
+        )
       )
       .setDescription(
         labels.description
@@ -235,7 +245,10 @@ function list(message) {
   return message.reply({
     embeds: [embed],
     components: [
-      createBackToMenuRow()
+      createBackToMenuRow(
+        message.guild.id,
+        message.author.id
+      )
     ]
   });
 }

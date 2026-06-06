@@ -116,5 +116,21 @@
   "watch_marked": "Episodio marcado como visto.",
   "// TRAILER": "",
   "trailer_available": "🎬 El trailer de {anime} acaba de estrenarse!",
-  "trailer_dm_failed": "No pude enviar el trailer por DM a"
+  "trailer_dm_failed": "No pude enviar el trailer por DM a",
+  "user_language.title": "Idioma personal",
+  "user_language.description": "Elige el idioma que AnimeDBot debe usar en tus DMs y vistas personales.",
+  "user_language.updated": "Idioma personal actualizado.",
+  "// NAVIGATION": "",
+  "nav_back_menu": "Volver al Menu",
+  "nav_add_again": "Agregar Otro Anime",
+  "nav_info_again": "Buscar Otro Anime",
+  "nav_remove_again": "Eliminar Otro Anime",
+  "episode_label": "Episodio",
+  "release_embed_title": "?? Episodio Disponible!",
+  "release_embed_description": "?? **{anime}**\n?? Episodio {episode} ya esta disponible!",
+  "release_embed_footer": "AnimeDBot ? Disfruta el episodio",
+  "dm_closed_warning": "?? No pude enviarte un DM.\n\nAnimeDBot usa mensajes privados para avisarte sobre nuevos episodios.\n\nActiva tus DMs para recibir avisos de 24h y lanzamientos.",
+  "language.updated": "Idioma del servidor actualizado.",
+  "language.invalid": "Idioma inv?lido.",
+  "selection_expired": "Esta selecci?n expir?. Ejecuta el comando nuevamente."
 }

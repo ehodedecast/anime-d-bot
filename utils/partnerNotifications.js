@@ -18,6 +18,10 @@ const {
   savePartnerSentEpisodes
 } = require('./partnerChannelStorage');
 
+const {
+  t
+} = require('./language');
+
 function normalize(value) {
   return String(value || '')
     .toLowerCase()
@@ -156,14 +160,17 @@ function createReleasePayload(anime) {
   const embed =
     new EmbedBuilder()
       .setColor(0xff6600)
-      .setTitle('🚨 Episódio Disponível!')
+      .setTitle(
+        t(null, 'release_embed_title')
+      )
       .setDescription(
-        `📺 **${title}**\n` +
-        `🎯 Episódio ${episode} já está disponível!`
+        t(null, 'release_embed_description')
+          .replace('{anime}', title)
+          .replace('{episode}', episode)
       )
       .setFooter({
         text:
-          'AnimeDBot • Boa sessão'
+          t(null, 'release_embed_footer')
       })
       .setTimestamp();
 
@@ -218,7 +225,7 @@ function create24hPayload(
   return {
     content:
       `⏰ ${title} • ` +
-      `Episódio ${anime.nextAiringEpisode?.episode} ` +
+      `${t(null, 'episode_label')} ${anime.nextAiringEpisode?.episode} ` +
       warningMessage
   };
 }

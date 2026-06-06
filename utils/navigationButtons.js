@@ -4,11 +4,35 @@ const {
   ButtonStyle
 } = require('discord.js');
 
-function createMenuBackButton() {
+const {
+  t,
+  tUser
+} = require('./language');
+
+function translate(
+  guildId,
+  userId,
+  key
+) {
+  return userId
+    ? tUser(userId, key, guildId)
+    : t(guildId, key);
+}
+
+function createMenuBackButton(
+  guildId = null,
+  userId = null
+) {
 
   return new ButtonBuilder()
     .setCustomId('menu_back')
-    .setLabel('Voltar ao Menu')
+    .setLabel(
+      translate(
+        guildId,
+        userId,
+        'nav_back_menu'
+      )
+    )
     .setStyle(ButtonStyle.Secondary);
 }
 
@@ -24,13 +48,18 @@ function createActionButton(
 }
 
 function createNavigationRow(
-  action
+  action,
+  guildId = null,
+  userId = null
 ) {
 
   const row =
     new ActionRowBuilder()
       .addComponents(
-        createMenuBackButton()
+        createMenuBackButton(
+          guildId,
+          userId
+        )
       );
 
   if (action) {
@@ -46,33 +75,76 @@ function createNavigationRow(
   return row;
 }
 
-function createBackToMenuRow() {
+function createBackToMenuRow(
+  guildId = null,
+  userId = null
+) {
 
-  return createNavigationRow();
+  return createNavigationRow(
+    null,
+    guildId,
+    userId
+  );
 }
 
-function createAddNavigationRow() {
+function createAddNavigationRow(
+  guildId = null,
+  userId = null
+) {
 
-  return createNavigationRow({
-    customId: 'add_again',
-    label: 'Adicionar Outro Anime'
-  });
+  return createNavigationRow(
+    {
+      customId: 'add_again',
+      label:
+        translate(
+          guildId,
+          userId,
+          'nav_add_again'
+        )
+    },
+    guildId,
+    userId
+  );
 }
 
-function createInfoNavigationRow() {
+function createInfoNavigationRow(
+  guildId = null,
+  userId = null
+) {
 
-  return createNavigationRow({
-    customId: 'info_again',
-    label: 'Pesquisar Outro Anime'
-  });
+  return createNavigationRow(
+    {
+      customId: 'info_again',
+      label:
+        translate(
+          guildId,
+          userId,
+          'nav_info_again'
+        )
+    },
+    guildId,
+    userId
+  );
 }
 
-function createRemoveNavigationRow() {
+function createRemoveNavigationRow(
+  guildId = null,
+  userId = null
+) {
 
-  return createNavigationRow({
-    customId: 'remove_again',
-    label: 'Remover Outro Anime'
-  });
+  return createNavigationRow(
+    {
+      customId: 'remove_again',
+      label:
+        translate(
+          guildId,
+          userId,
+          'nav_remove_again'
+        )
+    },
+    guildId,
+    userId
+  );
 }
 
 module.exports = {

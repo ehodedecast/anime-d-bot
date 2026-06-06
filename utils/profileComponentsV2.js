@@ -12,12 +12,13 @@ const {
   TextDisplayBuilder
 } = require('discord.js');
 
-const { t } =
+const { tUser } =
   require('./language');
 
 function createProfilePayload(
   guildId,
-  avatarUrl
+  avatarUrl,
+  userId
 ) {
 
   const container =
@@ -28,7 +29,7 @@ function createProfilePayload(
           .addTextDisplayComponents(
             new TextDisplayBuilder()
               .setContent(
-                `# ${t(guildId, 'profile_title')}`
+                `# ${tUser(userId, 'profile_title', guildId)}`
               )
           )
           .setThumbnailAccessory(
@@ -57,7 +58,7 @@ function createProfilePayload(
                 'profile_achievements'
               )
               .setLabel(
-                t(guildId, 'profile_achievements')
+                tUser(userId, 'profile_achievements', guildId)
               )
               .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
@@ -65,7 +66,7 @@ function createProfilePayload(
                 'profile_titles'
               )
               .setLabel(
-                t(guildId, 'profile_titles')
+                tUser(userId, 'profile_titles', guildId)
               )
               .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
@@ -73,13 +74,13 @@ function createProfilePayload(
                 'profile_history'
               )
               .setLabel(
-                t(guildId, 'profile_history')
+                tUser(userId, 'profile_history', guildId)
               )
               .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
               .setCustomId('menu_back')
               .setLabel(
-                t(guildId, 'profile_back')
+                tUser(userId, 'profile_back', guildId)
               )
               .setStyle(ButtonStyle.Primary)
           )

@@ -106,7 +106,8 @@ async function profile(
       message.guild.id,
       getUserAvatarUrl(
         message.author
-      )
+      ),
+      message.author.id
     ),
     files: [
       attachment
