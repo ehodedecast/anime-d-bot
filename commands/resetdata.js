@@ -1,4 +1,8 @@
 const {
+  MessageFlags
+} = require('discord.js');
+
+const {
   resetAnimeDBotData,
   detectEnvironment
 } = require('../utils/dataReset');
@@ -79,7 +83,7 @@ async function resetdata(
     return interaction.reply({
       content:
         'Você não tem permissão para utilizar este comando.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -96,7 +100,7 @@ async function resetdata(
     return interaction.reply({
       content:
         'Confirmação inválida.\n\nPara executar este comando você deve informar:\n\nRESET_ANIMEDBOT_DATA\n\nNenhuma alteração foi realizada.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -118,7 +122,7 @@ async function resetdata(
         '',
         'Iniciando reset...'
       ].join('\n'),
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 
   const result =

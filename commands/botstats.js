@@ -1,6 +1,7 @@
 const fs = require('fs');
 const {
-  version: discordVersion
+  version: discordVersion,
+  MessageFlags
 } = require('discord.js');
 
 const {
@@ -389,7 +390,7 @@ const totalVotes =
   return message.reply({
     content:
       `Status enviado em botstats.`,
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 
 } catch {
@@ -397,7 +398,7 @@ const totalVotes =
   return message.reply({
     content:
       `Não consegui enviar o status no canal botstats.`,
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 }
 }

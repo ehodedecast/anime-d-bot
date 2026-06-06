@@ -39,6 +39,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  MessageFlags,
   PermissionFlagsBits
 } = require('discord.js');
 
@@ -147,7 +148,7 @@ function validateWatchButtonOwner(
     return interaction.reply({
       content:
         'Este botao pertence a outro usuario.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -373,7 +374,7 @@ module.exports = async (
       return interaction.reply({
         content:
           'Você não tem permissão para utilizar este botão.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -416,7 +417,7 @@ module.exports = async (
       return interaction.reply({
         content:
           'Você não tem permissão para utilizar este botão.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -473,7 +474,7 @@ module.exports = async (
             interaction.user.id,
             'watch_link_not_found_notice'
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -557,7 +558,7 @@ module.exports = async (
             interaction.user.id,
             'watch_first_required'
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -640,7 +641,7 @@ module.exports = async (
             guildId,
             'selection_expired'
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -665,7 +666,7 @@ module.exports = async (
             guildId,
             'selection_invalid'
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -748,7 +749,7 @@ module.exports = async (
       return interaction.reply({
         content:
           'Anime nao encontrado na lista atual.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -812,7 +813,7 @@ module.exports = async (
           interaction.user.id,
           'profile_coming_soon'
         ),
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -907,7 +908,7 @@ module.exports = async (
     );
 
     await interaction.deferReply({
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
 
     return next(
@@ -930,7 +931,7 @@ module.exports = async (
     );
 
     await interaction.deferReply({
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
 
     return list(
@@ -983,7 +984,7 @@ module.exports = async (
           'clear_warning'
         ),
       components: [row],
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -1050,7 +1051,7 @@ module.exports = async (
             guildId,
             'no_permission'
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -1081,7 +1082,7 @@ module.exports = async (
           guildId,
           'language.updated'
         ),
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -1109,7 +1110,7 @@ module.exports = async (
             'language.invalid',
             guildId
           ),
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -1126,7 +1127,7 @@ module.exports = async (
           'user_language.updated',
           guildId
         ),
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 };

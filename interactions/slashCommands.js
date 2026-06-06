@@ -13,7 +13,8 @@ const resetdata = require('../commands/resetdata');
 const profile = require('../commands/profile');
 const sendMenu = require('./menu');
 const {
-  PermissionFlagsBits
+  PermissionFlagsBits,
+  MessageFlags
 } = require('discord.js');
 
 const {
@@ -133,7 +134,7 @@ async function handleSlashCommand(
     return interaction.reply({
       content:
         'Apenas o administrador do bot pode usar este comando.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -151,7 +152,7 @@ async function handleSlashCommand(
     return interaction.reply({
       content:
         'Este servidor ainda nao configurou um canal. Use /setchannel no canal desejado.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -167,7 +168,7 @@ async function handleSlashCommand(
     return interaction.reply({
       content:
         `Este servidor esta configurado para usar comandos em <#${effectiveChannelId}>.`,
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -184,7 +185,7 @@ async function handleSlashCommand(
 
     return interaction.reply({
       content: 'Voce nao tem permissao para usar este comando.',
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -215,7 +216,7 @@ async function handleSlashCommand(
       command,
       async () => {
         await interaction.deferReply({
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
 
         return list(
@@ -244,7 +245,7 @@ async function handleSlashCommand(
       command,
       async () => {
         await interaction.deferReply({
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
 
         return next(
@@ -303,7 +304,7 @@ async function handleSlashCommand(
       command,
       async () => {
         await interaction.deferReply({
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
 
         return profile(

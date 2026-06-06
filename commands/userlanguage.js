@@ -2,7 +2,8 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  EmbedBuilder
+  EmbedBuilder,
+  MessageFlags
 } = require('discord.js');
 
 const {
@@ -72,7 +73,7 @@ async function userlanguage(
   return message.reply({
     embeds: [embed],
     components: [row],
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
 }
 

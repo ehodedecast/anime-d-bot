@@ -2,6 +2,10 @@ const {
   tUser
 } = require('./language');
 
+const {
+  MessageFlags
+} = require('discord.js');
+
 async function canSendDm(user) {
   try {
     if (
@@ -28,7 +32,7 @@ async function warnDmClosed(
           'dm_closed_warning',
           interaction.guild?.id
         ),
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     };
 
     if (

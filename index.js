@@ -1,6 +1,7 @@
 const {
   Client,
-  GatewayIntentBits
+  GatewayIntentBits,
+  MessageFlags
 } = require('discord.js');
 
 require('dotenv').config();
@@ -155,7 +156,7 @@ client.on(
       const payload = {
         content:
           'Erro ao processar a interação.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       };
 
       if (
