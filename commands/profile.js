@@ -126,7 +126,6 @@ async function profile(
   return message.reply({
     ...createProfilePayload(
       message.guild.id,
-      avatarUrl,
       message.author.id
     ),
     files: [

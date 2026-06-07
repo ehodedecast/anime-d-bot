@@ -6,10 +6,7 @@ const {
   MediaGalleryBuilder,
   MediaGalleryItemBuilder,
   MessageFlags,
-  SeparatorBuilder,
-  SectionBuilder,
-  ThumbnailBuilder,
-  TextDisplayBuilder
+  SeparatorBuilder
 } = require('discord.js');
 
 const { tUser } =
@@ -17,26 +14,12 @@ const { tUser } =
 
 function createProfilePayload(
   guildId,
-  avatarUrl,
   userId
 ) {
 
   const container =
     new ContainerBuilder()
       .setAccentColor(0x5865F2)
-      .addSectionComponents(
-        new SectionBuilder()
-          .addTextDisplayComponents(
-            new TextDisplayBuilder()
-              .setContent(
-                `# ${tUser(userId, 'profile_title', guildId)}`
-              )
-          )
-          .setThumbnailAccessory(
-            new ThumbnailBuilder()
-              .setURL(avatarUrl)
-          )
-      )
       .addMediaGalleryComponents(
         new MediaGalleryBuilder()
           .addItems(
