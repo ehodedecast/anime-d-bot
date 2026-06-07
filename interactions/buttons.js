@@ -907,9 +907,7 @@ module.exports = async (
       interaction.user.id
     );
 
-    await interaction.deferReply({
-      flags: MessageFlags.Ephemeral
-    });
+    await interaction.deferReply();
 
     return next(
       createReplyAdapter(

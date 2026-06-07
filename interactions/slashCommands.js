@@ -244,9 +244,7 @@ async function handleSlashCommand(
       interaction,
       command,
       async () => {
-        await interaction.deferReply({
-          flags: MessageFlags.Ephemeral
-        });
+        await interaction.deferReply();
 
         return next(
           message,
