@@ -15,6 +15,10 @@ const {
 } = require('../utils/profileCardGenerator');
 
 const {
+  renderProfileImage
+} = require('../utils/profileImageRenderer');
+
+const {
   createProfilePayload
 } = require('../utils/profileComponentsV2');
 
@@ -42,7 +46,7 @@ function getUserAvatarUrl(
   if (typeof user.displayAvatarURL === 'function') {
     return user.displayAvatarURL({
       extension: 'png',
-      size: 256
+      size: 512
     });
   }
 
@@ -76,21 +80,39 @@ async function profile(
       anime.mode !== 'tracking'
     ).length;
 
-  const image =
-    generateProfileCard({
-      username:
-        message.author.username,
-      stats: {
-        animes:
-          tracking,
-        episodes:
-          countWatchedEpisodes(
-            userProfile
-          ),
-        library:
-          library || animeList.length
-      }
-    });
+  const avatarUrl =
+    getUserAvatarUrl(
+      message.author
+    );
+
+  let image;
+
+  try {
+    image =
+      await renderProfileImage({
+        avatarUrl
+      });
+  } catch (err) {
+    console.warn(
+      `[PROFILE] Sharp renderer failed, using fallback card: ${err.message}`
+    );
+
+    image =
+      generateProfileCard({
+        username:
+          message.author.username,
+        stats: {
+          animes:
+            tracking,
+          episodes:
+            countWatchedEpisodes(
+              userProfile
+            ),
+          library:
+            library || animeList.length
+        }
+      });
+  }
 
   const attachment =
     new AttachmentBuilder(
@@ -104,9 +126,7 @@ async function profile(
   return message.reply({
     ...createProfilePayload(
       message.guild.id,
-      getUserAvatarUrl(
-        message.author
-      ),
+      avatarUrl,
       message.author.id
     ),
     files: [
