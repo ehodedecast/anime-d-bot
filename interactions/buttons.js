@@ -73,8 +73,13 @@ const {
   setUserLanguage,
   getEpisodeProgress,
   markEpisodeOpened,
-  markEpisodeWatched
+  markEpisodeWatched,
+  addXp
 } = require('../utils/userProfileStorage');
+
+const {
+  XP_REWARDS
+} = require('../utils/xpSystem');
 
 function getOwnerId() {
 
@@ -557,6 +562,11 @@ module.exports = async (
       });
     }
 
+    const alreadyWatched =
+      Boolean(
+        progress?.watchedAt
+      );
+
     markEpisodeWatched({
       userId:
         parsed.userId,
@@ -567,6 +577,16 @@ module.exports = async (
       episode:
         parsed.episode
     });
+
+    if (
+      !alreadyWatched
+    ) {
+      addXp(
+        parsed.userId,
+        XP_REWARDS.episodeWatched,
+        interaction.user.username
+      );
+    }
 
     const watchTarget =
       getWatchTarget(

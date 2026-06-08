@@ -4,6 +4,10 @@ const fs =
 const PATH =
   './data/userProfiles.json';
 
+const {
+  getLevelFromXp
+} = require('./xpSystem');
+
 function ensureFile() {
 
   if (
@@ -141,19 +145,46 @@ function ensureUserProfile(
 
   data[userId].profile =
     data[userId].profile || {
-      level: 0,
+      level: 1,
       xp: 0,
       totalXp: 0
     };
 
+  const storedTotalXp =
+    Math.max(
+      0,
+      Math.floor(
+        Number(
+          data[userId].totalXp ??
+          data[userId].xp ??
+          data[userId].profile.totalXp ??
+          data[userId].profile.xp
+        ) || 0
+      )
+    );
+
+  const level =
+    getLevelFromXp(
+      storedTotalXp
+    );
+
+  data[userId].xp =
+    storedTotalXp;
+
+  data[userId].totalXp =
+    storedTotalXp;
+
+  data[userId].level =
+    level;
+
   data[userId].profile.level =
-    data[userId].profile.level || 0;
+    level;
 
   data[userId].profile.xp =
-    data[userId].profile.xp || 0;
+    storedTotalXp;
 
   data[userId].profile.totalXp =
-    data[userId].profile.totalXp || 0;
+    storedTotalXp;
 
   data[userId].trailers =
     data[userId].trailers || {};
@@ -166,6 +197,88 @@ function ensureUserProfile(
   );
 
   return data[userId];
+}
+
+function addXp(
+  userId,
+  amount,
+  username = 'Unknown User'
+) {
+
+  const profiles =
+    loadUserProfiles();
+
+  profiles[userId] =
+    profiles[userId] || {
+      username
+    };
+
+  profiles[userId].username =
+    username ||
+    profiles[userId].username ||
+    'Unknown User';
+
+  profiles[userId].profile =
+    profiles[userId].profile || {};
+
+  const currentTotalXp =
+    Math.max(
+      0,
+      Math.floor(
+        Number(
+          profiles[userId].totalXp ??
+          profiles[userId].xp ??
+          profiles[userId].profile.totalXp ??
+          profiles[userId].profile.xp
+        ) || 0
+      )
+    );
+
+  const addedXp =
+    Math.max(
+      0,
+      Math.floor(
+        Number(amount) || 0
+      )
+    );
+
+  const totalXp =
+    currentTotalXp + addedXp;
+
+  const level =
+    getLevelFromXp(
+      totalXp
+    );
+
+  profiles[userId].xp =
+    totalXp;
+
+  profiles[userId].totalXp =
+    totalXp;
+
+  profiles[userId].level =
+    level;
+
+  profiles[userId].profile.xp =
+    totalXp;
+
+  profiles[userId].profile.totalXp =
+    totalXp;
+
+  profiles[userId].profile.level =
+    level;
+
+  profiles[userId].preferences =
+    profiles[userId].preferences || {};
+
+  profiles[userId].trailers =
+    profiles[userId].trailers || {};
+
+  saveUserProfiles(
+    profiles
+  );
+
+  return profiles[userId];
 }
 
 function setUserLanguage(
@@ -569,6 +682,7 @@ module.exports = {
   loadUserProfiles,
   saveUserProfiles,
   ensureUserProfile,
+  addXp,
   setUserLanguage,
   getUserPreferences,
   markTrailerWaiting,

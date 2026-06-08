@@ -11,6 +11,18 @@ const {
   '../utils/voteStorage'
 );
 
+const {
+  addXp
+} = require(
+  '../utils/userProfileStorage'
+);
+
+const {
+  XP_REWARDS
+} = require(
+  '../utils/xpSystem'
+);
+
 const runtimeStatus =
   require('../state/runtimeStatus');
 
@@ -222,6 +234,11 @@ function startVoteServer(
         });
 
         saveVotes(votes);
+
+        addXp(
+          userId,
+          XP_REWARDS.topggVote
+        );
 
         console.log(
   `Vote saved for ${userId}. Total votes: ${votes[userId].totalVotes}`

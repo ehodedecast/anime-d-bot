@@ -84,7 +84,20 @@ function createCircleMask(
   );
 }
 
-function createProfileTextOverlay() {
+function escapeSvgText(
+  value
+) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function createProfileTextOverlay({
+  progress
+}) {
   const {
     width,
     height,
@@ -92,6 +105,21 @@ function createProfileTextOverlay() {
     level,
     xp
   } = PROFILE_TEXT_LAYOUT;
+
+  const levelText =
+    `Nível ${Math.max(
+      1,
+      Number(progress?.level) || 1
+    )}`;
+
+  const xpText =
+    `${Math.max(
+      0,
+      Number(progress?.currentXp) || 0
+    )} / ${Math.max(
+      0,
+      Number(progress?.requiredXp) || 0
+    )}`;
 
   return Buffer.from(`
     <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
@@ -113,7 +141,7 @@ function createProfileTextOverlay() {
         font-size="${level.fontSize}"
         font-weight="700"
         fill="#ffffff"
-      >N&#237;vel 0</text>
+      >${escapeSvgText(levelText)}</text>
       <text
         x="${xp.x}"
         y="${xp.y}"
@@ -122,7 +150,7 @@ function createProfileTextOverlay() {
         font-size="${xp.fontSize}"
         font-weight="600"
         fill="#dbeafe"
-      >0 / 1000</text>
+      >${escapeSvgText(xpText)}</text>
     </svg>
   `);
 }
@@ -167,7 +195,12 @@ async function createCircularAvatar({
 }
 
 async function renderProfileImage({
-  avatarUrl
+  avatarUrl,
+  progress = {
+    level: 1,
+    currentXp: 0,
+    requiredXp: 1000
+  }
 }) {
   const sharp =
     loadSharp();
@@ -207,7 +240,9 @@ async function renderProfileImage({
       },
       {
         input:
-          createProfileTextOverlay(),
+          createProfileTextOverlay({
+            progress
+          }),
         left:
           0,
         top:

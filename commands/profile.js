@@ -19,6 +19,10 @@ const {
 } = require('../utils/profileImageRenderer');
 
 const {
+  getCurrentLevelProgress
+} = require('../utils/xpSystem');
+
+const {
   createProfilePayload
 } = require('../utils/profileComponentsV2');
 
@@ -90,7 +94,15 @@ async function profile(
   try {
     image =
       await renderProfileImage({
-        avatarUrl
+        avatarUrl,
+        progress:
+          getCurrentLevelProgress(
+            userProfile.totalXp ??
+            userProfile.xp ??
+            userProfile.profile?.totalXp ??
+            userProfile.profile?.xp ??
+            0
+          )
       });
   } catch (err) {
     console.warn(
