@@ -107,7 +107,7 @@ function createProfileTextOverlay({
   } = PROFILE_TEXT_LAYOUT;
 
   const levelText =
-    `Nível ${Math.max(
+    `N\u00edvel ${Math.max(
       1,
       Number(progress?.level) || 1
     )}`;
@@ -199,7 +199,7 @@ async function renderProfileImage({
   progress = {
     level: 1,
     currentXp: 0,
-    requiredXp: 1000
+    requiredXp: 50
   }
 }) {
   const sharp =

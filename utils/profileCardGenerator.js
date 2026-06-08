@@ -281,7 +281,13 @@ function encodePng(image) {
 
 function generateProfileCard({
   username,
-  stats
+  stats,
+  progress = {
+    level: 1,
+    currentXp: 0,
+    requiredXp: 50,
+    totalXp: 0
+  }
 }) {
   const image =
     createImage(
@@ -298,9 +304,9 @@ function generateProfileCard({
 
   drawInitialsAvatar(image, username);
 
-  drawCenteredText(image, 'LEVEL 0', 505, 5, [255, 255, 255, 255]);
-  drawCenteredText(image, 'XP 0 / 100', 560, 4, [226, 232, 240, 255]);
-  drawCenteredText(image, 'TOTAL XP 0', 610, 4, [226, 232, 240, 255]);
+  drawCenteredText(image, `LEVEL ${progress.level}`, 505, 5, [255, 255, 255, 255]);
+  drawCenteredText(image, `XP ${progress.currentXp} / ${progress.requiredXp}`, 560, 4, [226, 232, 240, 255]);
+  drawCenteredText(image, `TOTAL XP ${progress.totalXp}`, 610, 4, [226, 232, 240, 255]);
 
   fillRect(image, 230, 685, 440, 90, [46, 55, 78, 255]);
   strokeRect(image, 230, 685, 440, 90, [0, 204, 255, 255], 4);

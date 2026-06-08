@@ -89,20 +89,22 @@ async function profile(
       message.author
     );
 
+  const progress =
+    getCurrentLevelProgress(
+      userProfile.totalXp ??
+      userProfile.xp ??
+      userProfile.profile?.totalXp ??
+      userProfile.profile?.xp ??
+      0
+    );
+
   let image;
 
   try {
     image =
       await renderProfileImage({
         avatarUrl,
-        progress:
-          getCurrentLevelProgress(
-            userProfile.totalXp ??
-            userProfile.xp ??
-            userProfile.profile?.totalXp ??
-            userProfile.profile?.xp ??
-            0
-          )
+        progress
       });
   } catch (err) {
     console.warn(
@@ -122,7 +124,8 @@ async function profile(
             ),
           library:
             library || animeList.length
-        }
+        },
+        progress
       });
   }
 
