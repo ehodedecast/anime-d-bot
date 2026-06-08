@@ -490,11 +490,6 @@ module.exports = async (
     });
 
     return interaction.update({
-      content:
-        tUser(
-          interaction.user.id,
-          'watch_opened'
-        ),
       components: [
         createWatchReadyRow({
           userId:
