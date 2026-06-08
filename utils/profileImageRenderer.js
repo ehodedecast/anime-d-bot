@@ -25,6 +25,28 @@ const AVATAR_PLACEMENT = {
   size: 332
 };
 
+const PROFILE_TEXT_LAYOUT = {
+  width: 700,
+  height: 1200,
+  titlePlaceholder: {
+    x: 190,
+    y: 475,
+    width: 320,
+    height: 58,
+    radius: 18
+  },
+  level: {
+    x: 350,
+    y: 610,
+    fontSize: 42
+  },
+  xp: {
+    x: 350,
+    y: 665,
+    fontSize: 34
+  }
+};
+
 function loadSharp() {
   try {
     return require('sharp');
@@ -60,6 +82,49 @@ function createCircleMask(
       `<circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}" fill="white"/>` +
     '</svg>'
   );
+}
+
+function createProfileTextOverlay() {
+  const {
+    width,
+    height,
+    titlePlaceholder,
+    level,
+    xp
+  } = PROFILE_TEXT_LAYOUT;
+
+  return Buffer.from(`
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="${titlePlaceholder.x}"
+        y="${titlePlaceholder.y}"
+        width="${titlePlaceholder.width}"
+        height="${titlePlaceholder.height}"
+        rx="${titlePlaceholder.radius}"
+        fill="rgba(8, 12, 28, 0.58)"
+        stroke="rgba(255, 255, 255, 0.28)"
+        stroke-width="2"
+      />
+      <text
+        x="${level.x}"
+        y="${level.y}"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${level.fontSize}"
+        font-weight="700"
+        fill="#ffffff"
+      >N&#237;vel 0</text>
+      <text
+        x="${xp.x}"
+        y="${xp.y}"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${xp.fontSize}"
+        font-weight="600"
+        fill="#dbeafe"
+      >0 / 1000</text>
+    </svg>
+  `);
 }
 
 async function createCircularAvatar({
@@ -139,6 +204,14 @@ async function renderProfileImage({
           AVATAR_PLACEMENT.x,
         top:
           AVATAR_PLACEMENT.y
+      },
+      {
+        input:
+          createProfileTextOverlay(),
+        left:
+          0,
+        top:
+          0
       }
     ])
     .png()
@@ -148,5 +221,6 @@ async function renderProfileImage({
 module.exports = {
   renderProfileImage,
   AVATAR_PLACEMENT,
+  PROFILE_TEXT_LAYOUT,
   BACKGROUND_PATH
 };
