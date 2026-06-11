@@ -278,6 +278,121 @@ function formatTopUsers(items) {
     .join('\n');
 }
 
+function safeLoadVotes() {
+
+  try {
+    return loadVotes();
+  } catch {
+    return {};
+  }
+}
+
+function getValidVoteEntries(
+  votes
+) {
+
+  return Object.entries(votes || {})
+    .map(([userId, data]) => ({
+      userId,
+      totalVotes:
+        Number(data?.totalVotes)
+    }))
+    .filter(entry =>
+      entry.userId &&
+      Number.isFinite(entry.totalVotes) &&
+      entry.totalVotes > 0
+    )
+    .sort((a, b) =>
+      b.totalVotes - a.totalVotes
+    );
+}
+
+async function fetchVoteUsername(
+  client,
+  userId
+) {
+
+  try {
+    if (
+      !client?.users?.fetch
+    ) {
+      return 'Unknown User';
+    }
+
+    const user =
+      await client.users.fetch(
+        userId
+      );
+
+    return (
+      user?.username ||
+      user?.tag ||
+      'Unknown User'
+    );
+  } catch {
+    return 'Unknown User';
+  }
+}
+
+async function getTopVotersStats(
+  client,
+  votes
+) {
+
+  const entries =
+    getValidVoteEntries(
+      votes
+    );
+
+  const topEntries =
+    entries.slice(
+      0,
+      10
+    );
+
+  const topVoters =
+    await Promise.all(
+      topEntries.map(async entry => ({
+        ...entry,
+        username:
+          await fetchVoteUsername(
+            client,
+            entry.userId
+          )
+      }))
+    );
+
+  return {
+    topVoters,
+    totalVoters:
+      entries.length,
+    totalVotes:
+      entries.reduce(
+        (sum, entry) =>
+          sum + entry.totalVotes,
+        0
+      )
+  };
+}
+
+function formatTopVoters(
+  items
+) {
+
+  if (
+    !items.length
+  ) {
+    return 'No votes registered yet.';
+  }
+
+  return items
+    .map((item, index) =>
+      `${index + 1}. ${item.username} ` +
+      `(${item.userId}) — ${item.totalVotes} votes`
+    )
+    .join('\n');
+}
+
 async function botstats(
   message,
   client
@@ -293,19 +408,12 @@ async function botstats(
     loadCache();
 
   const votes =
-  loadVotes();
+    safeLoadVotes();
 
-const uniqueVoters =
-  Object.keys(votes).length;
-
-const totalVotes =
-  Object.values(votes)
-    .reduce(
-      (sum, user) =>
-        sum + (
-          user.totalVotes || 0
-        ),
-      0
+  const voterStats =
+    await getTopVotersStats(
+      client,
+      votes
     );
 
   const animeStats =
@@ -344,8 +452,14 @@ const totalVotes =
     `Servers: ${client.guilds.cache.size}`,
     `Approx users: ${totalMembers}`,
     '',
-    `Total votes: ${totalVotes}`,
-    `Unique voters: ${uniqueVoters}`,
+    `Total voters: ${voterStats.totalVoters}`,
+    `Total votes: ${voterStats.totalVotes}`,
+    '',
+    'Top 10 Voters',
+    '',
+    formatTopVoters(
+      voterStats.topVoters
+    ),
     '',
     `Global anime: ${animeStats.total}`,
     `Unique anime: ${animeStats.unique}`,
