@@ -77,7 +77,7 @@ async function publishCommands() {
 
   const token =
     getRequiredEnv(
-      'TOKEN'
+      'DISCORDBOTLIST_TOKEN'
     );
 
   const body =
