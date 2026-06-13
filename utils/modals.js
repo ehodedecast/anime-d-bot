@@ -27,6 +27,29 @@ function createAnimeNameModal(
     );
 }
 
+function createPasswordModal(
+  customId,
+  title,
+  label
+) {
+
+  const input =
+    new TextInputBuilder()
+      .setCustomId('password')
+      .setLabel(label)
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true);
+
+  return new ModalBuilder()
+    .setCustomId(customId)
+    .setTitle(title)
+    .addComponents(
+      new ActionRowBuilder()
+        .addComponents(input)
+    );
+}
+
 module.exports = {
-  createAnimeNameModal
+  createAnimeNameModal,
+  createPasswordModal
 };

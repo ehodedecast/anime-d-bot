@@ -9,6 +9,9 @@ const next =
 const clear =
   require('../commands/clear');
 
+const resetdata =
+  require('../commands/resetdata');
+
 const help =
   require('../commands/help');
 
@@ -298,6 +301,58 @@ async function handleAnimeModal(
   interaction,
   client
 ) {
+
+  if (
+    interaction.customId ===
+    resetdata.RESETDATA_PASSWORD_MODAL_ID
+  ) {
+
+    if (
+      !resetdata.isBotOwner(
+        interaction
+      )
+    ) {
+
+      return interaction.reply({
+        content:
+          'Você não tem permissão para utilizar este comando.',
+        flags: MessageFlags.Ephemeral
+      });
+    }
+
+    const password =
+      interaction.fields.getTextInputValue(
+        'password'
+      );
+
+    if (
+      !process.env.RESETDATA_PASSWORD
+    ) {
+
+      return interaction.reply({
+        content:
+          'Reset password is not configured.',
+        flags: MessageFlags.Ephemeral
+      });
+    }
+
+    if (
+      !resetdata.isResetPasswordValid(
+        password
+      )
+    ) {
+
+      return interaction.reply({
+        content:
+          'Incorrect reset password.',
+        flags: MessageFlags.Ephemeral
+      });
+    }
+
+    return resetdata.executeResetData(
+      interaction
+    );
+  }
 
   const animeName =
     interaction.fields.getTextInputValue(

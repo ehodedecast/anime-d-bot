@@ -3,12 +3,19 @@ const {
 } = require('discord.js');
 
 const {
+  createPasswordModal
+} = require('../utils/modals');
+
+const {
   resetAnimeDBotData,
   detectEnvironment
 } = require('../utils/dataReset');
 
 const REQUIRED_CONFIRMATION =
   'RESET_ANIMEDBOT_DATA';
+
+const RESETDATA_PASSWORD_MODAL_ID =
+  'modal_resetdata_password';
 
 function getOwnerId() {
 
@@ -28,6 +35,23 @@ function isBotOwner(
   return Boolean(
     ownerId &&
     interaction.user.id === ownerId
+  );
+}
+
+function isResetPasswordConfigured() {
+
+  return Boolean(
+    process.env.RESETDATA_PASSWORD
+  );
+}
+
+function isResetPasswordValid(
+  value
+) {
+
+  return (
+    isResetPasswordConfigured() &&
+    value === process.env.RESETDATA_PASSWORD
   );
 }
 
@@ -87,6 +111,17 @@ async function resetdata(
     });
   }
 
+  if (
+    !isResetPasswordConfigured()
+  ) {
+
+    return interaction.reply({
+      content:
+        'Reset password is not configured.',
+      flags: MessageFlags.Ephemeral
+    });
+  }
+
   const confirmation =
     interaction.options.getString(
       'confirmation'
@@ -103,6 +138,19 @@ async function resetdata(
       flags: MessageFlags.Ephemeral
     });
   }
+
+  return interaction.showModal(
+    createPasswordModal(
+      RESETDATA_PASSWORD_MODAL_ID,
+      'Reset Password',
+      'Reset Password'
+    )
+  );
+}
+
+async function executeResetData(
+  interaction
+) {
 
   const environment =
     detectEnvironment();
@@ -137,5 +185,13 @@ async function resetdata(
 }
 
 module.exports = resetdata;
+module.exports.executeResetData =
+  executeResetData;
+module.exports.isBotOwner =
+  isBotOwner;
+module.exports.isResetPasswordValid =
+  isResetPasswordValid;
+module.exports.RESETDATA_PASSWORD_MODAL_ID =
+  RESETDATA_PASSWORD_MODAL_ID;
 module.exports.REQUIRED_CONFIRMATION =
   REQUIRED_CONFIRMATION;
