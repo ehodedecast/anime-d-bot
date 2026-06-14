@@ -433,19 +433,35 @@ module.exports = async (
       )
     ) {
 
-      return interaction.reply({
-        content:
-          'Você não tem permissão para usar este botão.',
-        flags: MessageFlags.Ephemeral
-      });
+      return interaction.deferUpdate();
     }
 
-    return botstats(
-      createInteractionMessage(
-        interaction
-      ),
-      client
-    );
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral
+    });
+
+    const result =
+      await botstats(
+        createInteractionMessage(
+          interaction
+        ),
+        client,
+        {
+          skipReply: true
+        }
+      );
+
+    if (
+      result?.sent &&
+      (
+        interaction.deferred ||
+        interaction.replied
+      )
+    ) {
+      await interaction.deleteReply();
+    }
+
+    return result;
   }
 
   if (

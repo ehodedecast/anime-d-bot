@@ -131,11 +131,11 @@ async function handleSlashCommand(
     )
   ) {
 
-    return interaction.reply({
-      content:
-        'Apenas o administrador do bot pode usar este comando.',
+    await interaction.deferReply({
       flags: MessageFlags.Ephemeral
     });
+
+    return interaction.deleteReply();
   }
 
   if (
@@ -339,10 +339,30 @@ async function handleSlashCommand(
 
   if (command === 'botstats') {
 
-    return botstats(
-      message,
-      client
-    );
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral
+    });
+
+    const result =
+      await botstats(
+        message,
+        client,
+        {
+          skipReply: true
+        }
+      );
+
+    if (
+      result?.sent &&
+      (
+        interaction.deferred ||
+        interaction.replied
+      )
+    ) {
+      await interaction.deleteReply();
+    }
+
+    return result;
   }
 
   if (command === 'resetdata') {

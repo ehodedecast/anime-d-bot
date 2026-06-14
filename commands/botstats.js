@@ -3,8 +3,11 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ContainerBuilder,
   version: discordVersion,
-  MessageFlags
+  MessageFlags,
+  SeparatorBuilder,
+  TextDisplayBuilder
 } = require('discord.js');
 
 const {
@@ -416,9 +419,236 @@ function createBotStatsRefreshRow() {
     );
 }
 
+function createTextDisplay(
+  content
+) {
+
+  return new TextDisplayBuilder()
+    .setContent(
+      content
+    );
+}
+
+function formatHealthStatus(
+  label,
+  value
+) {
+
+  return `**${label}:** ${value}`;
+}
+
+function createBotStatsPanel({
+  client,
+  totalMembers,
+  voterStats,
+  animeStats,
+  userStats,
+  currentGuildConfig,
+  cache,
+  topgg,
+  tracker,
+  topUsers
+}) {
+
+  const systemLines = [
+    '## AnimeDBot Control Center',
+    '',
+    `\u{1F7E2} **System**`,
+    formatHealthStatus(
+      'Bot',
+      client.isReady() ? 'Online' : 'Offline'
+    ),
+    formatHealthStatus(
+      'Uptime',
+      formatDuration(client.uptime)
+    ),
+    formatHealthStatus(
+      'Ping',
+      `${client.ws.ping}ms`
+    ),
+    formatHealthStatus(
+      'Node.js',
+      process.version
+    ),
+    formatHealthStatus(
+      'discord.js',
+      discordVersion
+    ),
+    formatHealthStatus(
+      'Environment',
+      getEnvironment()
+    ),
+    formatHealthStatus(
+      'Railway volume',
+      getRailwayVolumeStatus()
+    ),
+    '',
+    `\u{1F4C8} **Growth**`,
+    formatHealthStatus(
+      'Servers',
+      client.guilds.cache.size
+    ),
+    formatHealthStatus(
+      'Approx users',
+      totalMembers
+    ),
+    formatHealthStatus(
+      'AnimeDBot users',
+      userStats.total
+    ),
+    formatHealthStatus(
+      'Users with anime',
+      userStats.withAnime
+    )
+  ].join('\n');
+
+  const votesLines = [
+    `\u{1F5F3}\uFE0F **Votes**`,
+    formatHealthStatus(
+      'Total voters',
+      voterStats.totalVoters
+    ),
+    formatHealthStatus(
+      'Total votes',
+      voterStats.totalVotes
+    ),
+    '',
+    `\u{1F3C6} **Top 10 Voters**`,
+    formatTopVoters(
+      voterStats.topVoters
+    )
+  ].join('\n');
+
+  const animeLines = [
+    `\u{1F4FA} **Anime Tracking**`,
+    formatHealthStatus(
+      'Global anime',
+      animeStats.total
+    ),
+    formatHealthStatus(
+      'Unique anime',
+      animeStats.unique
+    ),
+    formatHealthStatus(
+      'Tracking',
+      animeStats.tracking
+    ),
+    formatHealthStatus(
+      'Library',
+      animeStats.library
+    ),
+    formatHealthStatus(
+      'Invalid/quarantined',
+      animeStats.invalid
+    ),
+    formatHealthStatus(
+      'Current server channel',
+      currentGuildConfig?.channelId || 'not configured'
+    ),
+    '',
+    `\u{1F525} **Top Anime**`,
+    formatTopAnime(
+      animeStats.topAnime
+    )
+  ].join('\n');
+
+  const userLines = [
+    `\u{1F465} **Top Users**`,
+    formatTopUsers(
+      topUsers
+    )
+  ].join('\n');
+
+  const cacheLines = [
+    `\u26A1 **Cache**`,
+    formatHealthStatus(
+      'Last tracker check',
+      tracker.lastFinishedAt || 'not available'
+    ),
+    formatHealthStatus(
+      'Cache updated',
+      cache.lastGlobalUpdate || 'not available'
+    ),
+    formatHealthStatus(
+      'Cache total',
+      Object.keys(cache.animes || {}).length
+    ),
+    formatHealthStatus(
+      'Cache hits',
+      cache.stats?.cacheHits || 0
+    ),
+    formatHealthStatus(
+      'Cache misses',
+      cache.stats?.cacheMisses || 0
+    )
+  ].join('\n');
+
+  const healthLines = [
+    `\u{1FA7A} **Health**`,
+    formatHealthStatus(
+      'Top.gg server',
+      `${topgg.started ? `online on port ${topgg.port}` : 'offline'}${topgg.error ? ` (${topgg.error})` : ''}`
+    ),
+    formatHealthStatus(
+      'Storage',
+      getStorageStatus()
+    ),
+    formatHealthStatus(
+      'Tracker',
+      tracker.lastError ? `error (${tracker.lastError})` : 'ok'
+    )
+  ].join('\n');
+
+  const container =
+    new ContainerBuilder()
+      .setAccentColor(0xff6600)
+      .addTextDisplayComponents(
+        createTextDisplay(
+          systemLines
+        )
+      )
+      .addSeparatorComponents(
+        new SeparatorBuilder()
+          .setDivider(true)
+      )
+      .addTextDisplayComponents(
+        createTextDisplay(
+          votesLines
+        ),
+        createTextDisplay(
+          animeLines
+        ),
+        createTextDisplay(
+          userLines
+        ),
+        createTextDisplay(
+          cacheLines
+        ),
+        createTextDisplay(
+          healthLines
+        )
+      )
+      .addSeparatorComponents(
+        new SeparatorBuilder()
+          .setDivider(true)
+      )
+      .addActionRowComponents(
+        createBotStatsRefreshRow()
+      );
+
+  return {
+    flags:
+      MessageFlags.IsComponentsV2,
+    components: [
+      container
+    ]
+  };
+}
+
 async function botstats(
   message,
-  client
+  client,
+  options = {}
 ) {
 
   const userAnimeData =
@@ -461,57 +691,24 @@ async function botstats(
   const tracker =
     runtimeStatus.tracker;
 
-  const statusText = [
-    'BOT STATUS',
-    '',
-    `Bot: ${client.isReady() ? 'online' : 'offline'}`,
-    `Uptime: ${formatDuration(client.uptime)}`,
-    `Ping: ${client.ws.ping}ms`,
-    `Node.js: ${process.version}`,
-    `discord.js: ${discordVersion}`,
-    `Environment: ${getEnvironment()}`,
-    `Railway volume: ${getRailwayVolumeStatus()}`,
-    '',
-    `Servers: ${client.guilds.cache.size}`,
-    `Approx users: ${totalMembers}`,
-    '',
-    `Total voters: ${voterStats.totalVoters}`,
-    `Total votes: ${voterStats.totalVotes}`,
-    '',
-    'Top 10 Voters',
-    '',
-    formatTopVoters(
-      voterStats.topVoters
-    ),
-    '',
-    `Global anime: ${animeStats.total}`,
-    `Unique anime: ${animeStats.unique}`,
-    `Tracking: ${animeStats.tracking}`,
-    `Library: ${animeStats.library}`,
-    `Invalid/quarantined: ${animeStats.invalid}`,
-    `Current server channel: ${currentGuildConfig?.channelId || 'not configured'}`,
-    '',
-    `Last tracker check: ${tracker.lastFinishedAt || 'not available'}`,
-    `Cache updated: ${cache.lastGlobalUpdate || 'not available'}`,
-    `Cache total: ${Object.keys(cache.animes || {}).length}`,
-    `Cache hits: ${cache.stats?.cacheHits || 0}`,
-    `Cache misses: ${cache.stats?.cacheMisses || 0}`,
-    '',
-    'Top anime:',
-    formatTopAnime(animeStats.topAnime),
-    '',
-    `AnimeDBot users: ${userStats.total}`,
-    `Users with anime: ${userStats.withAnime}`,
-    '',
-    'Top users:',
-    formatTopUsers(
-      getTopUsers(userAnimeData)
-    ),
-    '',
-    `Top.gg server: ${topgg.started ? `online on port ${topgg.port}` : 'offline'}${topgg.error ? ` (${topgg.error})` : ''}`,
-    `Storage: ${getStorageStatus()}`,
-    `Tracker: ${tracker.lastError ? `error (${tracker.lastError})` : 'ok'}`
-  ].join('\n');
+  const topUsers =
+    getTopUsers(
+      userAnimeData
+    );
+
+  const payload =
+    createBotStatsPanel({
+      client,
+      totalMembers,
+      voterStats,
+      animeStats,
+      userStats,
+      currentGuildConfig,
+      cache,
+      topgg,
+      tracker,
+      topUsers
+    });
 
   try {
 
@@ -520,19 +717,13 @@ async function botstats(
       BOTSTATS_CHANNEL_ID
     );
 
-  await channel.send({
-    content:
-      `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``,
-    components: [
-      createBotStatsRefreshRow()
-    ]
-  });
+  await channel.send(
+    payload
+  );
 
-  return message.reply({
-    content:
-      `Status enviado em botstats.`,
-    flags: MessageFlags.Ephemeral
-  });
+  return {
+    sent: true
+  };
 
 } catch {
 
