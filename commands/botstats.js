@@ -1,5 +1,8 @@
 const fs = require('fs');
 const {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   version: discordVersion,
   MessageFlags
 } = require('discord.js');
@@ -25,6 +28,9 @@ const runtimeStatus =
 
 const BOTSTATS_CHANNEL_ID =
   '1511002770532995112';
+
+const BOTSTATS_REFRESH_CUSTOM_ID =
+  'botstats_refresh';
 
 function formatDuration(ms) {
 
@@ -388,9 +394,26 @@ function formatTopVoters(
   return items
     .map((item, index) =>
       `${index + 1}. ${item.username} ` +
-      `(${item.userId}) — ${item.totalVotes} votes`
+      `(${item.userId}) \u2014 ${item.totalVotes} votes`
     )
     .join('\n');
+}
+
+function createBotStatsRefreshRow() {
+
+  return new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId(
+          BOTSTATS_REFRESH_CUSTOM_ID
+        )
+        .setLabel(
+          'Refresh'
+        )
+        .setStyle(
+          ButtonStyle.Primary
+        )
+    );
 }
 
 async function botstats(
@@ -497,9 +520,13 @@ async function botstats(
       BOTSTATS_CHANNEL_ID
     );
 
-  await channel.send(
-    `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``
-  );
+  await channel.send({
+    content:
+      `\`\`\`\n${statusText.slice(0, 1900)}\n\`\`\``,
+    components: [
+      createBotStatsRefreshRow()
+    ]
+  });
 
   return message.reply({
     content:
@@ -519,3 +546,5 @@ async function botstats(
 
 module.exports =
   botstats;
+module.exports.BOTSTATS_REFRESH_CUSTOM_ID =
+  BOTSTATS_REFRESH_CUSTOM_ID;

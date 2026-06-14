@@ -9,6 +9,9 @@ const next =
 const clear =
   require('../commands/clear');
 
+const botstats =
+  require('../commands/botstats');
+
 const resetdata =
   require('../commands/resetdata');
 
@@ -415,6 +418,32 @@ module.exports = async (
 
     return handleAnimeModal(
       interaction,
+      client
+    );
+  }
+
+  if (
+    interaction.customId ===
+    botstats.BOTSTATS_REFRESH_CUSTOM_ID
+  ) {
+
+    if (
+      !isBotOwner(
+        interaction
+      )
+    ) {
+
+      return interaction.reply({
+        content:
+          'Você não tem permissão para usar este botão.',
+        flags: MessageFlags.Ephemeral
+      });
+    }
+
+    return botstats(
+      createInteractionMessage(
+        interaction
+      ),
       client
     );
   }
