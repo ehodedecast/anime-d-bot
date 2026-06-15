@@ -252,7 +252,7 @@ function startVoteServer(
             );
 
           await user.send(
-            'Thank you for voting for AnimeDBot on Top.gg.'
+            'Thank you for voting for AnimeDBot on Top.gg. feel free to vote again in 12 hours for more rewards!'
           );
 
         } catch (err) {
