@@ -94,7 +94,7 @@ client.once(
 
     setInterval(() => {
       checkAnime(client);
-    }, 30000);
+    }, 60000);
   }
 );
 

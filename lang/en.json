@@ -132,5 +132,15 @@
   "dm_closed_warning": "⚠️ I could not send you a DM.\n\nAnimeDBot uses private messages to notify you about new episodes.\n\nEnable your DMs to receive 24h and release alerts.",
   "language.updated": "Server language updated.",
   "language.invalid": "Invalid language.",
-  "selection_expired": "This selection expired. Run the command again."
+  "selection_expired": "This selection expired. Run the command again.",
+  "season_end_finished": "The season for {anime} has ended.",
+  "season_end_found_sequel": "I found a sequel: {sequel}",
+  "season_end_ask_add": "Do you want to add it to your list?",
+  "season_end_add_sequel": "Add sequel",
+  "season_end_not_now": "Not now",
+  "season_end_added": "Sequel added to your list.",
+  "season_end_already_in_list": "The sequel is already in your list.",
+  "season_end_no_sequel": "I have not found an announced sequel yet.",
+  "season_end_declined": "Sequel was not added.",
+  "season_end_no_pending_prompt": "This sequel prompt is no longer available."
 }

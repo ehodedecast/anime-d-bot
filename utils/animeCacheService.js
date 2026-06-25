@@ -108,6 +108,14 @@ function upsertAnimeCacheEntry(
       anime.startDate ||
       previous.startDate ||
       null,
+    episodes:
+      anime.episodes ??
+      previous.episodes ??
+      null,
+    relations:
+      anime.relations ||
+      previous.relations ||
+      null,
     status: anime.status,
     lastUpdated: new Date().toISOString()
   };

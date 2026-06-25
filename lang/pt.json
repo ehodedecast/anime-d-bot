@@ -132,5 +132,15 @@
   "dm_closed_warning": "⚠️ Não consegui te enviar uma DM.\n\nO AnimeDBot usa mensagens privadas para avisar sobre novos episódios.\n\nAtive suas DMs para receber avisos de 24h e lançamentos.",
   "language.updated": "Idioma do servidor atualizado.",
   "language.invalid": "Idioma inv?lido.",
-  "selection_expired": "Esta sele??o expirou. Execute o comando novamente."
+  "selection_expired": "Esta sele??o expirou. Execute o comando novamente.",
+  "season_end_finished": "A temporada de {anime} acabou.",
+  "season_end_found_sequel": "Encontrei uma continua\u00e7\u00e3o: {sequel}",
+  "season_end_ask_add": "Deseja adicionar \u00e0 sua lista?",
+  "season_end_add_sequel": "Adicionar continua\u00e7\u00e3o",
+  "season_end_not_now": "N\u00e3o agora",
+  "season_end_added": "Continua\u00e7\u00e3o adicionada \u00e0 sua lista.",
+  "season_end_already_in_list": "A continua\u00e7\u00e3o j\u00e1 est\u00e1 na sua lista.",
+  "season_end_no_sequel": "Ainda n\u00e3o encontrei uma continua\u00e7\u00e3o anunciada.",
+  "season_end_declined": "Continua\u00e7\u00e3o n\u00e3o adicionada.",
+  "season_end_no_pending_prompt": "Esta sugest\u00e3o de continua\u00e7\u00e3o n\u00e3o est\u00e1 mais dispon\u00edvel."
 }

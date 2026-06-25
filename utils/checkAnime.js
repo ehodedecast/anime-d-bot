@@ -58,6 +58,11 @@ const {
   processPendingTrailers
 } = require('./trailerNotifications');
 
+const {
+  getSequelCandidate,
+  sendSeasonEndPrompt
+} = require('./seasonEndService');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -190,6 +195,14 @@ function createCacheEntry(data, previous = {}) {
     startDate:
       data.startDate ||
       previous.startDate ||
+      null,
+    episodes:
+      data.episodes ??
+      previous.episodes ??
+      null,
+    relations:
+      data.relations ||
+      previous.relations ||
       null,
     status:
       data.status ||
@@ -699,6 +712,12 @@ for (const chunk of chunks) {
   status:
     cachedAnime.status,
 
+  episodes:
+    cachedAnime.episodes,
+
+  relations:
+    cachedAnime.relations,
+
   startDate:
     cachedAnime.startDate,
 
@@ -859,6 +878,8 @@ if (
 
           status
 
+          episodes
+
           startDate {
             year
             month
@@ -882,6 +903,26 @@ if (
             id
             site
             thumbnail
+          }
+
+          relations {
+            edges {
+              relationType
+              node {
+                id
+                type
+                format
+                status
+                episodes
+                siteUrl
+                title { romaji }
+                coverImage { large medium }
+                nextAiringEpisode {
+                  episode
+                  airingAt
+                }
+              }
+            }
           }
           
         }
@@ -1215,6 +1256,30 @@ const sent24h =
     sentEpisodes
   );
 
+  try {
+    await sendSeasonEndPrompt({
+      client,
+      userId,
+      username:
+        userAnimeData[userId]
+          ?.username ||
+        'Unknown User',
+      anime:
+        data,
+      sequel:
+        getSequelCandidate(
+          data
+        ),
+      options
+    });
+  } catch (seasonErr) {
+    console.log(
+      chalk.yellow(
+        `Season end prompt failed for ${userId}: ${seasonErr.message}`
+      )
+    );
+  }
+
               console.log(
                 chalk.magenta(
                   `🚨 Episódio lançado enviado por DM para ${userId}`
@@ -1316,6 +1381,7 @@ if (
             id
             siteUrl
             status
+            episodes
             startDate {
               year
               month
@@ -1335,6 +1401,25 @@ if (
               id
               site
               thumbnail
+            }
+            relations {
+              edges {
+                relationType
+                node {
+                  id
+                  type
+                  format
+                  status
+                  episodes
+                  siteUrl
+                  title { romaji }
+                  coverImage { large medium }
+                  nextAiringEpisode {
+                    episode
+                    airingAt
+                  }
+                }
+              }
             }
           }
         }`;

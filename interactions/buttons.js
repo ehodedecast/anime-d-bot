@@ -87,6 +87,12 @@ const {
   XP_REWARDS
 } = require('../utils/xpSystem');
 
+const {
+  SEASON_SEQUEL_ADD_PREFIX,
+  SEASON_SEQUEL_DECLINE_PREFIX,
+  handleSeasonEndButton
+} = require('../utils/seasonEndService');
+
 function getOwnerId() {
 
   return (
@@ -462,6 +468,20 @@ module.exports = async (
     }
 
     return result;
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${SEASON_SEQUEL_ADD_PREFIX}:`
+    ) ||
+    interaction.customId?.startsWith(
+      `${SEASON_SEQUEL_DECLINE_PREFIX}:`
+    )
+  ) {
+
+    return handleSeasonEndButton(
+      interaction
+    );
   }
 
   if (

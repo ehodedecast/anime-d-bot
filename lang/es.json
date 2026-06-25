@@ -132,5 +132,15 @@
   "dm_closed_warning": "⚠️ No pude enviarte un DM.\n\nAnimeDBot usa mensajes privados para avisarte sobre nuevos episodios.\n\nActiva tus DMs para recibir avisos de 24h y lanzamientos.",
   "language.updated": "Idioma del servidor actualizado.",
   "language.invalid": "Idioma inv?lido.",
-  "selection_expired": "Esta selecci?n expir?. Ejecuta el comando nuevamente."
+  "selection_expired": "Esta selecci?n expir?. Ejecuta el comando nuevamente.",
+  "season_end_finished": "La temporada de {anime} ha terminado.",
+  "season_end_found_sequel": "Encontr\u00e9 una continuaci\u00f3n: {sequel}",
+  "season_end_ask_add": "\u00bfQuieres agregarla a tu lista?",
+  "season_end_add_sequel": "Agregar continuaci\u00f3n",
+  "season_end_not_now": "Ahora no",
+  "season_end_added": "Continuaci\u00f3n agregada a tu lista.",
+  "season_end_already_in_list": "La continuaci\u00f3n ya est\u00e1 en tu lista.",
+  "season_end_no_sequel": "Todav\u00eda no encontr\u00e9 una continuaci\u00f3n anunciada.",
+  "season_end_declined": "Continuaci\u00f3n no agregada.",
+  "season_end_no_pending_prompt": "Esta sugerencia de continuaci\u00f3n ya no est\u00e1 disponible."
 }
