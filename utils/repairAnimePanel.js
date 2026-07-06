@@ -20,6 +20,11 @@ const {
   saveAnimeToCache
 } = require('./animeCacheService');
 
+const {
+  getRetryAfterMs,
+  isTemporaryAniListError
+} = require('./anilistErrors');
+
 const SESSION_TTL_MS =
   10 * 60 * 1000;
 
@@ -614,13 +619,65 @@ async function validateAniListId(
       }
     }`;
 
-  const res =
-    await axios.post(
-      'https://graphql.anilist.co/graphql',
-      {
-        query
+  let res;
+
+  try {
+    res =
+      await axios.post(
+        'https://graphql.anilist.co/graphql',
+        {
+          query
+        }
+      );
+  } catch (err) {
+    if (
+      isTemporaryAniListError(
+        err
+      )
+    ) {
+      const retryAfterMs =
+        getRetryAfterMs(
+          err
+        );
+
+      console.log(
+        'AniList temporary error, skipping quarantine'
+      );
+
+      if (
+        retryAfterMs
+      ) {
+        console.log(
+          `AniList retry-after received: ${Math.ceil(retryAfterMs / 1000)}s`
+        );
       }
-    );
+    }
+
+    throw err;
+  }
+
+  if (
+    Array.isArray(
+      res.data?.errors
+    ) &&
+    res.data.errors.length
+  ) {
+    const error =
+      new Error(
+        'AniList GraphQL errors returned'
+      );
+
+    error.response = {
+      status:
+        res.status,
+      data:
+        res.data,
+      headers:
+        res.headers
+    };
+
+    throw error;
+  }
 
   return res.data?.data?.Media || null;
 }

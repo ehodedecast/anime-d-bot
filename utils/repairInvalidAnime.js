@@ -17,6 +17,12 @@ const {
   loadCache
 } = require('./cacheManager');
 
+const {
+  getRetryAfterMs,
+  isAniListNotFoundError,
+  isTemporaryAniListError
+} = require('./anilistErrors');
+
 function getOwnerId() {
 
   return (
@@ -175,6 +181,27 @@ function logRepairValidationDiagnostic({
   }
 }
 
+function createAniListGraphQLError(
+  response
+) {
+
+  const error =
+    new Error(
+      'AniList GraphQL errors returned'
+    );
+
+  error.response = {
+    status:
+      response.status,
+    data:
+      response.data,
+    headers:
+      response.headers
+  };
+
+  return error;
+}
+
 async function validateAniListId(
   id
 ) {
@@ -213,6 +240,17 @@ async function validateAniListId(
         }
       );
 
+    if (
+      Array.isArray(
+        res.data?.errors
+      ) &&
+      res.data.errors.length
+    ) {
+      throw createAniListGraphQLError(
+        res
+      );
+    }
+
     const media =
       res.data?.data?.Media || null;
 
@@ -233,15 +271,52 @@ async function validateAniListId(
 
     return media;
   } catch (err) {
+    if (
+      isTemporaryAniListError(
+        err
+      )
+    ) {
+      const retryAfterMs =
+        getRetryAfterMs(
+          err
+        );
+
+      console.log(
+        chalk.yellow(
+          'AniList temporary error, skipping quarantine'
+        )
+      );
+
+      if (
+        retryAfterMs
+      ) {
+        console.log(
+          chalk.yellow(
+            `AniList retry-after received: ${Math.ceil(retryAfterMs / 1000)}s`
+          )
+        );
+      }
+    }
+
     logRepairValidationDiagnostic({
       id,
       query,
       error:
         err,
       validationResult:
-        'AniList ID validation request failed',
+        isTemporaryAniListError(
+          err
+        )
+          ? 'Temporary/retryable AniList or Cloudflare response'
+          : 'AniList ID validation request failed',
       brokenCondition:
-        err.response?.status === 404
+        isTemporaryAniListError(
+          err
+        )
+          ? 'none - temporary errors must not mark anime broken'
+          : isAniListNotFoundError(
+              err
+            )
           ? 'AniList returned 404'
           : 'Network/timeout/rate-limit/server error path'
     });

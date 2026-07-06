@@ -59,6 +59,12 @@ const {
   sendSeasonEndPrompt
 } = require('./seasonEndService');
 
+const {
+  getRetryAfterMs,
+  isAniListNotFoundError,
+  isTemporaryAniListError
+} = require('./anilistErrors');
+
 function chunkArray(array, size) {
 
   const result = [];
@@ -68,6 +74,78 @@ function chunkArray(array, size) {
   }
 
   return result;
+}
+
+function delay(ms) {
+
+  return new Promise(resolve =>
+    setTimeout(
+      resolve,
+      ms
+    )
+  );
+}
+
+async function waitForRetryAfterIfSafe(
+  error
+) {
+
+  const retryAfterMs =
+    getRetryAfterMs(
+      error
+    );
+
+  if (
+    !retryAfterMs
+  ) {
+    return;
+  }
+
+  console.log(
+    chalk.yellow(
+      `AniList retry-after received: ${Math.ceil(retryAfterMs / 1000)}s`
+    )
+  );
+
+  const maxWaitMs =
+    30 * 1000;
+
+  if (
+    retryAfterMs > maxWaitMs
+  ) {
+    console.log(
+      chalk.yellow(
+        'AniList retry-after is too long for this tracker cycle; skipping wait.'
+      )
+    );
+
+    return;
+  }
+
+  await delay(
+    retryAfterMs
+  );
+}
+
+function createAniListGraphQLError(
+  response
+) {
+
+  const error =
+    new Error(
+      'AniList GraphQL errors returned'
+    );
+
+  error.response = {
+    status:
+      response.status,
+    data:
+      response.data,
+    headers:
+      response.headers
+  };
+
+  return error;
 }
 
 function logAniListRepairDiagnostic({
@@ -1063,6 +1141,17 @@ if (
         'Main query returned HTTP response'
     });
 
+    if (
+      Array.isArray(
+        res.data?.errors
+      ) &&
+      res.data.errors.length
+    ) {
+      throw createAniListGraphQLError(
+        res
+      );
+    }
+
     const apiResults =
   Object.entries(res.data.data)
     .map(([alias, data]) => {
@@ -1428,6 +1517,36 @@ const sent24h =
       runtimeStatus.tracker.lastError =
         err.message;
 
+      if (
+        isTemporaryAniListError(
+          err
+        )
+      ) {
+        console.log(
+          chalk.yellow(
+            'AniList temporary error, skipping quarantine'
+          )
+        );
+
+        await waitForRetryAfterIfSafe(
+          err
+        );
+
+        logAniListRepairDiagnostic({
+          phase:
+            'Temporary AniList error skipped',
+          query,
+          error:
+            err,
+          validationResult:
+            'Temporary/retryable AniList or Cloudflare response',
+          brokenCondition:
+            'none - quarantine disabled for temporary errors'
+        });
+
+        continue;
+      }
+
       logAniListRepairDiagnostic({
         phase:
           'Main tracker AniList query failed',
@@ -1446,7 +1565,10 @@ const sent24h =
 
       if (
 
-  err.response?.data?.errors
+  err.response?.data?.errors &&
+  isAniListNotFoundError(
+    err
+  )
 
 ) {
 
@@ -1469,7 +1591,10 @@ const sent24h =
 }
 if (
 
-  err.response?.data?.errors
+  err.response?.data?.errors &&
+  isAniListNotFoundError(
+    err
+  )
 
 ) {
 
@@ -1589,6 +1714,17 @@ if (
             : 'Retry returned empty media'
       });
 
+      if (
+        Array.isArray(
+          retryRes.data?.errors
+        ) &&
+        retryRes.data.errors.length
+      ) {
+        throw createAniListGraphQLError(
+          retryRes
+        );
+      }
+
       const retryData =
         retryRes.data?.data?.Media;
 
@@ -1609,6 +1745,37 @@ if (
 
     } catch (retryErr) {
 
+      if (
+        isTemporaryAniListError(
+          retryErr
+        )
+      ) {
+        console.log(
+          chalk.yellow(
+            'AniList temporary error, skipping quarantine'
+          )
+        );
+
+        await waitForRetryAfterIfSafe(
+          retryErr
+        );
+
+        logAniListRepairDiagnostic({
+          phase:
+            'Temporary individual AniList validation error skipped',
+          anime:
+            brokenAnime,
+          error:
+            retryErr,
+          validationResult:
+            'Temporary/retryable AniList or Cloudflare response',
+          brokenCondition:
+            'none - quarantine disabled for temporary errors'
+        });
+
+        continue;
+      }
+
       logAniListRepairDiagnostic({
         phase:
           'Individual AniList validation retry failed',
@@ -1619,7 +1786,11 @@ if (
         validationResult:
           'Individual validation did not return usable Media',
         brokenCondition:
-          'AniList validation failed'
+          isAniListNotFoundError(
+            retryErr
+          )
+            ? 'AniList validation failed'
+            : 'Non-temporary validation error without Not Found'
       });
     }
   }

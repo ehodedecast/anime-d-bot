@@ -89,6 +89,11 @@ const {
 } = require('../utils/xpSystem');
 
 const {
+  getRetryAfterMs,
+  isTemporaryAniListError
+} = require('../utils/anilistErrors');
+
+const {
   SEASON_SEQUEL_ADD_PREFIX,
   SEASON_SEQUEL_DECLINE_PREFIX,
   handleSeasonEndButton
@@ -130,6 +135,23 @@ function isBotOwner(
     ownerId &&
     interaction.user.id === ownerId
   );
+}
+
+function formatTemporaryAniListMessage(
+  error
+) {
+
+  const retryAfterMs =
+    getRetryAfterMs(
+      error
+    );
+
+  const retryText =
+    retryAfterMs
+      ? ` Tente novamente em cerca de ${Math.ceil(retryAfterMs / 1000)}s.`
+      : '';
+
+  return `AniList temporary error, skipping quarantine.${retryText}`;
 }
 
 function getWatchTarget(
@@ -442,10 +464,29 @@ async function handleAnimeModal(
       });
     }
 
-    const candidate =
-      await validateAniListId(
-        newId
-      );
+    let candidate;
+
+    try {
+      candidate =
+        await validateAniListId(
+          newId
+        );
+    } catch (err) {
+      if (
+        isTemporaryAniListError(
+          err
+        )
+      ) {
+        return interaction.editReply({
+          content:
+            formatTemporaryAniListMessage(
+              err
+            )
+        });
+      }
+
+      throw err;
+    }
 
     if (
       !candidate
@@ -657,10 +698,31 @@ module.exports = async (
       });
     }
 
-    const candidate =
-      await validateAniListId(
-        brokenId
-      );
+    let candidate;
+
+    try {
+      candidate =
+        await validateAniListId(
+          brokenId
+        );
+    } catch (err) {
+      if (
+        isTemporaryAniListError(
+          err
+        )
+      ) {
+        return interaction.followUp({
+          content:
+            formatTemporaryAniListMessage(
+              err
+            ),
+          flags:
+            MessageFlags.Ephemeral
+        });
+      }
+
+      throw err;
+    }
 
     if (
       !candidate
@@ -867,13 +929,34 @@ module.exports = async (
       );
     }
 
-    const candidate =
-      session.validated &&
-      String(session.validated.id) === String(candidateId)
-        ? session.validated
-        : await validateAniListId(
-            candidateId
-          );
+    let candidate;
+
+    try {
+      candidate =
+        session.validated &&
+        String(session.validated.id) === String(candidateId)
+          ? session.validated
+          : await validateAniListId(
+              candidateId
+            );
+    } catch (err) {
+      if (
+        isTemporaryAniListError(
+          err
+        )
+      ) {
+        return interaction.reply({
+          content:
+            formatTemporaryAniListMessage(
+              err
+            ),
+          flags:
+            MessageFlags.Ephemeral
+        });
+      }
+
+      throw err;
+    }
 
     if (
       !candidate
