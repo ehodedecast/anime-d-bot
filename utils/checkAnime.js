@@ -9,8 +9,7 @@ const {
 } = require('./language');
 
 const {
-  loadUserAnimes,
-  saveUserAnimes
+  loadUserAnimes
 } = require('./userAnimeStorage');
 
 const {
@@ -26,9 +25,6 @@ const {
   loadCache,
   saveCache
 } = require('./cacheManager');
-
-const repairInvalidAnime =
-  require('./repairInvalidAnime');
 
 const {
   EmbedBuilder
@@ -72,6 +68,102 @@ function chunkArray(array, size) {
   }
 
   return result;
+}
+
+function logAniListRepairDiagnostic({
+  phase,
+  anime = null,
+  query = null,
+  response = null,
+  error = null,
+  validationResult = null,
+  brokenCondition = null
+}) {
+
+  console.log(
+    chalk.cyan(
+      `\n[ANIME REPAIR DIAGNOSTIC] ${phase}`
+    )
+  );
+
+  if (anime) {
+    console.log(
+      chalk.cyan(
+        `[ANIME REPAIR DIAGNOSTIC] Anime: ${anime.title || 'Unknown'} (${anime.id})`
+      )
+    );
+  }
+
+  if (query) {
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] GraphQL query:\n${query}`
+      )
+    );
+  }
+
+  if (response) {
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] HTTP status: ${response.status || 'unknown'}`
+      )
+    );
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] AniList response body:\n${JSON.stringify(response.data, null, 2)}`
+      )
+    );
+  }
+
+  if (error) {
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Error message: ${error.message}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Error code: ${error.code || 'none'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] HTTP status: ${error.response?.status || 'none'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Network/timeout/rate-limit: ${(error.code || error.response?.status === 429) ? 'possible' : 'not detected'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] AniList error body:\n${JSON.stringify(error.response?.data || null, null, 2)}`
+      )
+    );
+  }
+
+  if (validationResult) {
+    console.log(
+      chalk.yellow(
+        `[ANIME REPAIR DIAGNOSTIC] Validation result: ${validationResult}`
+      )
+    );
+  }
+
+  if (brokenCondition) {
+    console.log(
+      chalk.yellow(
+        `[ANIME REPAIR DIAGNOSTIC] Broken condition: ${brokenCondition}`
+      )
+    );
+  }
+
+  console.log(
+    chalk.cyan(
+      '[ANIME REPAIR DIAGNOSTIC] Quarantine/repair JSON write skipped for investigation.\n'
+    )
+  );
 }
 
 function quarantineAnime(
@@ -831,15 +923,15 @@ if (!filteredChunk.length) {
     )
   );
 
-  quarantineAnime(
-    userAnimeData,
-    anime.id,
-    'Invalid AniList ID type'
-  );
-
-  saveUserAnimes(
-    userAnimeData
-  );
+  logAniListRepairDiagnostic({
+    phase:
+      'Invalid AniList ID type before query',
+    anime,
+    validationResult:
+      `Number.isInteger(${anime.id}) === false`,
+    brokenCondition:
+      'Invalid AniList ID type'
+  });
 
   return;
 }
@@ -948,10 +1040,28 @@ if (
   continue;
 }
 
+    logAniListRepairDiagnostic({
+      phase:
+        'Main tracker AniList query before request',
+      query,
+      validationResult:
+        `Query sources: ${querySources.map(source => `${source.title || 'Unknown'} (${source.id})`).join(', ')}`
+    });
+
     const res = await axios.post(
       'https://graphql.anilist.co/graphql',
       { query }
     );
+
+    logAniListRepairDiagnostic({
+      phase:
+        'Main tracker AniList query response',
+      query,
+      response:
+        res,
+      validationResult:
+        'Main query returned HTTP response'
+    });
 
     const apiResults =
   Object.entries(res.data.data)
@@ -1007,15 +1117,16 @@ results = [
 
   if (sourceAnime) {
 
-    quarantineAnime(
-      userAnimeData,
-      sourceAnime.id,
-      'AniList returned empty data'
-    );
-
-    saveUserAnimes(
-      userAnimeData
-    );
+    logAniListRepairDiagnostic({
+      phase:
+        'Empty Media data in processed tracker result',
+      anime:
+        sourceAnime,
+      validationResult:
+        'AniList returned null/empty Media for this alias',
+      brokenCondition:
+        'AniList returned empty data'
+    });
   }
 
   continue;
@@ -1317,6 +1428,22 @@ const sent24h =
       runtimeStatus.tracker.lastError =
         err.message;
 
+      logAniListRepairDiagnostic({
+        phase:
+          'Main tracker AniList query failed',
+        query,
+        error:
+          err,
+        validationResult:
+          err.response?.data?.errors
+            ? 'AniList returned GraphQL errors'
+            : 'Request failed before a valid GraphQL response',
+        brokenCondition:
+          err.response?.data?.errors
+            ? 'Tracker would inspect querySources as possible invalid IDs'
+            : 'Network/timeout/rate-limit/server error path'
+      });
+
       if (
 
   err.response?.data?.errors
@@ -1424,6 +1551,17 @@ if (
           }
         }`;
 
+      logAniListRepairDiagnostic({
+        phase:
+          'Individual AniList validation retry before request',
+        anime:
+          brokenAnime,
+        query:
+          retryQuery,
+        validationResult:
+          'Validating one query source after chunk error'
+      });
+
       const retryRes =
         await axios.post(
           'https://graphql.anilist.co/graphql',
@@ -1431,6 +1569,25 @@ if (
             query: retryQuery
           }
         );
+
+      logAniListRepairDiagnostic({
+        phase:
+          'Individual AniList validation retry response',
+        anime:
+          brokenAnime,
+        query:
+          retryQuery,
+        response:
+          retryRes,
+        validationResult:
+          retryRes.data?.data?.Media
+            ? 'Valid AniList Media returned'
+            : 'AniList Media missing/null',
+        brokenCondition:
+          retryRes.data?.data?.Media
+            ? null
+            : 'Retry returned empty media'
+      });
 
       const retryData =
         retryRes.data?.data?.Media;
@@ -1444,31 +1601,28 @@ if (
         );
       }
 
-      cache.animes[retryData.id] =
-        createCacheEntry(
-          retryData,
-          cache.animes[retryData.id]
-        );
-
       console.log(
         chalk.green(
           `Retry recovered anime: ${retryData.title?.romaji || brokenAnime.title}`
         )
       );
 
-    } catch {
+    } catch (retryErr) {
 
-      quarantineAnime(
-        userAnimeData,
-        brokenAnime.id,
-        'AniList validation failed'
-      );
+      logAniListRepairDiagnostic({
+        phase:
+          'Individual AniList validation retry failed',
+        anime:
+          brokenAnime,
+        error:
+          retryErr,
+        validationResult:
+          'Individual validation did not return usable Media',
+        brokenCondition:
+          'AniList validation failed'
+      });
     }
   }
-
-  saveUserAnimes(
-    userAnimeData
-  );
 }
       console.log(
   chalk.red(
@@ -1511,8 +1665,10 @@ saveCache(cache);
     options
   );
 
-  await repairInvalidAnime(
-    client
+  console.log(
+    chalk.yellow(
+      '[ANIME REPAIR DIAGNOSTIC] Automatic repair scan skipped for investigation.'
+    )
   );
 
   runtimeStatus.tracker.lastFinishedAt =

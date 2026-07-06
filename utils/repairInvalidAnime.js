@@ -94,6 +94,87 @@ function similarityScore(
     : 0;
 }
 
+function logRepairValidationDiagnostic({
+  id,
+  query = null,
+  response = null,
+  error = null,
+  validationResult = null,
+  brokenCondition = null
+}) {
+
+  console.log(
+    chalk.cyan(
+      `\n[ANIME REPAIR DIAGNOSTIC] validateAniListId(${id})`
+    )
+  );
+
+  if (query) {
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] GraphQL query:\n${query}`
+      )
+    );
+  }
+
+  if (response) {
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] HTTP status: ${response.status || 'unknown'}`
+      )
+    );
+    console.log(
+      chalk.gray(
+        `[ANIME REPAIR DIAGNOSTIC] AniList response body:\n${JSON.stringify(response.data, null, 2)}`
+      )
+    );
+  }
+
+  if (error) {
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Error message: ${error.message}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Error code: ${error.code || 'none'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] HTTP status: ${error.response?.status || 'none'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] Network/timeout/rate-limit: ${(error.code || error.response?.status === 429) ? 'possible' : 'not detected'}`
+      )
+    );
+    console.log(
+      chalk.red(
+        `[ANIME REPAIR DIAGNOSTIC] AniList error body:\n${JSON.stringify(error.response?.data || null, null, 2)}`
+      )
+    );
+  }
+
+  if (validationResult) {
+    console.log(
+      chalk.yellow(
+        `[ANIME REPAIR DIAGNOSTIC] Validation result: ${validationResult}`
+      )
+    );
+  }
+
+  if (brokenCondition) {
+    console.log(
+      chalk.yellow(
+        `[ANIME REPAIR DIAGNOSTIC] Broken condition: ${brokenCondition}`
+      )
+    );
+  }
+}
+
 async function validateAniListId(
   id
 ) {
@@ -116,15 +197,57 @@ async function validateAniListId(
       }
     }`;
 
-  const res =
-    await axios.post(
-      'https://graphql.anilist.co/graphql',
-      {
-        query
-      }
-    );
+  logRepairValidationDiagnostic({
+    id,
+    query,
+    validationResult:
+      'Starting AniList ID validation'
+  });
 
-  return res.data?.data?.Media || null;
+  try {
+    const res =
+      await axios.post(
+        'https://graphql.anilist.co/graphql',
+        {
+          query
+        }
+      );
+
+    const media =
+      res.data?.data?.Media || null;
+
+    logRepairValidationDiagnostic({
+      id,
+      query,
+      response:
+        res,
+      validationResult:
+        media
+          ? 'Valid AniList Media returned'
+          : 'AniList Media missing/null',
+      brokenCondition:
+        media
+          ? null
+          : 'validateAniListId returned null'
+    });
+
+    return media;
+  } catch (err) {
+    logRepairValidationDiagnostic({
+      id,
+      query,
+      error:
+        err,
+      validationResult:
+        'AniList ID validation request failed',
+      brokenCondition:
+        err.response?.status === 404
+          ? 'AniList returned 404'
+          : 'Network/timeout/rate-limit/server error path'
+    });
+
+    throw err;
+  }
 }
 
 async function searchAniListCandidates(
