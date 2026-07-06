@@ -53,7 +53,8 @@ const state =
   require('../state/state');
 
 const {
-  createAnimeNameModal
+  createAnimeNameModal,
+  createTextInputModal
 } = require('../utils/modals');
 
 const {
@@ -92,6 +93,23 @@ const {
   SEASON_SEQUEL_DECLINE_PREFIX,
   handleSeasonEndButton
 } = require('../utils/seasonEndService');
+
+const {
+  CUSTOM_IDS: REPAIR_PANEL_IDS,
+  applyManualRepair,
+  buildCancelledPanel,
+  buildComparisonPanel,
+  buildDetailsPanel,
+  buildFinalPanel,
+  buildInitialPanel,
+  deleteSession,
+  expiredPayload,
+  findQuarantinedById,
+  getSession,
+  isOwner: isRepairOwner,
+  notAllowedPayload,
+  validateAniListId
+} = require('../utils/repairAnimePanel');
 
 function getOwnerId() {
 
@@ -363,6 +381,95 @@ async function handleAnimeModal(
     );
   }
 
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.modalNewId}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const [
+      ,
+      sessionId,
+      brokenId
+    ] = interaction.customId
+      .split(':');
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    const newId =
+      interaction.fields.getTextInputValue(
+        'new_anilist_id'
+      );
+
+    await interaction.deferReply({
+      flags:
+        MessageFlags.Ephemeral
+    });
+
+    const broken =
+      findQuarantinedById(
+        brokenId
+      );
+
+    if (
+      !broken
+    ) {
+      return interaction.editReply({
+        content:
+          'Anime em quarentena nao encontrado. Execute /repairanime novamente.'
+      });
+    }
+
+    const candidate =
+      await validateAniListId(
+        newId
+      );
+
+    if (
+      !candidate
+    ) {
+      return interaction.editReply({
+        content:
+          'ID AniList invalido ou nao encontrado.'
+      });
+    }
+
+    session.selected =
+      broken;
+    session.validated =
+      candidate;
+
+    return interaction.editReply(
+      buildComparisonPanel({
+        sessionId,
+        broken,
+        candidate
+      })
+    );
+  }
+
   const animeName =
     interaction.fields.getTextInputValue(
       'anime_name'
@@ -425,6 +532,378 @@ module.exports = async (
     return handleAnimeModal(
       interaction,
       client
+    );
+  }
+
+  if (
+    interaction.isStringSelectMenu?.() &&
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.select}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const sessionId =
+      interaction.customId
+        .split(':')[1];
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    const selectedId =
+      interaction.values?.[0];
+
+    const selected =
+      findQuarantinedById(
+        selectedId
+      );
+
+    if (
+      !selected
+    ) {
+      return interaction.reply({
+        content:
+          'Anime em quarentena nao encontrado. Execute /repairanime novamente.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    session.selected =
+      selected;
+    session.validated =
+      null;
+
+    return interaction.update(
+      buildDetailsPanel(
+        sessionId,
+        selected
+      )
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.validateSame}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const [
+      ,
+      sessionId,
+      brokenId
+    ] = interaction.customId
+      .split(':');
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    await interaction.deferUpdate();
+
+    const broken =
+      findQuarantinedById(
+        brokenId
+      );
+
+    if (
+      !broken
+    ) {
+      return interaction.followUp({
+        content:
+          'Anime em quarentena nao encontrado. Execute /repairanime novamente.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    const candidate =
+      await validateAniListId(
+        brokenId
+      );
+
+    if (
+      !candidate
+    ) {
+      return interaction.followUp({
+        content:
+          'ID AniList invalido ou nao encontrado.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    session.selected =
+      broken;
+    session.validated =
+      candidate;
+
+    return interaction.editReply(
+      buildComparisonPanel({
+        sessionId,
+        broken,
+        candidate
+      })
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.newId}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const [
+      ,
+      sessionId,
+      brokenId
+    ] = interaction.customId
+      .split(':');
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    return interaction.showModal(
+      createTextInputModal(
+        `${REPAIR_PANEL_IDS.modalNewId}:${sessionId}:${brokenId}`,
+        'Informar novo AniList ID',
+        'new_anilist_id',
+        'Novo AniList ID'
+      )
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.back}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const [
+      ,
+      sessionId,
+      brokenId
+    ] = interaction.customId
+      .split(':');
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    const selected =
+      findQuarantinedById(
+        brokenId
+      );
+
+    if (
+      !selected
+    ) {
+      return interaction.reply({
+        content:
+          'Anime em quarentena nao encontrado. Execute /repairanime novamente.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    session.selected =
+      selected;
+    session.validated =
+      null;
+
+    return interaction.update(
+      buildDetailsPanel(
+        sessionId,
+        selected
+      )
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.cancel}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const sessionId =
+      interaction.customId
+        .split(':')[1];
+
+    deleteSession(
+      sessionId
+    );
+
+    return interaction.update(
+      buildCancelledPanel()
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${REPAIR_PANEL_IDS.apply}:`
+    )
+  ) {
+
+    if (
+      !isRepairOwner(
+        interaction
+      )
+    ) {
+      return interaction.reply(
+        notAllowedPayload()
+      );
+    }
+
+    const [
+      ,
+      sessionId,
+      brokenId,
+      candidateId
+    ] = interaction.customId
+      .split(':');
+
+    const session =
+      getSession(
+        sessionId,
+        interaction.user.id
+      );
+
+    if (
+      !session
+    ) {
+      return interaction.reply(
+        expiredPayload()
+      );
+    }
+
+    const candidate =
+      session.validated &&
+      String(session.validated.id) === String(candidateId)
+        ? session.validated
+        : await validateAniListId(
+            candidateId
+          );
+
+    if (
+      !candidate
+    ) {
+      return interaction.reply({
+        content:
+          'ID AniList invalido ou nao encontrado.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    await interaction.deferUpdate();
+
+    const result =
+      applyManualRepair(
+        brokenId,
+        candidate
+      );
+
+    deleteSession(
+      sessionId
+    );
+
+    return interaction.editReply(
+      buildFinalPanel({
+        brokenId,
+        candidate,
+        result
+      })
     );
   }
 

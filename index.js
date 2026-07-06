@@ -132,6 +132,7 @@ client.on(
 
       if (
         interaction.isButton() ||
+        interaction.isStringSelectMenu() ||
         interaction.isModalSubmit()
       ) {
 

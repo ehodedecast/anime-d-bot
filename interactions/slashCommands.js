@@ -10,6 +10,7 @@ const userlanguage = require('../commands/userlanguage');
 const help = require('../commands/help');
 const botstats = require('../commands/botstats');
 const resetdata = require('../commands/resetdata');
+const repairanime = require('../commands/repairanime');
 const profile = require('../commands/profile');
 const sendMenu = require('./menu');
 const {
@@ -146,6 +147,7 @@ async function handleSlashCommand(
     command !== 'setchannel' &&
     command !== 'botstats' &&
     command !== 'resetdata' &&
+    command !== 'repairanime' &&
     command !== 'userlanguage'
   ) {
 
@@ -162,6 +164,7 @@ async function handleSlashCommand(
     command !== 'setchannel' &&
     command !== 'botstats' &&
     command !== 'resetdata' &&
+    command !== 'repairanime' &&
     command !== 'userlanguage'
   ) {
 
@@ -368,6 +371,13 @@ async function handleSlashCommand(
   if (command === 'resetdata') {
 
     return resetdata(
+      interaction
+    );
+  }
+
+  if (command === 'repairanime') {
+
+    return repairanime(
       interaction
     );
   }

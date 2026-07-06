@@ -49,7 +49,31 @@ function createPasswordModal(
     );
 }
 
+function createTextInputModal(
+  customId,
+  title,
+  inputCustomId,
+  label
+) {
+
+  const input =
+    new TextInputBuilder()
+      .setCustomId(inputCustomId)
+      .setLabel(label)
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true);
+
+  return new ModalBuilder()
+    .setCustomId(customId)
+    .setTitle(title)
+    .addComponents(
+      new ActionRowBuilder()
+        .addComponents(input)
+    );
+}
+
 module.exports = {
   createAnimeNameModal,
-  createPasswordModal
+  createPasswordModal,
+  createTextInputModal
 };

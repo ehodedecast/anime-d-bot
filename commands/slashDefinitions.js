@@ -93,6 +93,13 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
+    .setName('repairanime')
+    .setDescription('Open the guided anime quarantine repair panel.')
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.Administrator
+    ),
+
+  new SlashCommandBuilder()
     .setName('clear')
     .setDescription('Clear this server anime list.')
     .setDefaultMemberPermissions(
