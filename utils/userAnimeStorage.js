@@ -199,7 +199,8 @@ function saveAnimeToUser(
   userId,
   username,
   anime,
-  mode
+  mode,
+  extraFields = {}
 ) {
 
   const data =
@@ -220,7 +221,9 @@ function saveAnimeToUser(
       coverImage:
         anime.coverImage || null,
 
-      mode
+      mode,
+
+      ...extraFields
     });
 
   saveUserAnimes(

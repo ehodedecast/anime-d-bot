@@ -89,9 +89,17 @@ function formatAnimeRows(
           ? ` - Ep ${cacheAnime.nextEpisode.episode}`
           : '';
 
+      const quarantineReason =
+        anime.invalidReason ||
+        anime.quarantineReason ||
+        'AniList validation failed';
+
       const quarantine =
-        anime.invalid
-          ? ` - ${labels.quarantine}`
+        (
+          anime.invalid ||
+          anime.quarantined
+        )
+          ? ` — ${labels.quarantine}: ${quarantineReason}`
           : '';
 
       return (

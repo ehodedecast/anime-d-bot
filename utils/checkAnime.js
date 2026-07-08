@@ -9,7 +9,8 @@ const {
 } = require('./language');
 
 const {
-  loadUserAnimes
+  loadUserAnimes,
+  saveUserAnimes
 } = require('./userAnimeStorage');
 
 const {
@@ -254,7 +255,7 @@ function quarantineAnime(
 
 ) {
 
-  let quarantined = false;
+  const affectedUsers = [];
 
   for (const userId in userAnimeData) {
 
@@ -275,17 +276,62 @@ function quarantineAnime(
           anime.invalidReason =
             reason;
 
+          anime.quarantined = true;
+
+          anime.quarantineReason =
+            reason;
+
           anime.invalidDetectedAt =
             new Date()
               .toISOString();
 
-          quarantined = true;
+          anime.quarantinedAt =
+            anime.invalidDetectedAt;
+
+          affectedUsers.push({
+            userId,
+            anime
+          });
         }
       }
     );
   }
 
-  return quarantined;
+  return affectedUsers;
+}
+
+async function notifyAnimeQuarantinedUsers({
+  client,
+  affectedUsers,
+  reason
+}) {
+
+  for (
+    const item of affectedUsers
+  ) {
+    try {
+      const user =
+        await client.users.fetch(
+          item.userId
+        );
+
+      await user.send(
+        [
+          `⚠️ Anime em quarentena: ${item.anime.title}`,
+          '',
+          `Motivo: ${reason}`,
+          '',
+          'Este anime não será monitorado até ser reparado pelo AnimeDBot.'
+        ].join('\n')
+      );
+    } catch (err) {
+      console.log(
+        chalk.yellow(
+          `Could not DM quarantine notice to ${item.userId}: ${err.message}`
+        )
+      );
+    }
+  }
 }
 
 function getSentEpisodeEntry(
@@ -568,7 +614,8 @@ async function checkAnime(
     }
 
     if (
-      anime.invalid
+      anime.invalid ||
+      anime.quarantined
     ) {
 
       console.log(
@@ -1019,7 +1066,8 @@ if (!filteredChunk.length) {
   )
 );
 if (
-  anime.invalid
+  anime.invalid ||
+  anime.quarantined
 ) {
 
   console.log(
@@ -1206,6 +1254,9 @@ results = [
 
   if (sourceAnime) {
 
+    const reason =
+      'AniList returned empty data';
+
     logAniListRepairDiagnostic({
       phase:
         'Empty Media data in processed tracker result',
@@ -1214,8 +1265,29 @@ results = [
       validationResult:
         'AniList returned null/empty Media for this alias',
       brokenCondition:
-        'AniList returned empty data'
+        reason
     });
+
+    const affectedUsers =
+      quarantineAnime(
+        userAnimeData,
+        sourceAnime.id,
+        reason
+      );
+
+    if (
+      affectedUsers.length
+    ) {
+      saveUserAnimes(
+        userAnimeData
+      );
+
+      await notifyAnimeQuarantinedUsers({
+        client,
+        affectedUsers,
+        reason
+      });
+    }
   }
 
   continue;
@@ -1792,6 +1864,42 @@ if (
             ? 'AniList validation failed'
             : 'Non-temporary validation error without Not Found'
       });
+
+      const shouldQuarantine =
+        retryErr.message === 'Retry returned empty media' ||
+        isAniListNotFoundError(
+          retryErr
+        );
+
+      if (
+        shouldQuarantine
+      ) {
+        const reason =
+          retryErr.message === 'Retry returned empty media'
+            ? 'AniList returned empty data'
+            : 'AniList validation failed';
+
+        const affectedUsers =
+          quarantineAnime(
+            userAnimeData,
+            brokenAnime.id,
+            reason
+          );
+
+        if (
+          affectedUsers.length
+        ) {
+          saveUserAnimes(
+            userAnimeData
+          );
+
+          await notifyAnimeQuarantinedUsers({
+            client,
+            affectedUsers,
+            reason
+          });
+        }
+      }
     }
   }
 }

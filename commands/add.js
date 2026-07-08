@@ -70,6 +70,10 @@ const {
 } = require('../utils/animeCacheService');
 
 const {
+  validateAniListAnimeById
+} = require('../utils/animeHealthValidation');
+
+const {
   handleTrailerAfterAdd
 } = require('../utils/trailerNotifications');
 
@@ -271,9 +275,58 @@ const mapping =
 
     // 🎯 MODE
 
+    const validation =
+      await validateAniListAnimeById(
+        anime.id
+      );
+
+    if (
+      validation.status === 'temporary'
+    ) {
+      return message.reply({
+        content:
+          [
+            'Nao consegui validar este anime na AniList agora.',
+            '',
+            'Isso parece ser um erro temporario da AniList/Cloudflare. Tente adicionar novamente em alguns minutos.',
+            '',
+            'Nenhum anime foi colocado em quarentena.'
+          ].join('\n'),
+        components: [
+          createAddNavigationRow()
+        ]
+      });
+    }
+
+    const finalAnime =
+      validation.status === 'valid'
+        ? {
+            ...anime,
+            ...validation.anime
+          }
+        : anime;
+
+    const quarantineFields =
+      validation.status === 'invalid'
+        ? {
+            invalid: true,
+            quarantined: true,
+            invalidReason:
+              validation.reason ||
+              'AniList validation failed',
+            quarantineReason:
+              validation.reason ||
+              'AniList validation failed',
+            invalidDetectedAt:
+              new Date().toISOString(),
+            quarantinedAt:
+              new Date().toISOString()
+          }
+        : {};
+
     const mode =
       getAnimeMode(
-        anime
+        finalAnime
       );
 
     // 💾 SAVE
@@ -284,9 +337,11 @@ const mapping =
 
       message.author.username,
 
-      anime,
+      finalAnime,
 
-      mode
+      mode,
+
+      quarantineFields
     );
 
     ensureUserProfile(
@@ -294,35 +349,48 @@ const mapping =
       message.author.username
     );
 
-    saveAnimeToCache(
-      anime
-    );
+    if (
+      validation.status === 'valid'
+    ) {
+      saveAnimeToCache(
+        finalAnime
+      );
+    }
 
-    await handleTrailerAfterAdd({
-      client:
-        message.client,
-      userId:
-        message.author.id,
-      username:
-        message.author.username,
-      anime,
-      guildId:
-        message.guild.id
-    });
+    if (
+      validation.status === 'valid'
+    ) {
+      await handleTrailerAfterAdd({
+        client:
+          message.client,
+        userId:
+          message.author.id,
+        username:
+          message.author.username,
+        anime:
+          finalAnime,
+        guildId:
+          message.guild.id
+      });
+    }
 
     // 📊 ANALYTICS
 
     registerSuccessfulAdd(
 
-      anime,
+      finalAnime,
 
       message.guild.id
     );
     // 🔄 PROVIDER SYNC
 
-syncAnimeProviders(
-  anime
-);
+if (
+  validation.status === 'valid'
+) {
+  syncAnimeProviders(
+    finalAnime
+  );
+}
 
     // 🎨 EMBED
 
@@ -333,13 +401,33 @@ syncAnimeProviders(
         guildId:
           message.guild.id,
 
-        anime,
+        anime:
+          finalAnime,
 
         mode,
 
         autoSelected:
           results.length > 1
       });
+
+    return message.reply({
+
+      content:
+        validation.status === 'invalid'
+          ? [
+              `⚠️ ${message.author.username} adicionou ${finalAnime.title} à lista pessoal, mas ele está em quarentena.`,
+              '',
+              `Motivo: ${validation.reason || 'AniList validation failed'}`,
+              'Este anime não será monitorado até ser reparado.'
+            ].join('\n')
+          : `✅ ${message.author.username} adicionou ${finalAnime.title} à lista pessoal.`,
+
+      embeds: [embed],
+
+      components: [
+        createAddNavigationRow()
+      ]
+    });
 
     return message.reply({
 

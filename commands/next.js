@@ -227,6 +227,20 @@ async function next(
       );
     }
 
+    const activeAnime =
+      userAnime.filter(anime =>
+        !anime.invalid &&
+        !anime.quarantined
+      );
+
+    if (
+      activeAnime.length === 0
+    ) {
+      return message.reply(
+        'Todos os seus animes estão temporariamente em quarentena e não podem ser consultados.'
+      );
+    }
+
     const userId =
       message.author?.id;
 
@@ -238,7 +252,7 @@ async function next(
     if (!allItems) {
       allItems =
         await fetchUpcomingEpisodes(
-          userAnime
+          activeAnime
         );
 
       if (userId) {
