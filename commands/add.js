@@ -106,6 +106,10 @@ const {
   '../utils/navigationButtons'
 );
 
+const {
+  createNotificationSettingsRow
+} = require('../utils/notificationSettings');
+
 async function add(
 
   message,
@@ -264,6 +268,9 @@ async function add(
       );
     }
 
+    const isFirstPersonalAnime =
+      animeList.length === 0;
+
 const mapping =
 
   registerAnimeMapping(
@@ -348,6 +355,35 @@ const mapping =
       message.author.id,
       message.author.username
     );
+
+    if (
+      isFirstPersonalAnime &&
+      message.client
+    ) {
+      try {
+        const user =
+          await message.client.users.fetch(
+            message.author.id
+          );
+
+        await user.send({
+          content:
+            'AnimeDBot usa DMs para enviar suas notificações pessoais. Você pode configurar essas notificações aqui.',
+          components: [
+            createNotificationSettingsRow({
+              userId:
+                message.author.id,
+              guildId:
+                message.guild.id
+            })
+          ]
+        });
+      } catch (err) {
+        console.log(
+          `Could not send notification settings DM to ${message.author.id}: ${err.message}`
+        );
+      }
+    }
 
     if (
       validation.status === 'valid'

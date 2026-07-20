@@ -142,5 +142,16 @@
   "season_end_already_in_list": "The sequel is already in your list.",
   "season_end_no_sequel": "I have not found an announced sequel yet.",
   "season_end_declined": "Sequel was not added.",
-  "season_end_no_pending_prompt": "This sequel prompt is no longer available."
+  "season_end_no_pending_prompt": "This sequel prompt is no longer available.",
+  "notification_settings_button": "Configure notifications",
+  "notification_settings_title": "AnimeDBot Notification Settings",
+  "notification_settings_language_label": "Notification language",
+  "notification_settings_choose": "Choose an option below.",
+  "notification_settings_language_button": "Language",
+  "notification_settings_close_button": "Close",
+  "notification_settings_language_select": "Choose a language",
+  "notification_settings_language_title": "Notification Language",
+  "notification_settings_language_description": "Choose the language AnimeDBot should use in your DMs.",
+  "notification_settings_language_updated": "Notification language updated successfully.",
+  "notification_settings_closed": "Notification settings closed."
 }

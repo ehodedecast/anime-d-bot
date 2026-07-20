@@ -24,6 +24,10 @@ const {
   saveAnimeToCache
 } = require('./animeCacheService');
 
+const {
+  createNotificationSettingsRow
+} = require('./notificationSettings');
+
 const SEASON_SEQUEL_ADD_PREFIX =
   'season_sequel_add';
 
@@ -371,6 +375,10 @@ async function sendSeasonEndPrompt({
           sequelId:
             sequel.id,
           guildId
+        }),
+        createNotificationSettingsRow({
+          userId,
+          guildId
         })
       ]
     });
@@ -409,7 +417,13 @@ async function sendSeasonEndPrompt({
           'season_end_no_sequel',
           guildId
         )
-      ].join('\n')
+      ].join('\n'),
+    components: [
+      createNotificationSettingsRow({
+        userId,
+        guildId
+      })
+    ]
   });
 
   if (

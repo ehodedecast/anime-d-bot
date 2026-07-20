@@ -67,6 +67,7 @@ function createWatchOpenRow({
   userId,
   animeId,
   episode,
+  url = null,
   guildId = null,
   userIdForLanguage = null,
   hasStreaming = true,
@@ -76,17 +77,11 @@ function createWatchOpenRow({
     new ActionRowBuilder();
 
   if (
-    hasStreaming
+    hasStreaming &&
+    isValidUrl(url)
   ) {
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId(
-          createWatchOpenCustomId({
-            userId,
-            animeId,
-            episode
-          })
-        )
         .setLabel(
           translate({
             guildId,
@@ -94,7 +89,8 @@ function createWatchOpenRow({
             key: 'watch_button'
           })
         )
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Link)
+        .setURL(url)
     );
   } else {
     row.addComponents(
@@ -132,6 +128,25 @@ function createWatchOpenRow({
         )
     );
   }
+
+  row.addComponents(
+    new ButtonBuilder()
+      .setCustomId(
+        createWatchDoneCustomId({
+          userId,
+          animeId,
+          episode
+        })
+      )
+      .setLabel(
+        translate({
+          guildId,
+          userIdForLanguage,
+          key: 'watched_button'
+        })
+      )
+      .setStyle(ButtonStyle.Success)
+  );
 
   return row;
 }

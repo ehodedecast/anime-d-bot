@@ -89,6 +89,16 @@ const {
 } = require('../utils/xpSystem');
 
 const {
+  NOTIFICATION_SETTINGS_BUTTON_ID,
+  NOTIFICATION_SETTINGS_CLOSE_ID,
+  NOTIFICATION_SETTINGS_LANGUAGE_ID,
+  NOTIFICATION_SETTINGS_LANGUAGE_SELECT_ID,
+  createLanguageSelectPanel,
+  createNotificationSettingsMessagePanel,
+  createNotificationSettingsPanel
+} = require('../utils/notificationSettings');
+
+const {
   getRetryAfterMs,
   isTemporaryAniListError
 } = require('../utils/anilistErrors');
@@ -573,6 +583,142 @@ module.exports = async (
     return handleAnimeModal(
       interaction,
       client
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${NOTIFICATION_SETTINGS_BUTTON_ID}:`
+    )
+  ) {
+    const targetUserId =
+      interaction.customId
+        .split(':')[1];
+
+    if (
+      targetUserId !== interaction.user.id
+    ) {
+      return interaction.reply({
+        content:
+          'Voce nao tem permissao para usar este botao.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    return interaction.reply(
+      createNotificationSettingsPanel(
+        interaction.user.id
+      )
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${NOTIFICATION_SETTINGS_LANGUAGE_ID}:`
+    )
+  ) {
+    const targetUserId =
+      interaction.customId
+        .split(':')[1];
+
+    if (
+      targetUserId !== interaction.user.id
+    ) {
+      return interaction.reply({
+        content:
+          'Voce nao tem permissao para usar este botao.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    return interaction.update(
+      createLanguageSelectPanel(
+        interaction.user.id
+      )
+    );
+  }
+
+  if (
+    interaction.customId?.startsWith(
+      `${NOTIFICATION_SETTINGS_CLOSE_ID}:`
+    )
+  ) {
+    const targetUserId =
+      interaction.customId
+        .split(':')[1];
+
+    if (
+      targetUserId !== interaction.user.id
+    ) {
+      return interaction.reply({
+        content:
+          'Voce nao tem permissao para usar este botao.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    return interaction.update(
+      createNotificationSettingsMessagePanel(
+        interaction.user.id,
+        'notification_settings_closed'
+      )
+    );
+  }
+
+  if (
+    interaction.isStringSelectMenu?.() &&
+    interaction.customId?.startsWith(
+      `${NOTIFICATION_SETTINGS_LANGUAGE_SELECT_ID}:`
+    )
+  ) {
+    const targetUserId =
+      interaction.customId
+        .split(':')[1];
+
+    if (
+      targetUserId !== interaction.user.id
+    ) {
+      return interaction.reply({
+        content:
+          'Voce nao tem permissao para usar este menu.',
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    const language =
+      normalizeLanguage(
+        interaction.values?.[0]
+      );
+
+    if (
+      !language
+    ) {
+      return interaction.reply({
+        content:
+          tUser(
+            interaction.user.id,
+            'language.invalid'
+          ),
+        flags:
+          MessageFlags.Ephemeral
+      });
+    }
+
+    setUserLanguage(
+      interaction.user.id,
+      interaction.user.username,
+      language
+    );
+
+    return interaction.update(
+      createNotificationSettingsMessagePanel(
+        interaction.user.id,
+        'notification_settings_language_updated'
+      )
     );
   }
 
@@ -1230,20 +1376,6 @@ module.exports = async (
           parsed.episode
       });
 
-    if (
-      !progress?.openedAt
-    ) {
-
-      return interaction.reply({
-        content:
-          tUser(
-            interaction.user.id,
-            'watch_first_required'
-          ),
-        flags: MessageFlags.Ephemeral
-      });
-    }
-
     const alreadyWatched =
       Boolean(
         progress?.watchedAt
@@ -1269,6 +1401,16 @@ module.exports = async (
         interaction.user.username
       );
     }
+
+    return interaction.reply({
+      content:
+        `✅ ${tUser(
+          interaction.user.id,
+          'watch_marked'
+        )}`,
+      flags:
+        MessageFlags.Ephemeral
+    });
 
     const watchTarget =
       getWatchTarget(

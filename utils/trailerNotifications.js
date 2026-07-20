@@ -30,6 +30,10 @@ const {
   tUser
 } = require('./language');
 
+const {
+  createNotificationSettingsRow
+} = require('./notificationSettings');
+
 function getAnimeTitle(anime) {
   return (
     anime?.title?.romaji ||
@@ -106,11 +110,19 @@ async function sendTrailerDm({
         targetUserId
       );
 
-    await user.send(
-      tUser(targetUserId, 'trailer_available', guildId)
-        .replace('{anime}', animeTitle) +
-      `\n\n${trailerUrl}`
-    );
+    await user.send({
+      content:
+        tUser(targetUserId, 'trailer_available', guildId)
+          .replace('{anime}', animeTitle) +
+        `\n\n${trailerUrl}`,
+      components: [
+        createNotificationSettingsRow({
+          userId:
+            targetUserId,
+          guildId
+        })
+      ]
+    });
 
     return true;
   } catch (err) {

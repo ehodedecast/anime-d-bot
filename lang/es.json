@@ -142,5 +142,16 @@
   "season_end_already_in_list": "La continuaci\u00f3n ya est\u00e1 en tu lista.",
   "season_end_no_sequel": "Todav\u00eda no encontr\u00e9 una continuaci\u00f3n anunciada.",
   "season_end_declined": "Continuaci\u00f3n no agregada.",
-  "season_end_no_pending_prompt": "Esta sugerencia de continuaci\u00f3n ya no est\u00e1 disponible."
+  "season_end_no_pending_prompt": "Esta sugerencia de continuaci\u00f3n ya no est\u00e1 disponible.",
+  "notification_settings_button": "Configurar notificaciones",
+  "notification_settings_title": "Configuraci\u00f3n de Notificaciones de AnimeDBot",
+  "notification_settings_language_label": "Idioma de las notificaciones",
+  "notification_settings_choose": "Elige una opci\u00f3n abajo.",
+  "notification_settings_language_button": "Idioma",
+  "notification_settings_close_button": "Cerrar",
+  "notification_settings_language_select": "Elige un idioma",
+  "notification_settings_language_title": "Idioma de las Notificaciones",
+  "notification_settings_language_description": "Elige el idioma que AnimeDBot debe usar en tus DMs.",
+  "notification_settings_language_updated": "Idioma de las notificaciones actualizado correctamente.",
+  "notification_settings_closed": "Configuraci\u00f3n de notificaciones cerrada."
 }

@@ -61,6 +61,11 @@ const {
 } = require('./seasonEndService');
 
 const {
+  createNotificationSettingsRow,
+  withNotificationSettingsButton
+} = require('./notificationSettings');
+
+const {
   getRetryAfterMs,
   isAniListNotFoundError,
   isTemporaryAniListError
@@ -315,15 +320,22 @@ async function notifyAnimeQuarantinedUsers({
           item.userId
         );
 
-      await user.send(
-        [
-          `⚠️ Anime em quarentena: ${item.anime.title}`,
-          '',
-          `Motivo: ${reason}`,
-          '',
-          'Este anime não será monitorado até ser reparado pelo AnimeDBot.'
-        ].join('\n')
-      );
+      await user.send({
+        content:
+          [
+            `⚠️ Anime em quarentena: ${item.anime.title}`,
+            '',
+            `Motivo: ${reason}`,
+            '',
+            'Este anime não será monitorado até ser reparado pelo AnimeDBot.'
+          ].join('\n'),
+        components: [
+          createNotificationSettingsRow({
+            userId:
+              item.userId
+          })
+        ]
+      });
     } catch (err) {
       console.log(
         chalk.yellow(
@@ -512,7 +524,11 @@ async function sendUserNotification({
       );
 
     await user.send(
-      payload
+      withNotificationSettingsButton({
+        payload,
+        userId,
+        guildId: null
+      })
     );
 
     return true;
@@ -1481,6 +1497,8 @@ const sent24h =
                       episode:
                         data.nextAiringEpisode
                           .episode,
+                      url:
+                        watchTarget.url,
                       guildId: null,
                       userIdForLanguage:
                         userId,

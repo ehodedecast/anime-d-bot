@@ -142,5 +142,16 @@
   "season_end_already_in_list": "A continua\u00e7\u00e3o j\u00e1 est\u00e1 na sua lista.",
   "season_end_no_sequel": "Ainda n\u00e3o encontrei uma continua\u00e7\u00e3o anunciada.",
   "season_end_declined": "Continua\u00e7\u00e3o n\u00e3o adicionada.",
-  "season_end_no_pending_prompt": "Esta sugest\u00e3o de continua\u00e7\u00e3o n\u00e3o est\u00e1 mais dispon\u00edvel."
+  "season_end_no_pending_prompt": "Esta sugest\u00e3o de continua\u00e7\u00e3o n\u00e3o est\u00e1 mais dispon\u00edvel.",
+  "notification_settings_button": "Configurar notifica\u00e7\u00f5es",
+  "notification_settings_title": "Configura\u00e7\u00f5es de Notifica\u00e7\u00f5es do AnimeDBot",
+  "notification_settings_language_label": "Idioma das notifica\u00e7\u00f5es",
+  "notification_settings_choose": "Escolha uma op\u00e7\u00e3o abaixo.",
+  "notification_settings_language_button": "Idioma",
+  "notification_settings_close_button": "Fechar",
+  "notification_settings_language_select": "Escolha um idioma",
+  "notification_settings_language_title": "Idioma das Notifica\u00e7\u00f5es",
+  "notification_settings_language_description": "Escolha o idioma que o AnimeDBot deve usar nas suas DMs.",
+  "notification_settings_language_updated": "Idioma das notifica\u00e7\u00f5es atualizado com sucesso.",
+  "notification_settings_closed": "Configura\u00e7\u00f5es de notifica\u00e7\u00f5es fechadas."
 }
